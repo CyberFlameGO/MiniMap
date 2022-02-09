@@ -1,0 +1,30 @@
+package net.pl3x.minimap.hardware;
+
+public class Key {
+    protected final Action action;
+
+    private int down = -1;
+
+    public Key(Action action) {
+        this.action = action;
+    }
+
+    public void press() {
+        if (++this.down == 0 || this.down > 5) {
+            this.action.execute();
+        }
+    }
+
+    public void release() {
+        this.down = -1;
+    }
+
+    public boolean pressed() {
+        return this.down > -1;
+    }
+
+    @FunctionalInterface
+    public interface Action {
+        void execute();
+    }
+}

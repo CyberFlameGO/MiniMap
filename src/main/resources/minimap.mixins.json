@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8.4",
+  "package": "net.pl3x.minimap.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "minimap.refmap.json",
+  "mixins": [
+    "MinecraftServerAccess",
+    "RenderPhaseMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

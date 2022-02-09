@@ -1,0 +1,56 @@
+{
+  "minimap.key.category": "MiniMap",
+  "minimap.key.map.open": "Open full screen map",
+  "minimap.key.minimap.zoom.out": "Minimap zoom out",
+  "minimap.key.minimap.zoom.in": "Minimap zoom in",
+
+  "minimap.sidebar.category.style": "Style",
+  "minimap.sidebar.category.position": "Position",
+  "minimap.sidebar.category.radar": "Radar",
+  "minimap.sidebar.category.waypoints": "Waypoints",
+  "minimap.sidebar.category.layers": "Layers",
+  "minimap.sidebar.category.clock": "Clock",
+  "minimap.sidebar.category.about": "About",
+
+  "minimap.fullmap.options": "Settings",
+  "minimap.fullmap.options.tooltip": "Configure MiniMap options",
+
+  "minimap.options.title": "MiniMap Options",
+
+  "minimap.options.minimap.enabled": "Minimap Enabled",
+  "minimap.options.minimap.enabled.tooltip": "Toggle the minimap on/off",
+
+  "minimap.options.minimap.north-locked": "Map North Locked",
+  "minimap.options.minimap.north-locked.tooltip": "Sets if the minimap should lock with the north position facing up",
+
+  "minimap.options.minimap.frame": "Show Frame",
+  "minimap.options.minimap.frame.tooltip": "Shows frame around the minimap",
+
+  "minimap.options.minimap.circular": "Circular Map",
+  "minimap.options.minimap.circular.tooltip": "Choose between circular and square minimap shapes",
+
+  "minimap.options.minimap.directions": "Show Cardinal Directions",
+  "minimap.options.minimap.directions.tooltip": "Shows the cardinal directions around the minimap",
+
+  "minimap.options.minimap.bottom-text": "Show Bottom Text",
+  "minimap.options.minimap.bottom-text.tooltip": "Shows text below the minimap\n\n{x} for x cord\n{y} for y cord\n{z} for z cord\n{biome} for biome\n{clock} for clock",
+
+  "minimap.options.minimap.clock-type": "Clock Type",
+  "minimap.options.minimap.clock-type.tooltip": "Specify clock type",
+  "minimap.options.minimap.clock-type.real-time": "Real Time",
+  "minimap.options.minimap.clock-type.world-time": "World Time",
+
+  "minimap.options.minimap.clock-format": "Clock Format",
+  "minimap.options.minimap.clock-format.tooltip": "Set the clock format\n\nHH for 00-23 hours\nhh for 1-12 hours\nmm for minutes\na for AM/PM",
+
+  "minimap.options.minimap.update-interval": "Update Interval",
+  "minimap.options.minimap.update-interval.tooltip": "How many ticks between texture updates\n\nNote: Lower values may cause lag",
+
+  "minimap.options.minimap.position": "Position, Size, Zoom",
+  "minimap.options.minimap.position.tooltip": "Set the position, size, and zoom of the minimap",
+  "minimap.options.minimap.position.error": "Error loading minimap...",
+
+  "minimap.options.minimap.position.size": "Size: %s Zoom: %s",
+  "minimap.options.minimap.position.center": "Position: %s, %s",
+  "minimap.options.minimap.position.help": "Drag the minimap to position\nMouse wheel to zoom\nCTRL + mouse wheel to resize\nPress ESC when done"
+}

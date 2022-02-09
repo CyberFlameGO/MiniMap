@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "minimap",
+  "version": "${version}",
+  "name": "MiniMap",
+  "description": "MiniMap for Fabric clients",
+  "authors": [
+    "BillyGalbreath"
+  ],
+  "contact": {
+    "homepage": "https://github.com/BillyGalbreath/MiniMap/",
+    "sources": "https://github.com/BillyGalbreath/MiniMap/",
+    "issues": "https://github.com/BillyGalbreath/MiniMap/issues/"
+  },
+  "license": "MIT",
+  "icon": "assets/minimap/textures/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "net.pl3x.minimap.MiniMapClientInitializer"
+    ],
+    "modmenu": [
+      "net.pl3x.minimap.gui.ModMenu"
+    ]
+  },
+  "mixins": [
+    "minimap.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.12.12",
+    "fabric": "*",
+    "minecraft": "1.18.1"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.gg/mtAAnkk"
+      }
+    }
+  }
+}

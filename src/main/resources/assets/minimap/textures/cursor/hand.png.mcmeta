@@ -1,0 +1,16 @@
+{
+  "cursor": {
+    "size": {
+      "width": 32,
+      "height": 32
+    },
+    "hotspot": {
+      "x": 3,
+      "y": 3
+    },
+    "animation": {
+      "frames": 9,
+      "frametime": 1
+    }
+  }
+}
