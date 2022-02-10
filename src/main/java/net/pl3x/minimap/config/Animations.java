@@ -2,7 +2,6 @@ package net.pl3x.minimap.config;
 
 import net.pl3x.minimap.gui.animation.Easing;
 
-@SuppressWarnings("CanBeFinal")
 public class Animations {
     public boolean enabled = true;
     public boolean tweening = true;
@@ -13,6 +12,7 @@ public class Animations {
         public Easing.Func firstOpen = Easing.Back.out;
 
         public Easing.Func iconSlideIn = Easing.Back.out;
+        public Easing.Func iconSlideOut = Easing.Back.out;
 
         public Easing.Func colorHoverOn = Easing.Cubic.out;
         public Easing.Func colorHoverOff = Easing.Cubic.out;

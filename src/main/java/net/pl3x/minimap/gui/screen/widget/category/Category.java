@@ -4,6 +4,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
+import net.pl3x.minimap.config.Config;
+import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.Icon;
 import net.pl3x.minimap.gui.animation.sidebar.ColorHover;
 import net.pl3x.minimap.gui.animation.sidebar.IconSlideIn;
@@ -17,7 +19,7 @@ public abstract class Category extends AnimatedWidget {
     public static final int DEFAULT_COLOR = 0xAAFFFFFF;
     public static final int HOVER_COLOR = 0xFF3399FF;
 
-    private final Sidebar sidebar;
+    public final Sidebar sidebar;
 
     public final Icon icon;
     public final float iconSize;
@@ -53,6 +55,10 @@ public abstract class Category extends AnimatedWidget {
     }
 
     @Override
+    public void init() {
+    }
+
+    @Override
     public float width() {
         return parent().width();
     }
@@ -60,10 +66,13 @@ public abstract class Category extends AnimatedWidget {
     @Override
     public void render(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
         super.render(matrixStack, mouseX, mouseY, delta);
-
         renderIcon(matrixStack);
-
         renderLabel(matrixStack);
+        renderContent(matrixStack);
+        if (hovered()) {
+            // todo on hover icon/label only
+            Mouse.INSTANCE.cursor(Cursor.HAND);
+        }
     }
 
     public void renderIcon(MatrixStack matrixStack) {
@@ -85,22 +94,36 @@ public abstract class Category extends AnimatedWidget {
         }
     }
 
-    @Override
-    public void updateMouseState(float mouseX, float mouseY) {
-        super.updateMouseState(mouseX, mouseY);
-        if (hovered()) {
-            Mouse.INSTANCE.cursor(Cursor.HAND);
-        }
+    public void renderContent(MatrixStack matrixStack) {
+        //
     }
 
     @Override
     public void onHoverChange() {
-        this.colorHoverAnimation.hover(hovered());
+        //this.colorHoverAnimation.hover(hovered());
+        updateTabColor();
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        this.sidebar.toggleAnimation.toggleOpen();
-        return true;
+        if (hovered()) {
+            if (this.sidebar.openedCategory != this) {
+                this.sidebar.openedCategory = this;
+                this.sidebar.open(GL.width());
+            } else {
+                this.sidebar.close(false);
+            }
+            this.sidebar.updateTabColors();
+            return true;
+        }
+        return false;
+    }
+
+    public void updateTabColor() {
+        if (hovered() || this.sidebar.openedCategory == this) {
+            this.colorHoverAnimation.set(HOVER_COLOR, Config.getConfig().animations.sidebar.colorHoverOn);
+        } else {
+            this.colorHoverAnimation.set(DEFAULT_COLOR, Config.getConfig().animations.sidebar.colorHoverOff);
+        }
     }
 }

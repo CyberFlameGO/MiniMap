@@ -1,7 +1,9 @@
 package net.pl3x.minimap.gui.screen.widget;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.pl3x.minimap.MiniMap;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class Widget {
     private final Widget parent;
@@ -21,6 +23,10 @@ public abstract class Widget {
         this.y = y;
         this.width = width;
         this.height = height;
+    }
+
+    public MinecraftClient client() {
+        return MiniMap.CLIENT;
     }
 
     public Widget parent() {
@@ -70,6 +76,9 @@ public abstract class Widget {
         updateMouseState(mouseX, mouseY);
     }
 
+    public void tick() {
+    }
+
     public void updateMouseState(float mouseX, float mouseY) {
         // check if mouse is hovering this widget
         this.hovered = mouseX >= x() && mouseX <= x() + width() && mouseY >= y() && mouseY <= y() + height();
@@ -85,6 +94,10 @@ public abstract class Widget {
     }
 
     protected boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return false;
+    }
+
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         return false;
     }
 }

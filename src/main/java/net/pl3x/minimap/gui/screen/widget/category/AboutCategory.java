@@ -10,7 +10,6 @@ public class AboutCategory extends Category {
         super(sidebar, x, y, delay, Lang.CATEGORY_ABOUT, Icon.ABOUT, size);
     }
 
-    public void render(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
-        super.render(matrixStack, mouseX, mouseY, delta);
+    public void renderContent(MatrixStack matrixStack) {
     }
 }

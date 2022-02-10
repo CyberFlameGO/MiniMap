@@ -28,6 +28,13 @@ public class ColorHover extends Animation {
         this.category.color = animateARGB(this.start, this.end, step, this.easingFunc);
     }
 
+    public void set(int color, Easing.Func easingFunc) {
+        this.easingFunc = easingFunc;
+        this.start = this.category.color;
+        this.end = color;
+        this.deltaSum = 0.0F;
+    }
+
     public void hover(boolean hovered) {
         this.easingFunc = hovered ? Config.getConfig().animations.sidebar.colorHoverOn : Config.getConfig().animations.sidebar.colorHoverOff;
         this.start = this.category.color;

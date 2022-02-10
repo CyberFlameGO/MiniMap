@@ -70,15 +70,15 @@ public class Easing {
         private static final float s = 1.70158f;
         private static final float s2 = 2.5949095f;
 
-        private static float in(float t) {
+        public static float in(float t) {
             return t * t * ((s + 1f) * t - s);
         }
 
-        private static float out(float t) {
+        public static float out(float t) {
             return (t -= 1f) * t * ((s + 1f) * t + s) + 1f;
         }
 
-        private static float inOut(float t) {
+        public static float inOut(float t) {
             if ((t *= 2f) < 1f) return 0.5f * (t * t * ((s2 + 1f) * t - s2));
             return 0.5f * ((t -= 2f) * t * ((s2 + 1f) * t + s2) + 2f);
         }
@@ -281,11 +281,8 @@ public class Easing {
         }
     }
 
-    public static class Func {
+    public record Func(String name, Easing.Func.EasingFunc func) {
         private static final Map<String, Func> BY_NAME = new HashMap<>();
-
-        private final String name;
-        private final Easing.Func.EasingFunc func;
 
         public Func(String name, EasingFunc func) {
             this.name = name;

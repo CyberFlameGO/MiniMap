@@ -13,7 +13,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 
-@SuppressWarnings("CanBeFinal")
 public class Config {
     public boolean enabled = true;
     public boolean northLocked = false;

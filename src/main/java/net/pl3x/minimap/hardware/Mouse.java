@@ -1,8 +1,8 @@
 package net.pl3x.minimap.hardware;
 
-import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.pl3x.minimap.MiniMap;
+import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.texture.Cursor;
 import org.lwjgl.glfw.GLFW;
 
@@ -19,12 +19,18 @@ public class Mouse {
     private boolean cursorEnabled;
     private boolean cursorRender;
 
-    private final Window window;
     private boolean windowFocused;
     private boolean windowHovered;
 
     private Mouse() {
-        this.window = MiniMap.CLIENT.getWindow();
+    }
+
+    public void initialize() {
+        // todo?
+    }
+
+    private long handle() {
+        return MiniMap.CLIENT.getWindow().getHandle();
     }
 
     public float x() {
@@ -53,7 +59,7 @@ public class Mouse {
     }
 
     public void update() {
-        GLFW.glfwGetCursorPos(MiniMap.CLIENT.getWindow().getHandle(), this.rawX, this.rawY);
+        GLFW.glfwGetCursorPos(handle(), this.rawX, this.rawY);
 
         this.mouseX = (float) rawX[0];
         this.mouseY = (float) rawY[0];
@@ -65,7 +71,7 @@ public class Mouse {
             }
         }
 
-        this.windowHovered = x() >= 0 && x() < this.window.getWidth() && y() >= 0 && y() < this.window.getHeight();
+        this.windowHovered = x() >= 0 && x() < GL.width() && y() >= 0 && y() < GL.height();
     }
 
     public void render(MatrixStack matrixStack, float delta) {
@@ -79,6 +85,6 @@ public class Mouse {
             cursor(null);
         }
         this.cursorRender = cursorRender;
-        GLFW.glfwSetInputMode(this.window.getHandle(), GLFW.GLFW_CURSOR, cursorRender ? GLFW.GLFW_CURSOR_HIDDEN : GLFW.GLFW_CURSOR_NORMAL);
+        GLFW.glfwSetInputMode(handle(), GLFW.GLFW_CURSOR, cursorRender ? GLFW.GLFW_CURSOR_HIDDEN : GLFW.GLFW_CURSOR_NORMAL);
     }
 }
