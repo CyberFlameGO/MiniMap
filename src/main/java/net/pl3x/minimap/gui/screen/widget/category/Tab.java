@@ -164,7 +164,7 @@ public class Tab extends AnimatedWidget {
         if (hovered()) {
             this.colorHoverAnimation.set(HOVER_COLOR, Config.getConfig().animations.sidebar.colorHoverOn);
         } else if (category().sidebar().openedCategory() == category()) {
-            this.colorHoverAnimation.set(ACTIVE_COLOR, Config.getConfig().animations.sidebar.colorActive);
+            this.colorHoverAnimation.set(ACTIVE_COLOR, Config.getConfig().animations.sidebar.colorHoverOff);
         } else {
             this.colorHoverAnimation.set(DEFAULT_COLOR, Config.getConfig().animations.sidebar.colorHoverOff);
         }

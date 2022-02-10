@@ -153,6 +153,7 @@ public class Sidebar extends AnimatedWidget {
             GL.drawSolidRect(matrixStack, HOVER_WIDTH, 0F, HOVER_WIDTH + 1F, height(), 0xBB000000);
         }
 
+        /*
         // todo - mask these circles to create a circle line
         int radius = 64;
 
@@ -166,6 +167,7 @@ public class Sidebar extends AnimatedWidget {
 
         // :O!!! lines!!
         GL.drawLine(matrixStack, 200F, 150F, 350F, 250F, 5.5F, 0x88ff0000);
+        */
     }
 
     @Override
@@ -237,6 +239,7 @@ public class Sidebar extends AnimatedWidget {
         this.state = State.CLOSED;
         this.width(0F);
         this.categories.clear();
+        children().clear();
     }
 
     public enum State {

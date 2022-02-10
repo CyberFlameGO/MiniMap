@@ -16,7 +16,6 @@ public class Animations {
 
         public Easing.Func colorHoverOn = Easing.Cubic.out;
         public Easing.Func colorHoverOff = Easing.Cubic.out;
-        public Easing.Func colorActive = Easing.Cubic.out;
 
         public Easing.Func toggleHoverOn = Easing.Back.out;
         public Easing.Func toggleHoverOff = Easing.Back.in;
