@@ -38,7 +38,7 @@ public abstract class Widget {
     }
 
     public void init() {
-        this.children.forEach(Widget::init);
+        children().forEach(Widget::init);
     }
 
     public float x() {
@@ -83,7 +83,7 @@ public abstract class Widget {
 
     public void render(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
         updateMouseState(mouseX, mouseY);
-        this.children.forEach(widget -> widget.render(matrixStack, mouseX, mouseY, delta));
+        children().forEach(widget -> widget.render(matrixStack, mouseX, mouseY, delta));
     }
 
     public void tick() {
@@ -96,15 +96,13 @@ public abstract class Widget {
             onHoverChange();
             this.wasHovered = this.hovered;
         }
-
-        // check if mouse clicked this widget
     }
 
     public void onHoverChange() {
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        for (Widget widget : this.children) {
+        for (Widget widget : children()) {
             if (widget.mouseClicked(mouseX, mouseY, button)) {
                 return true;
             }
@@ -113,7 +111,7 @@ public abstract class Widget {
     }
 
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        for (Widget widget : this.children) {
+        for (Widget widget : children()) {
             if (widget.keyPressed(keyCode, scanCode, modifiers)) {
                 return true;
             }

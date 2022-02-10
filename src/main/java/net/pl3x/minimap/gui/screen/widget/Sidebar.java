@@ -152,22 +152,6 @@ public class Sidebar extends AnimatedWidget {
         if (this.openedCategory != null && this.width() > HOVER_WIDTH) {
             GL.drawSolidRect(matrixStack, HOVER_WIDTH, 0F, HOVER_WIDTH + 1F, height(), 0xBB000000);
         }
-
-        /*
-        // todo - mask these circles to create a circle line
-        int radius = 64;
-
-        //RenderSystem.blendFuncSeparate(GL11.GL_ZERO, GL11.GL_ONE, GL11.GL_SRC_COLOR, GL11.GL_ZERO);
-        GL.drawSolidCirc(matrixStack, 300F, 200F, radius, 0xff000000);
-
-        //RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_COLOR);
-        GL.drawSolidCirc(matrixStack, 350F, 250F, radius, 0xffffffff);
-
-        //RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-        // :O!!! lines!!
-        GL.drawLine(matrixStack, 200F, 150F, 350F, 250F, 5.5F, 0x88ff0000);
-        */
     }
 
     @Override
