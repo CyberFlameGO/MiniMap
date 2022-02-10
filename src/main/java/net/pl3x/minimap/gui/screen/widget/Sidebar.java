@@ -36,8 +36,8 @@ public class Sidebar extends AnimatedWidget {
     private final List<Category> categories = new ArrayList<>();
     private final SidebarAnimation sidebarAnimation;
 
-    public Category openedCategory;
-    public State state;
+    private Category openedCategory;
+    private State state;
 
     public Sidebar() {
         super(null, 0, 0, 0, 0);
@@ -46,6 +46,22 @@ public class Sidebar extends AnimatedWidget {
         addAnimation(this.sidebarAnimation);
 
         HudRenderCallback.EVENT.register(this::render);
+    }
+
+    public Category openedCategory() {
+        return this.openedCategory;
+    }
+
+    public void openedCategory(Category category) {
+        this.openedCategory = category;
+    }
+
+    public State state() {
+        return this.state;
+    }
+
+    public void state(State state) {
+        this.state = state;
     }
 
     @Override
@@ -65,6 +81,7 @@ public class Sidebar extends AnimatedWidget {
                     new ClockCategory(this, 0, 270, 7.5F, 32),
                     new AboutCategory(this, 0, 320, 9.0F, 32)
             ));
+            children().addAll(this.categories);
         }
 
         if (client().currentScreen instanceof OverlayScreen overlayScreen) {
@@ -125,10 +142,13 @@ public class Sidebar extends AnimatedWidget {
 
     @Override
     public void render(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
-        super.render(matrixStack, mouseX, mouseY, delta);
-
+        // draw background
         GL.drawSolidRect(matrixStack, 0, 0, width(), height(), 0x99000000, 0xBB000000);
 
+        // draw children on top of background
+        super.render(matrixStack, mouseX, mouseY, delta);
+
+        // draw fancy separator line
         if (this.openedCategory != null && this.width() > HOVER_WIDTH) {
             GL.drawSolidRect(matrixStack, HOVER_WIDTH, 0, HOVER_WIDTH + 1, height(), 0xBB000000);
         }
@@ -146,8 +166,6 @@ public class Sidebar extends AnimatedWidget {
 
         // :O!!! lines!!
         GL.drawLine(matrixStack, 200, 150, 350, 250, 5.5f, 0x88ff0000);
-
-        this.categories.forEach(category -> category.render(matrixStack, mouseX, mouseY, delta));
     }
 
     @Override
@@ -158,16 +176,6 @@ public class Sidebar extends AnimatedWidget {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        for (Category category : this.categories) {
-            if (category.mouseClicked(mouseX, mouseY, button)) {
-                return true;
-            }
-        }
-        return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             if (this.state == State.OPENED) {
@@ -175,11 +183,11 @@ public class Sidebar extends AnimatedWidget {
                 return true;
             }
         }
-        return false;
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     public void updateTabColors() {
-        this.categories.forEach(Category::updateTabColor);
+        this.categories.forEach(category -> category.tab().updateTabColor());
     }
 
     public void close(boolean fully) {
@@ -188,7 +196,7 @@ public class Sidebar extends AnimatedWidget {
             this.state = State.CLOSED;
             this.sidebarAnimation.setWidth(0.0F);
             this.sidebarAnimation.func = Easing.Back.out;//Config.getConfig().animations.sidebar.firstOpen;
-            this.categories.forEach(category -> category.addAnimation(new IconSlideOut(category)));
+            this.categories.forEach(category -> category.tab().addAnimation(new IconSlideOut(category.tab())));
             this.sidebarAnimation.easeSpeed = 7.5F;
         } else {
             if (hovered()) {

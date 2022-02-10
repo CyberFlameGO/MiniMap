@@ -25,8 +25,8 @@ public class SidebarAnimation extends Animation {
     @Override
     public void tick(float delta) {
         // update state
-        if (this.sidebar.state != this.state) {
-            this.state = this.sidebar.state;
+        if (this.sidebar.state() != this.state) {
+            this.state = this.sidebar.state();
             setWidth(switch (this.state) {
                 case NOT_HOVERED -> Sidebar.DEFAULT_WIDTH;
                 case HOVERED -> Sidebar.HOVER_WIDTH;

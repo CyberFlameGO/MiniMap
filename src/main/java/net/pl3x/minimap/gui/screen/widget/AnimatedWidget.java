@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AnimatedWidget extends Widget {
-    protected final List<Animation> animations = new ArrayList<>();
+    private final List<Animation> animations = new ArrayList<>();
 
     public AnimatedWidget(Widget parent, float x, float y, float width, float height) {
         super(parent, x, y, width, height);
