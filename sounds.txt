@@ -2,6 +2,4 @@ List of sounds used and their licenses/attributions
 
 All sounds converted to OGG using https://convertio.co/
 
-whoosh.ogg
-    https://www.zapsplat.com/music/ui-computer-screen-window-expand-maximise-short-swipe-whoosh-1/
-    “Sound effects obtained from https://www.zapsplat.com“
+whoosh.ogg - https://www.zapsplat.com/music/ui-computer-screen-window-expand-maximise-short-swipe-whoosh-1
