@@ -1,4 +1,4 @@
-package net.pl3x.minimap.gui.screen.widget;
+package net.pl3x.minimap.gui.screen.widget.category;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.OrderedText;
@@ -10,11 +10,12 @@ import net.pl3x.minimap.gui.Icon;
 import net.pl3x.minimap.gui.animation.sidebar.ColorHover;
 import net.pl3x.minimap.gui.animation.sidebar.IconSlideIn;
 import net.pl3x.minimap.gui.font.Font;
-import net.pl3x.minimap.gui.screen.widget.category.Category;
+import net.pl3x.minimap.gui.screen.widget.AnimatedWidget;
+import net.pl3x.minimap.gui.screen.widget.Sidebar;
 import net.pl3x.minimap.gui.texture.Cursor;
 import net.pl3x.minimap.hardware.Mouse;
 
-public class CategoryTab extends AnimatedWidget {
+public class Tab extends AnimatedWidget {
     public static final int DEFAULT_COLOR = 0xAAFFFFFF;
     public static final int HOVER_COLOR = 0xFF3399FF;
     public static final int ACTIVE_COLOR = 0xFFFF9933;
@@ -33,7 +34,7 @@ public class CategoryTab extends AnimatedWidget {
     private final ColorHover colorHoverAnimation;
     private int color;
 
-    public CategoryTab(Category category, float x, float y, float delay, Text text, Icon icon, float iconSize) {
+    public Tab(Category category, float x, float y, float delay, Text text, Icon icon, float iconSize) {
         super(category, x, y, 0, iconSize);
 
         this.category = category;
@@ -48,7 +49,7 @@ public class CategoryTab extends AnimatedWidget {
         textY(y + 5);
 
         this.colorHoverAnimation = new ColorHover(this);
-        color(CategoryTab.DEFAULT_COLOR);
+        color(Tab.DEFAULT_COLOR);
 
         addAnimation(new IconSlideIn(this, this.iconX, x + 5, delay));
         addAnimation(this.colorHoverAnimation);

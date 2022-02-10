@@ -4,18 +4,17 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.pl3x.minimap.gui.Icon;
 import net.pl3x.minimap.gui.screen.widget.AnimatedWidget;
-import net.pl3x.minimap.gui.screen.widget.CategoryTab;
 import net.pl3x.minimap.gui.screen.widget.Sidebar;
 
 public abstract class Category extends AnimatedWidget {
     private final Sidebar sidebar;
-    private final CategoryTab tab;
+    private final Tab tab;
 
     public Category(Sidebar sidebar, float x, float y, float delay, Text text, Icon icon, float iconSize) {
         super(sidebar, x, y, sidebar.width(), iconSize);
 
         this.sidebar = sidebar;
-        this.tab = new CategoryTab(this, x, y, delay, text, icon, iconSize);
+        this.tab = new Tab(this, x, y, delay, text, icon, iconSize);
 
         children().add(this.tab);
     }
@@ -24,7 +23,7 @@ public abstract class Category extends AnimatedWidget {
         return this.sidebar;
     }
 
-    public CategoryTab tab() {
+    public Tab tab() {
         return this.tab;
     }
 

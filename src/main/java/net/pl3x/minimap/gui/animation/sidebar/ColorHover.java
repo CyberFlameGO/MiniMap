@@ -2,20 +2,21 @@ package net.pl3x.minimap.gui.animation.sidebar;
 
 import net.pl3x.minimap.gui.animation.Animation;
 import net.pl3x.minimap.gui.animation.Easing;
-import net.pl3x.minimap.gui.screen.widget.CategoryTab;
+import net.pl3x.minimap.gui.screen.widget.category.Tab;
 
 public class ColorHover extends Animation {
-    private final CategoryTab tab;
+    private final Tab tab;
 
-    private int start = CategoryTab.DEFAULT_COLOR;
-    private int end = CategoryTab.DEFAULT_COLOR;
+    private int start = Tab.DEFAULT_COLOR;
+    private int end = Tab.DEFAULT_COLOR;
 
     public Easing.Func easingFunc;
 
-    public ColorHover(CategoryTab tab) {
+    public ColorHover(Tab tab) {
         this.tab = tab;
     }
 
+    @Override
     public void tick(float delta) {
         // check if animation needed
         if (this.tab.color() == this.end) {

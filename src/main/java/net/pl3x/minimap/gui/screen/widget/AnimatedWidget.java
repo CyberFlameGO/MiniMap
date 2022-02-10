@@ -13,6 +13,7 @@ public abstract class AnimatedWidget extends Widget {
         super(parent, x, y, width, height);
     }
 
+    @Override
     public void render(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
         super.render(matrixStack, mouseX, mouseY, delta);
         tickAnimations(delta);

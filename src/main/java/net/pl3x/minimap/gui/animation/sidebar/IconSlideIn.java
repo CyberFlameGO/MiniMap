@@ -2,21 +2,22 @@ package net.pl3x.minimap.gui.animation.sidebar;
 
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.animation.Animation;
-import net.pl3x.minimap.gui.screen.widget.CategoryTab;
+import net.pl3x.minimap.gui.screen.widget.category.Tab;
 
 public class IconSlideIn extends Animation {
-    private final CategoryTab tab;
+    private final Tab tab;
     private final float start;
     private final float end;
     private float delay;
 
-    public IconSlideIn(CategoryTab tab, float start, float end, float delay) {
+    public IconSlideIn(Tab tab, float start, float end, float delay) {
         this.tab = tab;
         this.start = start;
         this.end = end;
         this.delay = delay;
     }
 
+    @Override
     public void tick(float delta) {
         // wait for delay
         if ((this.delay -= delta) > 0.0F) {
