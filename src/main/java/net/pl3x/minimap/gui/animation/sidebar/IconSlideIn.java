@@ -25,8 +25,8 @@ public class IconSlideIn extends Animation {
         }
 
         // step each frame
-        float step = Math.min((this.deltaSum += delta) / 6F, 1F);
-        this.tab.iconX(animate(this.start, this.end, step, Config.getConfig().animations.sidebar.iconSlideIn));
+        float step = Math.min((this.deltaSum += delta) / 8F, 1F);
+        this.tab.iconX(animate(this.start, this.end, step, Config.getConfig().animations.sidebar.firstOpen));
 
         // check if finished
         if (this.tab.iconX() == this.end) {

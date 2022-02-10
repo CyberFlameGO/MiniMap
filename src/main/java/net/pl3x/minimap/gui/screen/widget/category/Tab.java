@@ -150,7 +150,7 @@ public class Tab extends AnimatedWidget {
         if (hovered()) {
             if (category().sidebar().openedCategory() != category()) {
                 category().sidebar().openedCategory(category());
-                category().sidebar().open(GL.width());
+                category().sidebar().open();
             } else {
                 category().sidebar().close(false);
             }

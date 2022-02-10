@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.util.math.MatrixStack;
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.GL;
-import net.pl3x.minimap.gui.animation.Easing;
 import net.pl3x.minimap.gui.animation.sidebar.IconSlideOut;
 import net.pl3x.minimap.gui.animation.sidebar.SidebarAnimation;
 import net.pl3x.minimap.gui.font.Font;
@@ -86,12 +85,14 @@ public class Sidebar extends AnimatedWidget {
 
         if (client().currentScreen instanceof OverlayScreen overlayScreen) {
             if (this.state == State.OPENED) {
+                // fix width when fully open and screen size changes
                 this.sidebarAnimation.setWidth(overlayScreen.width(), false);
             } else {
-                this.state = State.NOT_HOVERED;
-                this.sidebarAnimation.setWidth(Sidebar.DEFAULT_WIDTH);
-                this.sidebarAnimation.func = Easing.Back.out;//Config.getConfig().animations.sidebar.toggleClose;
+                // set initial state
+                this.state = hovered() ? State.HOVERED : State.NOT_HOVERED;
+                this.sidebarAnimation.func = Config.getConfig().animations.sidebar.firstOpen;
                 this.sidebarAnimation.easeSpeed = 7.5F;
+                Sound.WHOOSH.play();
             }
         }
     }
@@ -176,23 +177,24 @@ public class Sidebar extends AnimatedWidget {
         this.categories.forEach(category -> category.tab().updateTabColor());
     }
 
+    public void open() {
+        this.state = State.OPENED;
+        this.sidebarAnimation.func = Config.getConfig().animations.sidebar.toggleOpen;
+        this.sidebarAnimation.easeSpeed = 20F;
+    }
+
     public void close(boolean fully) {
         this.openedCategory = null;
         if (fully) {
             this.state = State.CLOSED;
-            this.sidebarAnimation.setWidth(0F);
-            this.sidebarAnimation.func = Easing.Back.out;//Config.getConfig().animations.sidebar.firstOpen;
+            this.sidebarAnimation.func = Config.getConfig().animations.sidebar.fullyClose;
+            this.sidebarAnimation.easeSpeed = 10F;
+            // slide the tab icons out, too
             this.categories.forEach(category -> category.tab().addAnimation(new IconSlideOut(category.tab())));
-            this.sidebarAnimation.easeSpeed = 7.5F;
+            Sound.WHOOSH.play();
         } else {
-            if (hovered()) {
-                this.state = State.HOVERED;
-                this.sidebarAnimation.setWidth(Sidebar.HOVER_WIDTH);
-            } else {
-                this.state = State.NOT_HOVERED;
-                this.sidebarAnimation.setWidth(Sidebar.DEFAULT_WIDTH);
-            }
-            this.sidebarAnimation.func = Easing.Bounce.out;//Config.getConfig().animations.sidebar.toggleClose;
+            this.state = hovered() ? State.HOVERED : State.NOT_HOVERED;
+            this.sidebarAnimation.func = Config.getConfig().animations.sidebar.toggleClose;
             this.sidebarAnimation.easeSpeed = 20F;
         }
         this.updateTabColors();
@@ -201,22 +203,13 @@ public class Sidebar extends AnimatedWidget {
     public void hover(boolean hover) {
         if (hover) {
             this.state = State.HOVERED;
-            this.sidebarAnimation.setWidth(Sidebar.HOVER_WIDTH);
-            this.sidebarAnimation.func = Easing.Elastic.out;//Config.getConfig().animations.sidebar.toggleHoverOn;
+            this.sidebarAnimation.func = Config.getConfig().animations.sidebar.toggleHoverOn;
         } else {
             this.state = State.NOT_HOVERED;
-            this.sidebarAnimation.setWidth(Sidebar.DEFAULT_WIDTH);
-            this.sidebarAnimation.func = Easing.Quintic.out;//Config.getConfig().animations.sidebar.toggleHoverOff;
+            this.sidebarAnimation.func = Config.getConfig().animations.sidebar.toggleHoverOff;
         }
-        this.sidebarAnimation.easeSpeed = 7.5F;
+        this.sidebarAnimation.easeSpeed = 10F;
         Sound.WHOOSH.play();
-    }
-
-    public void open(float width) {
-        this.state = State.OPENED;
-        this.sidebarAnimation.setWidth(width);
-        this.sidebarAnimation.func = Config.getConfig().animations.sidebar.toggleOpen;
-        this.sidebarAnimation.easeSpeed = 20F;
     }
 
     public void resetState() {

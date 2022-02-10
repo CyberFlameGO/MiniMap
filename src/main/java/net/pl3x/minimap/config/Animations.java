@@ -10,17 +10,15 @@ public class Animations {
 
     public static class Sidebar {
         public Easing.Func firstOpen = Easing.Back.out;
+        public Easing.Func fullyClose = Easing.Cubic.out;
 
-        public Easing.Func iconSlideIn = Easing.Back.out;
-        public Easing.Func iconSlideOut = Easing.Back.out;
-
-        public Easing.Func colorHoverOn = Easing.Cubic.out;
-        public Easing.Func colorHoverOff = Easing.Cubic.out;
-
-        public Easing.Func toggleHoverOn = Easing.Back.out;
-        public Easing.Func toggleHoverOff = Easing.Back.in;
+        public Easing.Func toggleHoverOn = Easing.Elastic.out;
+        public Easing.Func toggleHoverOff = Easing.Quintic.out;
 
         public Easing.Func toggleOpen = Easing.Bounce.out;
         public Easing.Func toggleClose = Easing.Bounce.out;
+
+        public Easing.Func colorHoverOn = Easing.Cubic.out;
+        public Easing.Func colorHoverOff = Easing.Cubic.out;
     }
 }
