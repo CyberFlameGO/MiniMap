@@ -103,19 +103,19 @@ public enum Icon {
     }
 
     public float u0() {
-        return u() / 16.0F;
+        return u() / 16F;
     }
 
     public float v0() {
-        return v() / 16.0F;
+        return v() / 16F;
     }
 
     public float u1() {
-        return (u() + 1) / 16.0F;
+        return (u() + 1) / 16F;
     }
 
     public float v1() {
-        return (v() + 1) / 16.0F;
+        return (v() + 1) / 16F;
     }
 
     public void draw(MatrixStack matrixStack, float x, float y, float size, int color) {

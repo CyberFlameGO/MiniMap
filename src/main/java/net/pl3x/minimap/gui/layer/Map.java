@@ -11,9 +11,9 @@ import org.lwjgl.opengl.GL11;
 public class Map extends Layer {
     @Override
     public void render(MatrixStack matrixStack) {
-        float halfSize = mm.size / 2.0F;
+        float halfSize = mm.size / 2F;
         float scale = mm.size / mm.deltaZoom;
-        float scale2 = scale * 2.0F;
+        float scale2 = scale * 2F;
 
         float x0 = mm.centerX - halfSize + scale;
         float x1 = x0 + mm.size - scale2;
@@ -21,7 +21,7 @@ public class Map extends Layer {
         float y1 = y0 + mm.size - scale2;
 
         float u = (MiniMap.TILE_SIZE / 2F - mm.deltaZoom / 2F) / MiniMap.TILE_SIZE; // resizes with zoom _and_ size
-        float v = 1.0F - u;
+        float v = 1F - u;
 
         // uses blend which only writes where high alpha values exist from above
         RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);

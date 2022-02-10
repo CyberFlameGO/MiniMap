@@ -21,17 +21,17 @@ public class Drawable {
 
     public void tint(MatrixStack matrixStack, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, int color) {
         RenderSystem.setShaderColor(
-                Colors.red(color) / 255.0F,
-                Colors.green(color) / 255.0F,
-                Colors.blue(color) / 255.0F,
-                Colors.alpha(color) / 255.0F
+                Colors.red(color) / 255F,
+                Colors.green(color) / 255F,
+                Colors.blue(color) / 255F,
+                Colors.alpha(color) / 255F
         );
         draw(matrixStack, x0, y0, x1, y1, u0, v0, u1, v1);
-        RenderSystem.setShaderColor(1, 1, 1, 1);
+        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
     }
 
     public void draw(MatrixStack matrixStack, float x, float y, float width, float height) {
-        draw(matrixStack, x, y, x + width, y + height, 0.0F, 0.0F, 1.0F, 1.0F);
+        draw(matrixStack, x, y, x + width, y + height, 0F, 0F, 1F, 1F);
     }
 
     public void draw(MatrixStack matrixStack, float x0, float y0, float x1, float y1, float u, float v) {

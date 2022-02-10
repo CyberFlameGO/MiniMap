@@ -56,7 +56,7 @@ public class Sound {
         stop();
 
         // create new instance
-        this.instance = PositionedSoundInstance.master(this.soundEvent, 1.0F, 1.0F);
+        this.instance = PositionedSoundInstance.master(this.soundEvent, 1F, 1F);
 
         // player instance
         MiniMap.CLIENT.getSoundManager().play(this.instance);

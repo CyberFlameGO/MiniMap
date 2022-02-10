@@ -9,11 +9,11 @@ public record AnimationMetadata(int width, int height, int frames, int frametime
     public static final String KEY = "animation";
 
     public float width(float width) {
-        return this.width > 0 ? this.width : width;
+        return this.width > 0F ? this.width : width;
     }
 
     public float height(float height) {
-        return this.height > 0 ? this.height : height;
+        return this.height > 0F ? this.height : height;
     }
 
     public static class AnimationMetadataReader implements ResourceMetadataReader<AnimationMetadata> {

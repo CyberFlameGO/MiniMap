@@ -30,8 +30,8 @@ import java.util.List;
 public class Sidebar extends AnimatedWidget {
     public static final Sidebar INSTANCE = new Sidebar();
 
-    public static final float DEFAULT_WIDTH = 42.0F;
-    public static final float HOVER_WIDTH = 180.0F;
+    public static final float DEFAULT_WIDTH = 42F;
+    public static final float HOVER_WIDTH = 180F;
 
     private final List<Category> categories = new ArrayList<>();
     private final SidebarAnimation sidebarAnimation;
@@ -40,7 +40,7 @@ public class Sidebar extends AnimatedWidget {
     private State state;
 
     public Sidebar() {
-        super(null, 0, 0, 0, 0);
+        super(null, 0F, 0F, 0F, 0F);
 
         this.sidebarAnimation = new SidebarAnimation(this);
         addAnimation(this.sidebarAnimation);
@@ -73,13 +73,13 @@ public class Sidebar extends AnimatedWidget {
     public void init() {
         if (this.categories.isEmpty()) {
             this.categories.addAll(List.of(
-                    new StyleCategory(this, 0, 20, 0.0F, 32),
-                    new PositionCategory(this, 0, 70, 1.5F, 32),
-                    new RadarCategory(this, 0, 120, 3.0F, 32),
-                    new WaypointsCategory(this, 0, 170, 4.5F, 32),
-                    new LayersCategory(this, 0, 220, 6.0F, 32),
-                    new ClockCategory(this, 0, 270, 7.5F, 32),
-                    new AboutCategory(this, 0, 320, 9.0F, 32)
+                    new StyleCategory(this, 0F, 20F, 0F, 32F),
+                    new PositionCategory(this, 0F, 70F, 1.5F, 32F),
+                    new RadarCategory(this, 0F, 120F, 3F, 32F),
+                    new WaypointsCategory(this, 0F, 170F, 4.5F, 32F),
+                    new LayersCategory(this, 0F, 220F, 6F, 32F),
+                    new ClockCategory(this, 0F, 270F, 7.5F, 32F),
+                    new AboutCategory(this, 0F, 320F, 9F, 32F)
             ));
             children().addAll(this.categories);
         }
@@ -98,7 +98,7 @@ public class Sidebar extends AnimatedWidget {
 
     private void render(MatrixStack matrixStack, float delta) {
         // quick check to see if we should be rendering anything at all
-        if (this.state == State.CLOSED && width() <= 0.0F) {
+        if (this.state == State.CLOSED && width() <= 0F) {
             // nope. lets save some cpu
             return;
         }
@@ -106,13 +106,13 @@ public class Sidebar extends AnimatedWidget {
         boolean useMouse = client().currentScreen instanceof OverlayScreen;
 
         // fix scaling
-        float screenScaled = 1.0F / GL.scale();
+        float screenScaled = 1F / GL.scale();
 
         // setup opengl stuff
         matrixStack.push();
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         matrixStack.scale(screenScaled, screenScaled, screenScaled);
 
         // don't allow Mojang disable blending after drawing text
@@ -143,29 +143,29 @@ public class Sidebar extends AnimatedWidget {
     @Override
     public void render(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
         // draw background
-        GL.drawSolidRect(matrixStack, 0, 0, width(), height(), 0x99000000, 0xBB000000);
+        GL.drawSolidRect(matrixStack, 0F, 0F, width(), height(), 0x99000000, 0xBB000000);
 
         // draw children on top of background
         super.render(matrixStack, mouseX, mouseY, delta);
 
         // draw fancy separator line
         if (this.openedCategory != null && this.width() > HOVER_WIDTH) {
-            GL.drawSolidRect(matrixStack, HOVER_WIDTH, 0, HOVER_WIDTH + 1, height(), 0xBB000000);
+            GL.drawSolidRect(matrixStack, HOVER_WIDTH, 0F, HOVER_WIDTH + 1F, height(), 0xBB000000);
         }
 
         // todo - mask these circles to create a circle line
         int radius = 64;
 
         //RenderSystem.blendFuncSeparate(GL11.GL_ZERO, GL11.GL_ONE, GL11.GL_SRC_COLOR, GL11.GL_ZERO);
-        GL.drawSolidCirc(matrixStack, 300, 200, radius, 0xff000000);
+        GL.drawSolidCirc(matrixStack, 300F, 200F, radius, 0xff000000);
 
         //RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_COLOR);
-        GL.drawSolidCirc(matrixStack, 350, 250, radius, 0xffffffff);
+        GL.drawSolidCirc(matrixStack, 350F, 250F, radius, 0xffffffff);
 
         //RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         // :O!!! lines!!
-        GL.drawLine(matrixStack, 200, 150, 350, 250, 5.5f, 0x88ff0000);
+        GL.drawLine(matrixStack, 200F, 150F, 350F, 250F, 5.5F, 0x88ff0000);
     }
 
     @Override
@@ -194,7 +194,7 @@ public class Sidebar extends AnimatedWidget {
         this.openedCategory = null;
         if (fully) {
             this.state = State.CLOSED;
-            this.sidebarAnimation.setWidth(0.0F);
+            this.sidebarAnimation.setWidth(0F);
             this.sidebarAnimation.func = Easing.Back.out;//Config.getConfig().animations.sidebar.firstOpen;
             this.categories.forEach(category -> category.tab().addAnimation(new IconSlideOut(category.tab())));
             this.sidebarAnimation.easeSpeed = 7.5F;
@@ -235,7 +235,7 @@ public class Sidebar extends AnimatedWidget {
 
     public void resetState() {
         this.state = State.CLOSED;
-        this.width(0.0F);
+        this.width(0F);
         this.categories.clear();
     }
 

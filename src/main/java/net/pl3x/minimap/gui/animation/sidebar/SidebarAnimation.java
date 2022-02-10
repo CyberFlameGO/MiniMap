@@ -31,7 +31,7 @@ public class SidebarAnimation extends Animation {
                 case NOT_HOVERED -> Sidebar.DEFAULT_WIDTH;
                 case HOVERED -> Sidebar.HOVER_WIDTH;
                 case OPENED -> GL.width();
-                default -> 0.0F;
+                default -> 0F;
             });
         }
 
@@ -45,7 +45,7 @@ public class SidebarAnimation extends Animation {
         }
 
         // step each frame
-        float step = Math.min((this.deltaSum += delta) / this.easeSpeed, 1.0F);
+        float step = Math.min((this.deltaSum += delta) / this.easeSpeed, 1F);
         this.sidebar.width(animate(this.start, this.end, step, this.func));
     }
 
@@ -57,7 +57,7 @@ public class SidebarAnimation extends Animation {
         this.start = this.sidebar.width();
         this.end = width;
         if (resetDelta) {
-            this.deltaSum = 0;
+            this.deltaSum = 0F;
         }
     }
 }

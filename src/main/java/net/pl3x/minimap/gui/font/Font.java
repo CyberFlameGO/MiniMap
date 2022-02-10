@@ -26,9 +26,9 @@ public class Font {
     private static final Set<Font> REGISTERED_FONTS = new HashSet<>();
     private static final String PROVIDER_JSON = "{\"providers\":[{\"type\":\"ttf\",\"file\":\"minimap:%s.ttf\",\"shift\":[0, 0],\"size\":%f,\"oversample\":%f}]}";
 
-    public static final Font DEFAULT = register("default_font", MiniMap.CLIENT.textRenderer.fontHeight, 2.0F);
-    public static final Font RALEWAY_MEDIUM = register("raleway-medium", 26.0F, 4.0F);
-    public static final Font RALEWAY_SEMIBOLD = register("raleway-semibold", 25.0F, 4.0F);
+    public static final Font DEFAULT = register("default_font", MiniMap.CLIENT.textRenderer.fontHeight, 2F);
+    public static final Font RALEWAY_MEDIUM = register("raleway-medium", 26F, 4F);
+    public static final Font RALEWAY_SEMIBOLD = register("raleway-semibold", 25F, 4F);
 
     public static boolean ALLOW_DISABLE_BLENDING_AFTER_DRAWING_TEXT = true;
 

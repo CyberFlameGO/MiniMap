@@ -7,9 +7,9 @@ import java.awt.Color;
 public class Colors {
     public static int shade(int color, int shade) {
         float ratio = switch (shade) {
-            case 0 -> 180.0F / 255.0F;
-            case 1 -> 220.0F / 255.0F;
-            case 2 -> 1.0F;
+            case 0 -> 180F / 0xFF;
+            case 1 -> 220F / 0xFF;
+            case 2 -> 255F / 0xFF;
             default -> throw new IllegalStateException("Unexpected shade: " + shade);
         };
         return shade(color, ratio);
@@ -26,8 +26,8 @@ public class Colors {
 
     public static int lerpARGB(float delta, int color0, int color1) {
         if (color0 == color1) return color0;
-        if (delta >= 1.0F) return color1;
-        if (delta <= 0.0F) return color0;
+        if (delta >= 1F) return color1;
+        if (delta <= 0F) return color0;
         return argb(
                 (int) MathHelper.lerp(delta, alpha(color0), alpha(color1)),
                 (int) MathHelper.lerp(delta, red(color0), red(color1)),

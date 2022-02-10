@@ -38,7 +38,7 @@ public class TileManager {
         Iterator<Tile> iter = tiles.iterator();
         while (iter.hasNext()) {
             Tile tile = iter.next();
-            if (tile.getLastUsed() + 10000 < now) {
+            if (tile.getLastUsed() + 10000L < now) {
                 tile.unload();
                 iter.remove();
             }

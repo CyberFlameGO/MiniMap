@@ -37,6 +37,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import net.pl3x.minimap.util.Mathf;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -44,43 +45,25 @@ import java.util.Map;
 
 @SuppressWarnings("unused")
 public class Easing {
-    public static final float PI = 3.14159265358979323846F;
-
-    public static float cos(float t) {
-        return (float) Math.cos(t);
-    }
-
-    public static float pow(float t, float p) {
-        return (float) Math.pow(t, p);
-    }
-
-    public static float sin(float t) {
-        return (float) Math.sin(t);
-    }
-
-    public static float sqrt(float t) {
-        return (float) Math.sqrt(t);
-    }
-
     public static class Back {
         public static final Func in = new Func("back-in", Back::in);
         public static final Func out = new Func("back-out", Back::out);
         public static final Func inOut = new Func("back-in-out", Back::inOut);
 
-        private static final float s = 1.70158f;
-        private static final float s2 = 2.5949095f;
+        private static final float s = 1.70158F;
+        private static final float s2 = 2.5949095F;
 
         public static float in(float t) {
-            return t * t * ((s + 1f) * t - s);
+            return t * t * ((s + 1F) * t - s);
         }
 
         public static float out(float t) {
-            return (t -= 1f) * t * ((s + 1f) * t + s) + 1f;
+            return (t -= 1F) * t * ((s + 1F) * t + s) + 1;
         }
 
         public static float inOut(float t) {
-            if ((t *= 2f) < 1f) return 0.5f * (t * t * ((s2 + 1f) * t - s2));
-            return 0.5f * ((t -= 2f) * t * ((s2 + 1f) * t + s2) + 2f);
+            if ((t *= 2F) < 1F) return 0.5F * (t * t * ((s2 + 1F) * t - s2));
+            return 0.5F * ((t -= 2F) * t * ((s2 + 1F) * t + s2) + 2F);
         }
     }
 
@@ -90,24 +73,24 @@ public class Easing {
         public static final Func inOut = new Func("bounce-in-out", Bounce::inOut);
 
         public static float in(float t) {
-            return 1f - out(1f - t);
+            return 1F - out(1F - t);
         }
 
         public static float out(float t) {
-            if (t < (1f / 2.75f)) {
-                return 7.5625f * t * t;
-            } else if (t < (2f / 2.75f)) {
-                return 7.5625f * (t -= (1.5f / 2.75f)) * t + 0.75f;
-            } else if (t < (2.5f / 2.75f)) {
-                return 7.5625f * (t -= (2.25f / 2.75f)) * t + 0.9375f;
+            if (t < (1F / 2.75F)) {
+                return 7.5625F * t * t;
+            } else if (t < (2F / 2.75F)) {
+                return 7.5625F * (t -= (1.5F / 2.75F)) * t + 0.75F;
+            } else if (t < (2.5F / 2.75F)) {
+                return 7.5625F * (t -= (2.25F / 2.75F)) * t + 0.9375F;
             } else {
-                return 7.5625f * (t -= (2.625f / 2.75f)) * t + 0.984375f;
+                return 7.5625F * (t -= (2.625F / 2.75F)) * t + 0.984375F;
             }
         }
 
         public static float inOut(float t) {
-            if (t < 0.5f) return in(t * 2f) * 0.5f;
-            return out(t * 2f - 1f) * 0.5f + 0.5f;
+            if (t < 0.5F) return in(t * 2F) * 0.5F;
+            return out(t * 2F - 1F) * 0.5F + 0.5F;
         }
     }
 
@@ -117,16 +100,16 @@ public class Easing {
         public static final Func inOut = new Func("circular-in-out", Circular::inOut);
 
         public static float in(float t) {
-            return 1f - sqrt(1f - t * t);
+            return 1F - Mathf.sqrt(1F - t * t);
         }
 
         public static float out(float t) {
-            return sqrt(1f - ((t -= 1f) * t));
+            return Mathf.sqrt(1F - ((t -= 1F) * t));
         }
 
         public static float inOut(float t) {
-            if ((t *= 2f) < 1f) return -0.5f * (sqrt(1f - t * t) - 1);
-            return 0.5f * (sqrt(1f - (t -= 2f) * t) + 1f);
+            if ((t *= 2F) < 1F) return -0.5F * (Mathf.sqrt(1F - t * t) - 1F);
+            return 0.5F * (Mathf.sqrt(1F - (t -= 2F) * t) + 1F);
         }
     }
 
@@ -140,12 +123,12 @@ public class Easing {
         }
 
         public static float out(float t) {
-            return 1f + ((t -= 1f) * t * t);
+            return 1F + ((t -= 1F) * t * t);
         }
 
         public static float inOut(float t) {
-            if ((t *= 2f) < 1f) return 0.5f * t * t * t;
-            return 0.5f * ((t -= 2f) * t * t + 2f);
+            if ((t *= 2F) < 1F) return 0.5F * t * t * t;
+            return 0.5F * ((t -= 2F) * t * t + 2F);
         }
     }
 
@@ -155,21 +138,21 @@ public class Easing {
         public static final Func inOut = new Func("elastic-in-out", Elastic::inOut);
 
         public static float in(float t) {
-            if (t == 0) return 0;
-            if (t == 1) return 1;
-            return -pow(2f, 10f * (t -= 1f)) * sin((t - 0.1f) * (2f * PI) / 0.4f);
+            if (t == 0F) return 0F;
+            if (t == 1F) return 1F;
+            return -Mathf.pow(2F, 10F * (t -= 1F)) * Mathf.sin((t - 0.1F) * (2F * Mathf.PI) / 0.4F);
         }
 
         public static float out(float t) {
-            if (t == 0) return 0;
-            if (t == 1) return 1;
-            return pow(2f, -10f * t) * sin((t - 0.1f) * (2f * PI) / 0.4f) + 1f;
+            if (t == 0F) return 0F;
+            if (t == 1F) return 1F;
+            return Mathf.pow(2F, -10F * t) * Mathf.sin((t - 0.1F) * (2F * Mathf.PI) / 0.4F) + 1F;
         }
 
         public static float inOut(float t) {
-            if ((t *= 2f) < 1f)
-                return -0.5f * pow(2f, 10f * (t -= 1f)) * sin((t - 0.1f) * (2f * PI) / 0.4f);
-            return pow(2f, -10f * (t -= 1f)) * sin((t - 0.1f) * (2f * PI) / 0.4f) * 0.5f + 1f;
+            if ((t *= 2F) < 1F)
+                return -0.5F * Mathf.pow(2F, 10F * (t -= 1F)) * Mathf.sin((t - 0.1F) * (2F * Mathf.PI) / 0.4F);
+            return Mathf.pow(2F, -10F * (t -= 1F)) * Mathf.sin((t - 0.1F) * (2F * Mathf.PI) / 0.4F) * 0.5F + 1F;
         }
     }
 
@@ -179,18 +162,18 @@ public class Easing {
         public static final Func inOut = new Func("exponential-in-out", Exponential::inOut);
 
         public static float in(float t) {
-            return t == 0f ? 0f : pow(1024f, t - 1f);
+            return t == 0F ? 0F : Mathf.pow(1024F, t - 1F);
         }
 
         public static float out(float t) {
-            return t == 1f ? 1f : 1f - pow(2f, -10f * t);
+            return t == 1F ? 1F : 1F - Mathf.pow(2F, -10F * t);
         }
 
         public static float inOut(float t) {
-            if (t == 0f) return 0f;
-            if (t == 1f) return 1f;
-            if ((t *= 2f) < 1f) return 0.5f * pow(1024f, t - 1f);
-            return 0.5f * (-pow(2f, -10f * (t - 1f)) + 2f);
+            if (t == 0F) return 0F;
+            if (t == 1F) return 1F;
+            if ((t *= 2F) < 1F) return 0.5F * Mathf.pow(1024F, t - 1F);
+            return 0.5F * (-Mathf.pow(2F, -10F * (t - 1F)) + 2F);
         }
     }
 
@@ -204,12 +187,12 @@ public class Easing {
         }
 
         public static float out(float t) {
-            return t * (2f - t);
+            return t * (2F - t);
         }
 
         public static float inOut(float t) {
-            if ((t *= 2f) < 1f) return 0.5f * t * t;
-            return -0.5f * ((t -= 1f) * (t - 2f) - 1f);
+            if ((t *= 2F) < 1F) return 0.5F * t * t;
+            return -0.5F * ((t -= 1F) * (t - 2F) - 1F);
         }
     }
 
@@ -223,12 +206,12 @@ public class Easing {
         }
 
         public static float out(float t) {
-            return 1f - ((t -= 1f) * t * t * t);
+            return 1F - ((t -= 1F) * t * t * t);
         }
 
         public static float inOut(float t) {
-            if ((t *= 2f) < 1f) return 0.5f * t * t * t * t;
-            return -0.5f * ((t -= 2f) * t * t * t - 2f);
+            if ((t *= 2F) < 1F) return 0.5F * t * t * t * t;
+            return -0.5F * ((t -= 2F) * t * t * t - 2F);
         }
     }
 
@@ -242,12 +225,12 @@ public class Easing {
         }
 
         public static float out(float t) {
-            return 1f + ((t -= 1f) * t * t * t * t);
+            return 1F + ((t -= 1F) * t * t * t * t);
         }
 
         public static float inOut(float t) {
-            if ((t *= 2f) < 1f) return 0.5f * t * t * t * t * t;
-            return 0.5f * ((t -= 2f) * t * t * t * t + 2f);
+            if ((t *= 2F) < 1F) return 0.5F * t * t * t * t * t;
+            return 0.5F * ((t -= 2F) * t * t * t * t + 2F);
         }
     }
 
@@ -257,15 +240,15 @@ public class Easing {
         public static final Func inOut = new Func("sinusoidal-in-out", Sinusoidal::inOut);
 
         public static float in(float t) {
-            return 1f - cos(t * PI / 2f);
+            return 1F - Mathf.cos(t * Mathf.PI / 2F);
         }
 
         public static float out(float t) {
-            return sin(t * PI / 2f);
+            return Mathf.sin(t * Mathf.PI / 2F);
         }
 
         public static float inOut(float t) {
-            return 0.5f * (1f - cos(PI * t));
+            return 0.5F * (1F - Mathf.cos(Mathf.PI * t));
         }
     }
 

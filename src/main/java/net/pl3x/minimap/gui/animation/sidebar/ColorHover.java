@@ -24,7 +24,7 @@ public class ColorHover extends Animation {
         }
 
         // step each frame
-        float step = Math.min((this.deltaSum += delta) / 5F, 1.0F);
+        float step = Math.min((this.deltaSum += delta) / 5F, 1F);
         this.tab.color(animateARGB(this.start, this.end, step, this.easingFunc));
     }
 
@@ -32,6 +32,6 @@ public class ColorHover extends Animation {
         this.easingFunc = easingFunc;
         this.start = this.tab.color();
         this.end = color;
-        this.deltaSum = 0.0F;
+        this.deltaSum = 0F;
     }
 }

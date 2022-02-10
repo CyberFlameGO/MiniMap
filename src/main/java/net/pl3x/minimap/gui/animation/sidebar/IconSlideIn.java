@@ -20,12 +20,12 @@ public class IconSlideIn extends Animation {
     @Override
     public void tick(float delta) {
         // wait for delay
-        if ((this.delay -= delta) > 0.0F) {
+        if ((this.delay -= delta) > 0F) {
             return;
         }
 
         // step each frame
-        float step = Math.min((this.deltaSum += delta) / 6.0F, 1.0F);
+        float step = Math.min((this.deltaSum += delta) / 6F, 1F);
         this.tab.iconX(animate(this.start, this.end, step, Config.getConfig().animations.sidebar.iconSlideIn));
 
         // check if finished

@@ -71,7 +71,7 @@ public class Mouse {
             }
         }
 
-        this.windowHovered = x() >= 0 && x() < GL.width() && y() >= 0 && y() < GL.height();
+        this.windowHovered = x() >= 0F && x() < GL.width() && y() >= 0F && y() < GL.height();
     }
 
     public void render(MatrixStack matrixStack, float delta) {

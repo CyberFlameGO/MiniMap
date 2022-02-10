@@ -35,7 +35,7 @@ public class Tab extends AnimatedWidget {
     private int color;
 
     public Tab(Category category, float x, float y, float delay, Text text, Icon icon, float iconSize) {
-        super(category, x, y, 0, iconSize);
+        super(category, x, y, 0F, iconSize);
 
         this.category = category;
 
@@ -45,13 +45,13 @@ public class Tab extends AnimatedWidget {
         iconY(y);
 
         this.text = text;
-        textX(x + iconSize + 15);
-        textY(y + 5);
+        textX(x + iconSize + 15F);
+        textY(y + 5F);
 
         this.colorHoverAnimation = new ColorHover(this);
         color(Tab.DEFAULT_COLOR);
 
-        addAnimation(new IconSlideIn(this, this.iconX, x + 5, delay));
+        addAnimation(new IconSlideIn(this, this.iconX, x + 5F, delay));
         addAnimation(this.colorHoverAnimation);
     }
 

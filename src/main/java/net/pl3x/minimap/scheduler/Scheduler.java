@@ -31,7 +31,7 @@ public class Scheduler {
             }
             task.run();
             if (task.repeat) {
-                task.tick = 0;
+                task.tick = 0L;
                 continue;
             }
             iter.remove();

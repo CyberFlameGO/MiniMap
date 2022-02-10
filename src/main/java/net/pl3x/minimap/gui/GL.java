@@ -12,6 +12,7 @@ import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3f;
 import net.pl3x.minimap.MiniMap;
+import net.pl3x.minimap.util.Mathf;
 
 public class GL {
     public static void drawSolidRect(MatrixStack matrixStack, float x0, float y0, float x1, float y1, int color) {
@@ -41,10 +42,10 @@ public class GL {
         BufferBuilder buf = Tessellator.getInstance().getBuffer();
         buf.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-        buf.vertex(matrix, x1, y0, 0).color(colorTopRight).next();
-        buf.vertex(matrix, x0, y0, 0).color(colorTopLeft).next();
-        buf.vertex(matrix, x0, y1, 0).color(colorBottomLeft).next();
-        buf.vertex(matrix, x1, y1, 0).color(colorBottomRight).next();
+        buf.vertex(matrix, x1, y0, 0F).color(colorTopRight).next();
+        buf.vertex(matrix, x0, y0, 0F).color(colorTopLeft).next();
+        buf.vertex(matrix, x0, y1, 0F).color(colorBottomLeft).next();
+        buf.vertex(matrix, x1, y1, 0F).color(colorBottomRight).next();
 
         buf.end();
         BufferRenderer.draw(buf);
@@ -64,10 +65,10 @@ public class GL {
         buf.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
         for (int i = 0; i <= res; i++) {
-            double angle = 2 * Math.PI * i / res;
-            float x = (float) (Math.sin(angle)) * radius;
-            float y = (float) (Math.cos(angle)) * radius;
-            buf.vertex(matrix, centerX + x, centerY + y, 0.0F).color(color).next();
+            float angle = 2F * Mathf.PI * i / res;
+            float x = Mathf.sin(angle) * radius;
+            float y = Mathf.cos(angle) * radius;
+            buf.vertex(matrix, centerX + x, centerY + y, 0F).color(color).next();
         }
 
         buf.end();
@@ -86,13 +87,13 @@ public class GL {
         BufferBuilder buf = Tessellator.getInstance().getBuffer();
 
         buf.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
-        buf.vertex(matrix4f, x0, y0, 0.0f).color(color).normal(matrix3f, 1.0f, 1.0f, 0.0f).next();
-        buf.vertex(matrix4f, x1, y1, 0.0f).color(color).normal(matrix3f, 1.0f, 1.0f, 0.0f).next();
+        buf.vertex(matrix4f, x0, y0, 0F).color(color).normal(matrix3f, 1F, 1F, 0F).next();
+        buf.vertex(matrix4f, x1, y1, 0F).color(color).normal(matrix3f, 1F, 1F, 0F).next();
 
         buf.end();
         BufferRenderer.draw(buf);
 
-        RenderSystem.lineWidth(1.0F);
+        RenderSystem.lineWidth(1F);
     }
 
     public static float scale() {
@@ -107,15 +108,15 @@ public class GL {
         return MiniMap.CLIENT.getWindow().getHeight();
     }
 
-    public static void rotateScene(MatrixStack matrixStack, double x, double y, double degrees) {
-        matrixStack.translate(x, y, 0);
-        matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion((float) degrees));
-        matrixStack.translate(-x, -y, 0);
+    public static void rotateScene(MatrixStack matrixStack, float x, float y, float degrees) {
+        matrixStack.translate(x, y, 0D);
+        matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(degrees));
+        matrixStack.translate(-x, -y, 0D);
     }
 
-    public static void scaleScene(MatrixStack matrixStack, double x, double y, float scale) {
-        matrixStack.translate(x, y, 0);
+    public static void scaleScene(MatrixStack matrixStack, float x, float y, float scale) {
+        matrixStack.translate(x, y, 0D);
         matrixStack.scale(scale, scale, scale);
-        matrixStack.translate(-x, -y, 0);
+        matrixStack.translate(-x, -y, 0D);
     }
 }

@@ -19,7 +19,7 @@ public class BottomText extends Layer {
         float scale = 0.5F / mm.scaleFactor;
 
         float x = mm.centerX / scale;
-        float y = (mm.centerY + mm.size / 2.0F + Font.DEFAULT.height() / mm.scaleFactor) / scale;
+        float y = (mm.centerY + mm.size / 2F + Font.DEFAULT.height() / mm.scaleFactor) / scale;
 
         matrixStack.push();
         matrixStack.scale(scale, scale, scale);

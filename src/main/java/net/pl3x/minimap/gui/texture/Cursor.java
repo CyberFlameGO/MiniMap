@@ -64,19 +64,19 @@ public class Cursor extends Drawable {
 
         if (this.meta.frames() > 0) {
             if ((this.time += delta) >= this.meta.frametime()) {
-                this.time = 0;
+                this.time = 0F;
                 if (++this.frame >= this.meta.frames()) {
                     this.frame = 0;
                 }
             }
-            float h = 1.0F / this.meta.frames();
+            float h = 1F / this.meta.frames();
             u = h * this.frame;
             v = u + h;
         } else {
-            u = 0.0F;
-            v = 1.0F;
+            u = 0F;
+            v = 1F;
         }
 
-        draw(matrixStack, this.x, this.y, this.x + this.meta.width(), this.y + this.meta.height(), 0.0F, u, 1.0F, v);
+        draw(matrixStack, this.x, this.y, this.x + this.meta.width(), this.y + this.meta.height(), 0F, u, 1F, v);
     }
 }

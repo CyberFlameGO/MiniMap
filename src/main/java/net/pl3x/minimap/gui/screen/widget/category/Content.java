@@ -8,7 +8,7 @@ public class Content extends AnimatedWidget {
     private final Tab tab;
 
     public Content(Tab tab, float x, float y) {
-        super(tab, x, y, 0, 0);
+        super(tab, x, y, 0F, 0F);
 
         this.tab = tab;
     }

@@ -33,6 +33,6 @@ public class Tile extends NativeImageBackedTexture {
     }
 
     public void unload() {
-        this.lastUsed = 0;
+        this.lastUsed = 0L;
     }
 }

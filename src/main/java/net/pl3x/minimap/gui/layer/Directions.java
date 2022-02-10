@@ -3,6 +3,7 @@ package net.pl3x.minimap.gui.layer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.font.Font;
+import net.pl3x.minimap.util.Mathf;
 
 public class Directions extends Layer {
     private float x;
@@ -17,12 +18,12 @@ public class Directions extends Layer {
         float scale = 0.5F / mm.scaleFactor;
 
         this.x = mm.centerX / scale;
-        this.y = mm.centerY / scale + 1;
+        this.y = mm.centerY / scale + 1F;
 
-        double angle = Config.getConfig().northLocked ? 0.0D : mm.angle;
-        double distance = mm.size / 2 / scale + Font.DEFAULT.height() / mm.scaleFactor;
-        if (!Config.getConfig().circular && !Config.getConfig().northLocked && angle != 0.0D) {
-            distance /= cos(45.0D - Math.abs(45.0D + (-Math.abs(angle) % 90.0D)));
+        float angle = Config.getConfig().northLocked ? 0 : mm.angle;
+        float distance = mm.size / 2F / scale + Font.DEFAULT.height() / mm.scaleFactor;
+        if (!Config.getConfig().circular && !Config.getConfig().northLocked && angle != 0F) {
+            distance /= Mathf.cosRads(45F - Math.abs(45F + (-Math.abs(angle) % 90F)));
         }
 
         // use a blend that supports translucent pixels for all the remaining textures
@@ -30,25 +31,17 @@ public class Directions extends Layer {
 
         matrixStack.push();
         matrixStack.scale(scale, scale, scale);
-        draw(matrixStack, "N", distance * sin(angle + 180.0D), distance * cos(angle + 180.0D));
-        draw(matrixStack, "E", distance * sin(angle + 90.0D), distance * cos(angle + 90.0D));
-        draw(matrixStack, "S", distance * sin(angle), distance * cos(angle));
-        draw(matrixStack, "W", distance * sin(angle - 90.0D), distance * cos(angle - 90.0D));
+        draw(matrixStack, "N", distance * Mathf.sinRads(angle + 180F), distance * Mathf.cosRads(angle + 180F));
+        draw(matrixStack, "E", distance * Mathf.sinRads(angle + 90F), distance * Mathf.cosRads(angle + 90F));
+        draw(matrixStack, "S", distance * Mathf.sinRads(angle), distance * Mathf.cosRads(angle));
+        draw(matrixStack, "W", distance * Mathf.sinRads(angle - 90F), distance * Mathf.cosRads(angle - 90F));
         matrixStack.pop();
     }
 
-    private void draw(MatrixStack matrixStack, String direction, double x, double y) {
+    private void draw(MatrixStack matrixStack, String direction, float x, float y) {
         matrixStack.push();
-        matrixStack.translate(x, y, 0);
+        matrixStack.translate(x, y, 0D);
         Font.DEFAULT.drawCenteredWithShadow(matrixStack, direction, this.x, this.y);
         matrixStack.pop();
-    }
-
-    private double cos(double degree) {
-        return Math.cos(Math.toRadians(degree));
-    }
-
-    private double sin(double degree) {
-        return Math.sin(Math.toRadians(degree));
     }
 }

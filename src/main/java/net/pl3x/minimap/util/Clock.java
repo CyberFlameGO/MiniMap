@@ -12,7 +12,7 @@ public class Clock {
 
     private final Calendar calendar = new GregorianCalendar();
 
-    private long lastChecked = 0;
+    private long lastChecked = 0L;
     private String time;
 
     private Clock() {
@@ -20,7 +20,7 @@ public class Clock {
 
     public String getTime(World world) {
         long now = System.currentTimeMillis();
-        if (now - this.lastChecked > 500) {
+        if (now - this.lastChecked > 500L) {
             updateTime(world);
             this.lastChecked = now;
         }
@@ -35,9 +35,9 @@ public class Clock {
             hours = this.calendar.get(Calendar.HOUR_OF_DAY);
             minutes = this.calendar.get(Calendar.MINUTE);
         } else {
-            long daytime = world.getTimeOfDay() + 6000;
-            hours = (int) (daytime / 1000) % 24;
-            minutes = (int) ((daytime % 1000) * 60 / 1000);
+            long daytime = world.getTimeOfDay() + 6000L;
+            hours = (int) (daytime / 1000L) % 24;
+            minutes = (int) ((daytime % 1000L) * 60 / 1000);
         }
 
         boolean pm = hours >= 12;

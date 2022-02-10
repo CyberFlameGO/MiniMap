@@ -5,7 +5,7 @@ public abstract class Task implements Runnable {
     protected final boolean repeat;
 
     protected boolean cancelled = false;
-    protected int tick;
+    protected long tick;
 
     public Task(int delay) {
         this(delay, false);
@@ -18,7 +18,7 @@ public abstract class Task implements Runnable {
 
     public void cancel() {
         this.cancelled = true;
-        this.tick = 0;
+        this.tick = 0L;
     }
 
     public boolean cancelled() {

@@ -13,8 +13,8 @@ public class Frame extends Layer {
             return;
         }
 
-        float x = mm.centerX - mm.size / 2.0F;
-        float y = mm.centerY - mm.size / 2.0F;
+        float x = mm.centerX - mm.size / 2F;
+        float y = mm.centerY - mm.size / 2F;
 
         // use a blend that supports translucent pixels for all the remaining textures
         RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);

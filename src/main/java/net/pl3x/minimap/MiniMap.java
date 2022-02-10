@@ -43,14 +43,14 @@ public class MiniMap {
     public float scaleFactor;
     public float size;
     public float deltaZoom;
-    public double angle;
+    public float angle;
     public float centerX;
     public float centerY;
     private int lastWidth;
     private int lastHeight;
 
     private Task tickTask;
-    private int tick;
+    private long tick;
 
     private MiniMap() {
     }
@@ -64,15 +64,15 @@ public class MiniMap {
             return; // disabled
         }
 
-        this.scaleFactor = 0;
-        this.size = 0;
-        this.deltaZoom = 0;
-        this.angle = 0;
-        this.centerX = 0;
-        this.centerY = 0;
+        this.scaleFactor = 0F;
+        this.size = 0F;
+        this.deltaZoom = 0F;
+        this.angle = 0F;
+        this.centerX = 0F;
+        this.centerY = 0F;
         this.lastWidth = 0;
         this.lastHeight = 0;
-        this.tick = 0;
+        this.tick = 0L;
 
         updateWindow();
 
@@ -130,13 +130,13 @@ public class MiniMap {
         }
 
         // angle of player rotation
-        this.angle = (this.player.getYaw(delta) - 180.0F) % 360.0F;
+        this.angle = (this.player.getYaw(delta) - 180F) % 360F;
 
         // setup opengl stuff
         matrixStack.push();
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
         // don't allow Mojang disable blending after drawing text
         Font.ALLOW_DISABLE_BLENDING_AFTER_DRAWING_TEXT = false;
@@ -156,7 +156,7 @@ public class MiniMap {
     public void tick() {
         if (this.tick++ >= Config.getConfig().updateInterval) {
             this.layers.forEach(Layer::update);
-            this.tick = 0;
+            this.tick = 0L;
         }
         updateWindow();
     }
@@ -164,7 +164,7 @@ public class MiniMap {
     public void updateWindow() {
         int width = CLIENT.getWindow().getScaledWidth();
         int height = CLIENT.getWindow().getScaledHeight();
-        float scaleFactor = GL.scale() / 2.0F; // todo - replace this with something better
+        float scaleFactor = GL.scale() / 2F; // todo - replace this with something better
 
         if (this.lastWidth == width && this.lastHeight == height && this.scaleFactor == scaleFactor) {
             return; // nothing changed
@@ -175,25 +175,25 @@ public class MiniMap {
         this.scaleFactor = scaleFactor;
 
         this.size = Config.getConfig().size / this.scaleFactor;
-        float scale = 1.0F;
+        float scale = 1F;
 
         Monitor monitor = CLIENT.getWindow().getMonitor();
         if (monitor != null) {
             float windowHeight = CLIENT.getWindow().getHeight();
             float monitorHeight = monitor.getCurrentVideoMode().getHeight();
-            scale = MathHelper.clamp(windowHeight / monitorHeight / 0.9F, 0.5F, 1.0F);
+            scale = MathHelper.clamp(windowHeight / monitorHeight / 0.9F, 0.5F, 1F);
             this.size = size * scale;
         }
 
         this.centerX = (int) switch (Config.getConfig().anchorX) {
-            case LOW -> 0;
-            case MID -> width / 2.0F;
+            case LOW -> 0F;
+            case MID -> width / 2F;
             case HIGH -> width;
         } + Config.getConfig().anchorOffsetX * scale / this.scaleFactor;
 
         this.centerY = (int) switch (Config.getConfig().anchorY) {
-            case LOW -> 0;
-            case MID -> height / 2.0F;
+            case LOW -> 0F;
+            case MID -> height / 2F;
             case HIGH -> height;
         } + Config.getConfig().anchorOffsetY * scale / this.scaleFactor;
     }
