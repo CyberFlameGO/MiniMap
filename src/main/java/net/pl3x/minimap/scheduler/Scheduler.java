@@ -43,10 +43,6 @@ public class Scheduler {
         return task;
     }
 
-    public Task addTask(int delay, Runnable runnable) {
-        return addTask(delay, false, runnable);
-    }
-
     public Task addTask(int delay, boolean repeat, Runnable runnable) {
         return addTask(new Task(delay, repeat) {
             @Override

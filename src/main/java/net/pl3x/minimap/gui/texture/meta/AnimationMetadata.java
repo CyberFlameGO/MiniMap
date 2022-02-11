@@ -8,6 +8,10 @@ public record AnimationMetadata(int width, int height, int frames, int frametime
     public static final AnimationMetadataReader READER = new AnimationMetadataReader();
     public static final String KEY = "animation";
 
+    public AnimationMetadata() {
+        this(0, 0, 0, 0);
+    }
+
     public float width(float width) {
         return this.width > 0F ? this.width : width;
     }

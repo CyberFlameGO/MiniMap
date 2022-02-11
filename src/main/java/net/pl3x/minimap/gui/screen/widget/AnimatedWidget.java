@@ -26,8 +26,4 @@ public abstract class AnimatedWidget extends Widget {
     public void tickAnimations(float delta) {
         Animation.tick(this.animations, delta);
     }
-
-    public List<Animation> animations() {
-        return this.animations;
-    }
 }

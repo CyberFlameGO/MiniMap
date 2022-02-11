@@ -84,22 +84,24 @@ public class Sidebar extends AnimatedWidget {
         }
 
         if (client().currentScreen instanceof OverlayScreen overlayScreen) {
-            if (this.state == State.OPENED) {
+            if (state() == State.OPENED) {
                 // fix width when fully open and screen size changes
                 this.sidebarAnimation.setWidth(overlayScreen.width(), false);
             } else {
                 // set initial state
-                this.state = hovered() ? State.HOVERED : State.NOT_HOVERED;
+                this.state(hovered() ? State.HOVERED : State.NOT_HOVERED);
                 this.sidebarAnimation.func = Config.getConfig().animations.sidebar.firstOpen;
                 this.sidebarAnimation.easeSpeed = 7.5F;
                 Sound.WHOOSH.play();
             }
         }
+
+        super.init();
     }
 
     private void render(MatrixStack matrixStack, float delta) {
         // quick check to see if we should be rendering anything at all
-        if (this.state == State.CLOSED && width() <= 0F) {
+        if (state() == State.CLOSED && width() <= 0F) {
             // nope. lets save some cpu
             return;
         }
@@ -157,7 +159,7 @@ public class Sidebar extends AnimatedWidget {
 
     @Override
     public void onHoverChange() {
-        if (this.state != State.OPENED && this.state != State.CLOSED) {
+        if (state() != State.OPENED && state() != State.CLOSED) {
             hover(hovered());
         }
     }
@@ -165,7 +167,7 @@ public class Sidebar extends AnimatedWidget {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            if (this.state == State.OPENED) {
+            if (state() == State.OPENED) {
                 close(false);
                 return true;
             }
@@ -178,7 +180,7 @@ public class Sidebar extends AnimatedWidget {
     }
 
     public void open() {
-        this.state = State.OPENED;
+        this.state(State.OPENED);
         this.sidebarAnimation.func = Config.getConfig().animations.sidebar.toggleOpen;
         this.sidebarAnimation.easeSpeed = 20F;
     }
@@ -186,14 +188,14 @@ public class Sidebar extends AnimatedWidget {
     public void close(boolean fully) {
         this.openedCategory = null;
         if (fully) {
-            this.state = State.CLOSED;
+            this.state(State.CLOSED);
             this.sidebarAnimation.func = Config.getConfig().animations.sidebar.fullyClose;
             this.sidebarAnimation.easeSpeed = 10F;
             // slide the tab icons out, too
             this.categories.forEach(category -> category.tab().addAnimation(new IconSlideOut(category.tab())));
             Sound.WHOOSH.play();
         } else {
-            this.state = hovered() ? State.HOVERED : State.NOT_HOVERED;
+            this.state(hovered() ? State.HOVERED : State.NOT_HOVERED);
             this.sidebarAnimation.func = Config.getConfig().animations.sidebar.toggleClose;
             this.sidebarAnimation.easeSpeed = 20F;
         }
@@ -202,10 +204,10 @@ public class Sidebar extends AnimatedWidget {
 
     public void hover(boolean hover) {
         if (hover) {
-            this.state = State.HOVERED;
+            this.state(State.HOVERED);
             this.sidebarAnimation.func = Config.getConfig().animations.sidebar.toggleHoverOn;
         } else {
-            this.state = State.NOT_HOVERED;
+            this.state(State.NOT_HOVERED);
             this.sidebarAnimation.func = Config.getConfig().animations.sidebar.toggleHoverOff;
         }
         this.sidebarAnimation.easeSpeed = 10F;
@@ -213,7 +215,7 @@ public class Sidebar extends AnimatedWidget {
     }
 
     public void resetState() {
-        this.state = State.CLOSED;
+        this.state(State.CLOSED);
         this.width(0F);
         this.categories.clear();
         children().clear();

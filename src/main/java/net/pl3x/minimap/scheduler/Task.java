@@ -7,10 +7,6 @@ public abstract class Task implements Runnable {
     protected boolean cancelled = false;
     protected long tick;
 
-    public Task(int delay) {
-        this(delay, false);
-    }
-
     public Task(int delay, boolean repeat) {
         this.delay = delay;
         this.repeat = repeat;

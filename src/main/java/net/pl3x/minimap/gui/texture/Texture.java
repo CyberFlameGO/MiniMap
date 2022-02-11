@@ -25,6 +25,9 @@ public class Texture extends Drawable {
     public static final Texture SKY_THE_NETHER = register(new Texture("gui/sky/the_nether"));
     public static final Texture SKY_THE_END = register(new Texture("gui/sky/the_end"));
 
+    public static final Texture CURSOR_ARROW = register(new Texture("cursor/arrow"));
+    public static final Texture CURSOR_HAND = register(new Texture("cursor/hand"));
+
     private static Texture register(Texture texture) {
         REGISTERED_TEXTURES.add(texture);
         return texture;
@@ -35,7 +38,10 @@ public class Texture extends Drawable {
             try {
                 Resource resource = texture.resource();
                 if (resource.hasMetadata()) {
+                    System.out.println(texture.identifier + " has meta");
                     texture.meta = texture.load(resource);
+                } else {
+                    texture.meta = new AnimationMetadata();
                 }
                 MiniMap.LOG.info("Loaded texture " + texture.identifier);
             } catch (IOException e) {
@@ -44,7 +50,8 @@ public class Texture extends Drawable {
         });
     }
 
-    private AnimationMetadata meta;
+    protected AnimationMetadata meta;
+
     private float time;
     private int frame;
 
@@ -60,10 +67,11 @@ public class Texture extends Drawable {
         return MiniMap.CLIENT.getResourceManager().getResource(this.identifier);
     }
 
-    public void animate(MatrixStack matrixStack, float x, float y, float width, float height, float delta) {
+    public void animate(MatrixStack matrixStack, float x, float y, float delta) {
         float u, v;
         if (this.meta.frames() > 0) {
-            if ((this.time += delta) >= this.meta.frametime()) {
+            this.time += delta;
+            if (this.time >= this.meta.frametime()) {
                 this.time = 0F;
                 if (++this.frame >= this.meta.frames()) {
                     this.frame = 0;
@@ -77,6 +85,6 @@ public class Texture extends Drawable {
             v = 1F;
         }
 
-        draw(matrixStack, x, y, x + this.meta.width(width), y + this.meta.height(height), 0F, u, 1F, v);
+        draw(matrixStack, x, y, x + this.meta.width(128F), y + this.meta.height(128F), 0F, u, 1F, v);
     }
 }

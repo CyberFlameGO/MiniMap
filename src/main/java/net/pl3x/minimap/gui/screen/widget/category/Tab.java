@@ -5,7 +5,6 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.pl3x.minimap.config.Config;
-import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.Icon;
 import net.pl3x.minimap.gui.animation.sidebar.ColorHover;
 import net.pl3x.minimap.gui.animation.sidebar.IconSlideIn;
@@ -120,7 +119,7 @@ public class Tab extends AnimatedWidget {
     public void render(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
         super.render(matrixStack, mouseX, mouseY, delta);
 
-        this.icon.draw(matrixStack, iconX(), iconY(), iconSize(), color());
+        icon().draw(matrixStack, iconX(), iconY(), iconSize(), color());
 
         if (parent().width() > Sidebar.DEFAULT_WIDTH) {
             if (parent().width() < Sidebar.HOVER_WIDTH) {

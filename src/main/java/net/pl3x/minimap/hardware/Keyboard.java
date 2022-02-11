@@ -21,18 +21,18 @@ public class Keyboard {
 
         this.globalKeys.clear();
         this.globalKeys.addAll(List.of(
-                new GlobalKey("minimap.key.map.open", "minimap.key.category", GLFW.GLFW_KEY_N, () -> {
+                new GlobalKey("minimap.key.map.open", GLFW.GLFW_KEY_M, () -> {
                     if (MiniMap.CLIENT.currentScreen == null) {
                         MiniMap.CLIENT.setScreen(new OverlayScreen(null));
                     }
                 }),
-                new GlobalKey("minimap.key.minimap.zoom.out", "minimap.key.category", GLFW.GLFW_KEY_PAGE_UP, () -> {
+                new GlobalKey("minimap.key.minimap.zoom.out", GLFW.GLFW_KEY_PAGE_UP, () -> {
                     if (Config.getConfig().zoom < 7) {
                         Config.getConfig().zoom++;
                         Config.save();
                     }
                 }),
-                new GlobalKey("minimap.key.minimap.zoom.in", "minimap.key.category", GLFW.GLFW_KEY_PAGE_DOWN, () -> {
+                new GlobalKey("minimap.key.minimap.zoom.in", GLFW.GLFW_KEY_PAGE_DOWN, () -> {
                     if (Config.getConfig().zoom > 0) {
                         Config.getConfig().zoom--;
                         Config.save();
@@ -45,9 +45,9 @@ public class Keyboard {
         private final Action action;
         private final KeyBinding binding;
 
-        private GlobalKey(String name, String category, int keyCode, Action action) {
+        private GlobalKey(String name, int keyCode, Action action) {
             this.action = action;
-            this.binding = KeyBindingHelper.registerKeyBinding(new KeyBinding(name, keyCode, category));
+            this.binding = KeyBindingHelper.registerKeyBinding(new KeyBinding(name, keyCode, "minimap.key.category"));
         }
 
         private void tick() {

@@ -25,10 +25,6 @@ public class Mouse {
     private Mouse() {
     }
 
-    public void initialize() {
-        // todo?
-    }
-
     private long handle() {
         return MiniMap.CLIENT.getWindow().getHandle();
     }
@@ -49,13 +45,9 @@ public class Mouse {
         this.cursor = cursor;
     }
 
-    public boolean useCursor() {
-        return this.cursorEnabled;
-    }
-
-    public void useCursor(boolean useCursor) {
-        this.cursorEnabled = useCursor;
-        visibility(useCursor);
+    public void cursorEnabled(boolean enabled) {
+        this.cursorEnabled = enabled;
+        visibility(enabled);
     }
 
     public void update() {
@@ -76,7 +68,7 @@ public class Mouse {
 
     public void render(MatrixStack matrixStack, float delta) {
         if (this.cursorEnabled && this.cursorRender && this.windowHovered) {
-            cursor().animate(matrixStack, delta);
+            cursor().draw(matrixStack, Mouse.INSTANCE.x(), Mouse.INSTANCE.y(), delta);
         }
     }
 

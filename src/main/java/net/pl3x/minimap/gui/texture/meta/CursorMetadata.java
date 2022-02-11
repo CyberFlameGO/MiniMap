@@ -8,6 +8,10 @@ public record CursorMetadata(int hotX, int hotY, int width, int height, int fram
     public static final CursorMetadataReader READER = new CursorMetadataReader();
     public static final String KEY = "cursor";
 
+    public CursorMetadata() {
+        this(0, 0, 32, 32, 0, 0);
+    }
+
     public static class CursorMetadataReader implements ResourceMetadataReader<CursorMetadata> {
         @Override
         public CursorMetadata fromJson(JsonObject json) {

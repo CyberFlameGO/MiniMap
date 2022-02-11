@@ -38,10 +38,10 @@ public class OverlayScreen extends Screen {
         MiniMap.INSTANCE.visible = false;
         MiniMap.CLIENT.options.hudHidden = true;
 
-        this.width = (int) (this.width * GL.scale());
-        this.height = (int) (this.height * GL.scale());
+        this.width = (int) (width() * GL.scale());
+        this.height = (int) (height() * GL.scale());
 
-        Mouse.INSTANCE.useCursor(true);
+        Mouse.INSTANCE.cursorEnabled(true);
 
         Sidebar.INSTANCE.init();
     }
@@ -60,7 +60,7 @@ public class OverlayScreen extends Screen {
     public void removed() {
         MiniMap.INSTANCE.visible = true;
         MiniMap.CLIENT.options.hudHidden = false;
-        Mouse.INSTANCE.useCursor(false);
+        Mouse.INSTANCE.cursorEnabled(false);
     }
 
     @Override

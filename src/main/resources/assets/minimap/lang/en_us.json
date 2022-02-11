@@ -1,4 +1,6 @@
 {
+  "minimap.title": "MiniMap",
+
   "minimap.key.category": "MiniMap",
   "minimap.key.map.open": "Open full screen map",
   "minimap.key.minimap.zoom.out": "Minimap zoom out",

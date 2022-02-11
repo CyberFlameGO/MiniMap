@@ -23,12 +23,13 @@ public abstract class Widget {
 
     public Widget(Widget parent, float x, float y, float width, float height) {
         this.parent = parent;
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        x(x);
+        y(y);
+        width(width);
+        height(height);
     }
 
+    @SuppressWarnings("SameReturnValue")
     public MinecraftClient client() {
         return MiniMap.CLIENT;
     }
@@ -86,6 +87,7 @@ public abstract class Widget {
         children().forEach(widget -> widget.render(matrixStack, mouseX, mouseY, delta));
     }
 
+    @SuppressWarnings("EmptyMethod")
     public void tick() {
     }
 

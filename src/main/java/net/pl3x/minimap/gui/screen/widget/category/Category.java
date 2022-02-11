@@ -1,6 +1,5 @@
 package net.pl3x.minimap.gui.screen.widget.category;
 
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.pl3x.minimap.gui.Icon;
 import net.pl3x.minimap.gui.screen.widget.AnimatedWidget;
@@ -28,20 +27,7 @@ public abstract class Category extends AnimatedWidget {
     }
 
     @Override
-    public void init() {
-    }
-
-    @Override
     public float width() {
         return Math.min(parent().width(), Sidebar.HOVER_WIDTH);
-    }
-
-    @Override
-    public void render(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
-        super.render(matrixStack, mouseX, mouseY, delta);
-
-        //this.tab.render(matrixStack, mouseX, mouseY, delta);
-
-        // todo render content
     }
 }
