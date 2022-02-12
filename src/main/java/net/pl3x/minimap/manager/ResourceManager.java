@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import net.pl3x.minimap.MiniMap;
+import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.font.Font;
 import net.pl3x.minimap.gui.texture.Cursor;
 import net.pl3x.minimap.gui.texture.Texture;
@@ -26,6 +27,7 @@ public class ResourceManager {
 
                     @Override
                     public void reload(net.minecraft.resource.ResourceManager manager) {
+                        Config.reload();
                         Texture.initialize();
                         Cursor.initialize();
                         Font.initialize();

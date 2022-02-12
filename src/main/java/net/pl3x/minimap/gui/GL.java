@@ -96,18 +96,6 @@ public class GL {
         RenderSystem.lineWidth(1F);
     }
 
-    public static float scale() {
-        return (float) MiniMap.CLIENT.getWindow().getScaleFactor();
-    }
-
-    public static float width() {
-        return MiniMap.CLIENT.getWindow().getWidth();
-    }
-
-    public static float height() {
-        return MiniMap.CLIENT.getWindow().getHeight();
-    }
-
     public static void rotateScene(MatrixStack matrixStack, float x, float y, float degrees) {
         matrixStack.translate(x, y, 0D);
         matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(degrees));

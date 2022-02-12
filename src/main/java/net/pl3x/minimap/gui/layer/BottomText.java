@@ -16,15 +16,12 @@ public class BottomText extends Layer {
             return;
         }
 
-        float scale = 0.5F / mm.scaleFactor;
-
-        float x = mm.centerX / scale;
-        float y = (mm.centerY + mm.size / 2F + Font.DEFAULT.height() / mm.scaleFactor) / scale;
+        float x = mm.centerX;
+        float y = mm.centerY + mm.size / 2F + Font.DEFAULT.height() * 2F;
 
         matrixStack.push();
-        matrixStack.scale(scale, scale, scale);
         for (int i = 0; i < this.text.length; i++) {
-            Font.DEFAULT.drawCentered(matrixStack, this.text[i], x, y + Font.DEFAULT.height() * i);
+            Font.DEFAULT.drawCenteredWithShadow(matrixStack, this.text[i], x, y + Font.DEFAULT.height() * i);
         }
         matrixStack.pop();
     }

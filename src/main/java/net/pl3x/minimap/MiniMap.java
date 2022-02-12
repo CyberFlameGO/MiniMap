@@ -8,7 +8,6 @@ import net.minecraft.client.util.Monitor;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
 import net.pl3x.minimap.config.Config;
-import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.font.Font;
 import net.pl3x.minimap.gui.layer.Background;
 import net.pl3x.minimap.gui.layer.BottomText;
@@ -40,7 +39,6 @@ public class MiniMap {
     public ClientPlayerEntity player;
 
     public boolean visible = true;
-    public float scaleFactor;
     public float size;
     public float deltaZoom;
     public float angle;
@@ -64,7 +62,6 @@ public class MiniMap {
             return; // disabled
         }
 
-        this.scaleFactor = 0F;
         this.size = 0F;
         this.deltaZoom = 0F;
         this.angle = 0F;
@@ -102,22 +99,25 @@ public class MiniMap {
         this.layers.clear();
     }
 
-    public boolean canRender() {
+    public boolean dontRender() {
+        // todo - temp disable this while we focus on sidebar UI
+        if (true) return true;
+
         if (!this.visible) {
-            return false; // hidden
+            return true; // hidden
         }
 
         this.player = CLIENT.player;
         if (this.player == null) {
-            return false; //  no player
+            return true; //  no player
         }
 
         // don't render when debug hud is showing
-        return !CLIENT.options.debugEnabled;
+        return CLIENT.options.debugEnabled;
     }
 
     public void render(MatrixStack matrixStack, float delta) {
-        if (!canRender()) {
+        if (dontRender()) {
             return;
         }
 
@@ -154,6 +154,9 @@ public class MiniMap {
     }
 
     public void tick() {
+        if (dontRender()) {
+            return;
+        }
         if (this.tick++ >= Config.getConfig().updateInterval) {
             this.layers.forEach(Layer::update);
             this.tick = 0L;
@@ -164,17 +167,15 @@ public class MiniMap {
     public void updateWindow() {
         int width = CLIENT.getWindow().getScaledWidth();
         int height = CLIENT.getWindow().getScaledHeight();
-        float scaleFactor = GL.scale() / 2F; // todo - replace this with something better
 
-        if (this.lastWidth == width && this.lastHeight == height && this.scaleFactor == scaleFactor) {
+        if (this.lastWidth == width && this.lastHeight == height) {
             return; // nothing changed
         }
 
         this.lastWidth = width;
         this.lastHeight = height;
-        this.scaleFactor = scaleFactor;
 
-        this.size = Config.getConfig().size / this.scaleFactor;
+        this.size = Config.getConfig().size;
         float scale = 1F;
 
         Monitor monitor = CLIENT.getWindow().getMonitor();
@@ -182,19 +183,19 @@ public class MiniMap {
             float windowHeight = CLIENT.getWindow().getHeight();
             float monitorHeight = monitor.getCurrentVideoMode().getHeight();
             scale = MathHelper.clamp(windowHeight / monitorHeight / 0.9F, 0.5F, 1F);
-            this.size = size * scale;
+            this.size *= scale;
         }
 
         this.centerX = (int) switch (Config.getConfig().anchorX) {
             case LOW -> 0F;
             case MID -> width / 2F;
             case HIGH -> width;
-        } + Config.getConfig().anchorOffsetX * scale / this.scaleFactor;
+        } + Config.getConfig().anchorOffsetX * scale;
 
         this.centerY = (int) switch (Config.getConfig().anchorY) {
             case LOW -> 0F;
             case MID -> height / 2F;
             case HIGH -> height;
-        } + Config.getConfig().anchorOffsetY * scale / this.scaleFactor;
+        } + Config.getConfig().anchorOffsetY * scale;
     }
 }

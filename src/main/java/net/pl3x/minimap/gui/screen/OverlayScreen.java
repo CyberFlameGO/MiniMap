@@ -4,7 +4,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.pl3x.minimap.MiniMap;
-import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.screen.widget.Sidebar;
 import net.pl3x.minimap.hardware.Mouse;
 
@@ -37,9 +36,6 @@ public class OverlayScreen extends Screen {
     public void init() {
         MiniMap.INSTANCE.visible = false;
         MiniMap.CLIENT.options.hudHidden = true;
-
-        this.width = (int) (width() * GL.scale());
-        this.height = (int) (height() * GL.scale());
 
         Mouse.INSTANCE.cursorEnabled(true);
 

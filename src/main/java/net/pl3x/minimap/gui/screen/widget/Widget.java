@@ -1,6 +1,5 @@
 package net.pl3x.minimap.gui.screen.widget;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.pl3x.minimap.MiniMap;
 
@@ -27,11 +26,6 @@ public abstract class Widget {
         y(y);
         width(width);
         height(height);
-    }
-
-    @SuppressWarnings("SameReturnValue")
-    public MinecraftClient client() {
-        return MiniMap.CLIENT;
     }
 
     public Widget parent() {
@@ -83,21 +77,17 @@ public abstract class Widget {
     }
 
     public void render(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
-        updateMouseState(mouseX, mouseY);
-        children().forEach(widget -> widget.render(matrixStack, mouseX, mouseY, delta));
-    }
-
-    @SuppressWarnings("EmptyMethod")
-    public void tick() {
-    }
-
-    public void updateMouseState(float mouseX, float mouseY) {
         // check if mouse is hovering this widget
         this.hovered = mouseX >= x() && mouseX <= x() + width() && mouseY >= y() && mouseY <= y() + height();
         if (this.wasHovered != this.hovered && MiniMap.CLIENT.isWindowFocused()) {
             onHoverChange();
             this.wasHovered = this.hovered;
         }
+
+        children().forEach(widget -> widget.render(matrixStack, mouseX, mouseY, delta));
+    }
+
+    public void tick() {
     }
 
     public void onHoverChange() {

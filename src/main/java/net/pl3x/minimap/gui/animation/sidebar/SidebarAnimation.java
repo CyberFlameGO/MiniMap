@@ -1,10 +1,10 @@
 package net.pl3x.minimap.gui.animation.sidebar;
 
 import net.pl3x.minimap.config.Config;
-import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.animation.Animation;
 import net.pl3x.minimap.gui.animation.Easing;
 import net.pl3x.minimap.gui.screen.widget.Sidebar;
+import net.pl3x.minimap.hardware.Monitor;
 
 public class SidebarAnimation extends Animation {
     private final Sidebar sidebar;
@@ -30,7 +30,7 @@ public class SidebarAnimation extends Animation {
             setWidth(switch (this.state) {
                 case NOT_HOVERED -> Sidebar.DEFAULT_WIDTH;
                 case HOVERED -> Sidebar.HOVER_WIDTH;
-                case OPENED -> GL.width();
+                case OPENED -> Monitor.width();
                 default -> 0F;
             });
         }

@@ -4,8 +4,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.util.math.MatrixStack;
 import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.config.Config;
-import net.pl3x.minimap.gui.texture.Texture;
 import net.pl3x.minimap.gui.GL;
+import net.pl3x.minimap.gui.texture.Texture;
+import net.pl3x.minimap.util.Mathf;
 import org.lwjgl.opengl.GL11;
 
 public class Map extends Layer {
@@ -32,7 +33,7 @@ public class Map extends Layer {
             GL.rotateScene(matrixStack, mm.centerX, mm.centerY, -mm.angle);
             if (!Config.getConfig().circular) {
                 // scale map if square and not north locked to hide missing pixels in corners when rotating
-                GL.scaleScene(matrixStack, mm.centerX, mm.centerY, 1.41421356237F);
+                GL.scaleScene(matrixStack, mm.centerX, mm.centerY, Mathf.SQRT_OF_2);
             }
         }
         Texture.MINIMAP.draw(matrixStack, x0, y0, x1, y1, u, v);

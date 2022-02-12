@@ -44,13 +44,13 @@ public class Tab extends AnimatedWidget {
         iconY(y);
 
         this.text = text;
-        textX(x + iconSize + 15F);
-        textY(y + 5F);
+        textX(x + iconSize + 5F);
+        textY(y + 4F);
 
         this.colorHoverAnimation = new ColorHover(this);
         color(Tab.DEFAULT_COLOR);
 
-        addAnimation(new IconSlideIn(this, this.iconX, x + 5F, delay));
+        addAnimation(new IconSlideIn(this, this.iconX, x + 2F, delay));
         addAnimation(this.colorHoverAnimation);
     }
 

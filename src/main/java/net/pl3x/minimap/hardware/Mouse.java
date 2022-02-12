@@ -2,7 +2,6 @@ package net.pl3x.minimap.hardware;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.pl3x.minimap.MiniMap;
-import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.texture.Cursor;
 import org.lwjgl.glfw.GLFW;
 
@@ -53,8 +52,8 @@ public class Mouse {
     public void update() {
         GLFW.glfwGetCursorPos(handle(), this.rawX, this.rawY);
 
-        this.mouseX = (float) rawX[0];
-        this.mouseY = (float) rawY[0];
+        this.mouseX = (float) (rawX[0] / Monitor.scale());
+        this.mouseY = (float) (rawY[0] / Monitor.scale());
 
         if (this.windowFocused != MiniMap.CLIENT.isWindowFocused()) {
             this.windowFocused = MiniMap.CLIENT.isWindowFocused();
@@ -63,7 +62,7 @@ public class Mouse {
             }
         }
 
-        this.windowHovered = x() >= 0F && x() < GL.width() && y() >= 0F && y() < GL.height();
+        this.windowHovered = x() >= 0F && x() < Monitor.width() && y() >= 0F && y() < Monitor.height();
     }
 
     public void render(MatrixStack matrixStack, float delta) {

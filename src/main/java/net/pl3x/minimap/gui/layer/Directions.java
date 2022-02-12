@@ -15,13 +15,11 @@ public class Directions extends Layer {
             return;
         }
 
-        float scale = 0.5F / mm.scaleFactor;
-
-        this.x = mm.centerX / scale;
-        this.y = mm.centerY / scale + 1F;
+        this.x = mm.centerX;
+        this.y = mm.centerY + 2F; // not sure why this offset is needed
 
         float angle = Config.getConfig().northLocked ? 0 : mm.angle;
-        float distance = mm.size / 2F / scale + Font.DEFAULT.height() / mm.scaleFactor;
+        float distance = mm.size / 2F + Font.DEFAULT.height() / 2F;
         if (!Config.getConfig().circular && !Config.getConfig().northLocked && angle != 0F) {
             distance /= Mathf.cosRads(45F - Math.abs(45F + (-Math.abs(angle) % 90F)));
         }
@@ -30,7 +28,7 @@ public class Directions extends Layer {
         //RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         matrixStack.push();
-        matrixStack.scale(scale, scale, scale);
+        //matrixStack.scale(scale, scale, scale);
         draw(matrixStack, "N", distance * Mathf.sinRads(angle + 180F), distance * Mathf.cosRads(angle + 180F));
         draw(matrixStack, "E", distance * Mathf.sinRads(angle + 90F), distance * Mathf.cosRads(angle + 90F));
         draw(matrixStack, "S", distance * Mathf.sinRads(angle), distance * Mathf.cosRads(angle));

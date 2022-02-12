@@ -3,6 +3,7 @@ package net.pl3x.minimap.gui.screen.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.util.math.MatrixStack;
+import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.animation.sidebar.IconSlideOut;
@@ -18,6 +19,7 @@ import net.pl3x.minimap.gui.screen.widget.category.RadarCategory;
 import net.pl3x.minimap.gui.screen.widget.category.StyleCategory;
 import net.pl3x.minimap.gui.screen.widget.category.WaypointsCategory;
 import net.pl3x.minimap.gui.texture.Cursor;
+import net.pl3x.minimap.hardware.Monitor;
 import net.pl3x.minimap.hardware.Mouse;
 import net.pl3x.minimap.sound.Sound;
 import org.lwjgl.glfw.GLFW;
@@ -29,8 +31,8 @@ import java.util.List;
 public class Sidebar extends AnimatedWidget {
     public static final Sidebar INSTANCE = new Sidebar();
 
-    public static final float DEFAULT_WIDTH = 42F;
-    public static final float HOVER_WIDTH = 180F;
+    public static final float DEFAULT_WIDTH = 20F;
+    public static final float HOVER_WIDTH = 90F;
 
     private final List<Category> categories = new ArrayList<>();
     private final SidebarAnimation sidebarAnimation;
@@ -65,25 +67,25 @@ public class Sidebar extends AnimatedWidget {
 
     @Override
     public float height() {
-        return GL.height();
+        return Monitor.height();
     }
 
     @Override
     public void init() {
         if (this.categories.isEmpty()) {
             this.categories.addAll(List.of(
-                    new StyleCategory(this, 0F, 20F, 0F, 32F),
-                    new PositionCategory(this, 0F, 70F, 1.5F, 32F),
-                    new RadarCategory(this, 0F, 120F, 3F, 32F),
-                    new WaypointsCategory(this, 0F, 170F, 4.5F, 32F),
-                    new LayersCategory(this, 0F, 220F, 6F, 32F),
-                    new ClockCategory(this, 0F, 270F, 7.5F, 32F),
-                    new AboutCategory(this, 0F, 320F, 9F, 32F)
+                    new StyleCategory(this, 0F, 5F, 0F, 16F),
+                    new PositionCategory(this, 0F, 30F, 1.5F, 16F),
+                    new RadarCategory(this, 0F, 55F, 3F, 16F),
+                    new WaypointsCategory(this, 0F, 80F, 4.5F, 16F),
+                    new LayersCategory(this, 0F, 105F, 6F, 16F),
+                    new ClockCategory(this, 0F, 130F, 7.5F, 16F),
+                    new AboutCategory(this, 0F, 155F, 9F, 16F)
             ));
             children().addAll(this.categories);
         }
 
-        if (client().currentScreen instanceof OverlayScreen overlayScreen) {
+        if (MiniMap.CLIENT.currentScreen instanceof OverlayScreen overlayScreen) {
             if (state() == State.OPENED) {
                 // fix width when fully open and screen size changes
                 this.sidebarAnimation.setWidth(overlayScreen.width(), false);
@@ -106,17 +108,13 @@ public class Sidebar extends AnimatedWidget {
             return;
         }
 
-        boolean useMouse = client().currentScreen instanceof OverlayScreen;
-
-        // fix scaling
-        float screenScaled = 1F / GL.scale();
+        boolean useMouse = MiniMap.CLIENT.currentScreen instanceof OverlayScreen;
 
         // setup opengl stuff
         matrixStack.push();
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        matrixStack.scale(screenScaled, screenScaled, screenScaled);
 
         // don't allow Mojang disable blending after drawing text
         Font.ALLOW_DISABLE_BLENDING_AFTER_DRAWING_TEXT = false;
@@ -191,8 +189,12 @@ public class Sidebar extends AnimatedWidget {
             this.state(State.CLOSED);
             this.sidebarAnimation.func = Config.getConfig().animations.sidebar.fullyClose;
             this.sidebarAnimation.easeSpeed = 10F;
-            // slide the tab icons out, too
-            this.categories.forEach(category -> category.tab().addAnimation(new IconSlideOut(category.tab())));
+            this.categories.forEach(category -> {
+                // remove any current animations
+                category.tab().animations().clear();
+                // and add removal animations instead
+                category.tab().addAnimation(new IconSlideOut(category.tab()));
+            });
             Sound.WHOOSH.play();
         } else {
             this.state(hovered() ? State.HOVERED : State.NOT_HOVERED);
