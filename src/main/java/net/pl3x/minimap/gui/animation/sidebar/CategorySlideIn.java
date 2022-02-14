@@ -2,19 +2,18 @@ package net.pl3x.minimap.gui.animation.sidebar;
 
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.animation.Animation;
-import net.pl3x.minimap.gui.screen.widget.element.Tab;
+import net.pl3x.minimap.gui.screen.widget.Category;
 
-public class IconSlideIn extends Animation {
-    private final Tab tab;
+public class CategorySlideIn extends Animation {
+    private final Category category;
     private final float start;
     private final float end;
     private float delay;
 
-    public IconSlideIn(Tab tab, float start, float end, float delay) {
-        this.tab = tab;
+    public CategorySlideIn(Category category, float start, float end) {
+        this.category = category;
         this.start = start;
         this.end = end;
-        this.delay = delay;
     }
 
     @Override
@@ -25,11 +24,11 @@ public class IconSlideIn extends Animation {
         }
 
         // step each frame
-        float step = Math.min((this.deltaSum += delta) / 8F, 1F);
-        this.tab.iconX(animate(this.start, this.end, step, Config.getConfig().animations.sidebar.firstOpen));
+        float step = Math.min((this.deltaSum += delta) / 10F, 1F);
+        this.category.baseY(animate(this.start, this.end, step, Config.getConfig().animations.sidebar.firstOpen));
 
         // check if finished
-        if (this.tab.iconX() == this.end) {
+        if (step >= 1F) {
             this.remove = true;
         }
     }

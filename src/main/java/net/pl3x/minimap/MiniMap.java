@@ -6,7 +6,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Monitor;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.MathHelper;
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.font.Font;
 import net.pl3x.minimap.gui.layer.Background;
@@ -17,10 +16,12 @@ import net.pl3x.minimap.gui.layer.Layer;
 import net.pl3x.minimap.gui.layer.Map;
 import net.pl3x.minimap.gui.layer.Mask;
 import net.pl3x.minimap.gui.layer.Players;
+import net.pl3x.minimap.gui.screen.widget.Sidebar;
 import net.pl3x.minimap.manager.FileManager;
 import net.pl3x.minimap.manager.TileManager;
 import net.pl3x.minimap.scheduler.Scheduler;
 import net.pl3x.minimap.scheduler.Task;
+import net.pl3x.minimap.util.Mathf;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -96,6 +97,8 @@ public class MiniMap {
         TileManager.INSTANCE.stop();
         FileManager.INSTANCE.stop();
 
+        Sidebar.INSTANCE.close(true);
+
         this.layers.clear();
     }
 
@@ -122,7 +125,7 @@ public class MiniMap {
         }
 
         // smooth delta zoom
-        int zoom = Math.min(Math.max(Config.getConfig().zoom, 0), 7) * 64 + 64;
+        int zoom = (int) (Mathf.clamp(0, 7, Config.getConfig().zoom) * 64 + 64);
         if (Math.abs(zoom - this.deltaZoom) > 0.01F) {
             this.deltaZoom += delta / 5F * (zoom - this.deltaZoom);
         } else {
@@ -182,7 +185,7 @@ public class MiniMap {
         if (monitor != null) {
             float windowHeight = CLIENT.getWindow().getHeight();
             float monitorHeight = monitor.getCurrentVideoMode().getHeight();
-            scale = MathHelper.clamp(windowHeight / monitorHeight / 0.9F, 0.5F, 1F);
+            scale = Mathf.clamp(0.5F, 1F, windowHeight / monitorHeight / 0.9F);
             this.size *= scale;
         }
 

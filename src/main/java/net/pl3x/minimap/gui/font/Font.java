@@ -27,8 +27,11 @@ public class Font {
     private static final String PROVIDER_JSON = "{\"providers\":[{\"type\":\"ttf\",\"file\":\"minimap:%s.ttf\",\"shift\":[0, 0],\"size\":%f,\"oversample\":%f}]}";
 
     public static final Font DEFAULT = register("default_font", MiniMap.CLIENT.textRenderer.fontHeight, 2F);
-    public static final Font RALEWAY_MEDIUM = register("raleway-medium", 14F, 4F);
-    public static final Font RALEWAY_SEMIBOLD = register("raleway-semibold", 14F, 4F);
+    public static final Font GOODDOG = register("gooddog", 32F, 4F);
+    public static final Font LATO = register("lato", 20F, 4F);
+    public static final Font NOTOSANS = register("notosans", 20F, 4F);
+    public static final Font RALEWAY = register("raleway", 28F, 4F);
+    public static final Font ROBOTO = register("roboto", 20F, 4F);
 
     public static boolean ALLOW_DISABLE_BLENDING_AFTER_DRAWING_TEXT = true;
 
@@ -68,7 +71,7 @@ public class Font {
                 e.printStackTrace();
             }
         }
-        FontStorage storage = new FontStorage(MiniMap.CLIENT.getTextureManager(), new Identifier(MiniMap.MODID, "font/" + font.name()));
+        FontStorage storage = new FontStorage(MiniMap.CLIENT.getTextureManager(), new Identifier(MiniMap.MODID, "font/" + font.name() + "_" + font.height()));
         storage.setFonts(list);
         return new TextRenderer(id -> storage);
     }

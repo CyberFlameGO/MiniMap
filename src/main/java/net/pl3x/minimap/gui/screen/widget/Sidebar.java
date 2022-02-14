@@ -10,14 +10,13 @@ import net.pl3x.minimap.gui.animation.sidebar.IconSlideOut;
 import net.pl3x.minimap.gui.animation.sidebar.SidebarAnimation;
 import net.pl3x.minimap.gui.font.Font;
 import net.pl3x.minimap.gui.screen.OverlayScreen;
-import net.pl3x.minimap.gui.screen.widget.category.AboutCategory;
-import net.pl3x.minimap.gui.screen.widget.category.Category;
-import net.pl3x.minimap.gui.screen.widget.category.ClockCategory;
-import net.pl3x.minimap.gui.screen.widget.category.LayersCategory;
-import net.pl3x.minimap.gui.screen.widget.category.PositionCategory;
-import net.pl3x.minimap.gui.screen.widget.category.RadarCategory;
-import net.pl3x.minimap.gui.screen.widget.category.StyleCategory;
-import net.pl3x.minimap.gui.screen.widget.category.WaypointsCategory;
+import net.pl3x.minimap.gui.screen.category.AboutCategory;
+import net.pl3x.minimap.gui.screen.category.ClockCategory;
+import net.pl3x.minimap.gui.screen.category.LayersCategory;
+import net.pl3x.minimap.gui.screen.category.PositionCategory;
+import net.pl3x.minimap.gui.screen.category.RadarCategory;
+import net.pl3x.minimap.gui.screen.category.StyleCategory;
+import net.pl3x.minimap.gui.screen.category.WaypointsCategory;
 import net.pl3x.minimap.gui.texture.Cursor;
 import net.pl3x.minimap.hardware.Monitor;
 import net.pl3x.minimap.hardware.Mouse;
@@ -31,13 +30,13 @@ import java.util.List;
 public class Sidebar extends AnimatedWidget {
     public static final Sidebar INSTANCE = new Sidebar();
 
-    public static final float DEFAULT_WIDTH = 20F;
-    public static final float HOVER_WIDTH = 90F;
+    public static final float DEFAULT_WIDTH = 40F;
+    public static final float HOVER_WIDTH = 180F;
 
     private final List<Category> categories = new ArrayList<>();
     private final SidebarAnimation sidebarAnimation;
 
-    private Category openedCategory;
+    private Category selected;
     private State state;
 
     public Sidebar() {
@@ -46,15 +45,23 @@ public class Sidebar extends AnimatedWidget {
         this.sidebarAnimation = new SidebarAnimation(this);
         addAnimation(this.sidebarAnimation);
 
-        HudRenderCallback.EVENT.register(this::render);
+        HudRenderCallback.EVENT.register((matrixStack, delta) ->
+                render(matrixStack, MiniMap.CLIENT.getLastFrameDuration())
+        );
     }
 
-    public Category openedCategory() {
-        return this.openedCategory;
+    public Category selected() {
+        return this.selected;
     }
 
-    public void openedCategory(Category category) {
-        this.openedCategory = category;
+    public void select(Category category) {
+        if (this.selected != null) {
+            this.selected.close();
+        }
+        this.selected = category;
+        if (category != null) {
+            this.selected.open();
+        }
     }
 
     public State state() {
@@ -74,13 +81,13 @@ public class Sidebar extends AnimatedWidget {
     public void init() {
         if (this.categories.isEmpty()) {
             this.categories.addAll(List.of(
-                    new StyleCategory(this, 0F, 5F, 0F, 16F),
-                    new PositionCategory(this, 0F, 30F, 1.5F, 16F),
-                    new RadarCategory(this, 0F, 55F, 3F, 16F),
-                    new WaypointsCategory(this, 0F, 80F, 4.5F, 16F),
-                    new LayersCategory(this, 0F, 105F, 6F, 16F),
-                    new ClockCategory(this, 0F, 130F, 7.5F, 16F),
-                    new AboutCategory(this, 0F, 155F, 9F, 16F)
+                    new StyleCategory(20F, 0F),
+                    new PositionCategory(70F, 1.5F),
+                    new RadarCategory(120F, 3F),
+                    new WaypointsCategory(170F, 4.5F),
+                    new LayersCategory(220F, 6F),
+                    new ClockCategory(0270F, 7.5F),
+                    new AboutCategory(320F, 9F)
             ));
             children().addAll(this.categories);
         }
@@ -116,6 +123,10 @@ public class Sidebar extends AnimatedWidget {
         RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
+        // fixed scaling
+        float scale = 1F / Monitor.scale();
+        matrixStack.scale(scale, scale, scale);
+
         // don't allow Mojang disable blending after drawing text
         Font.ALLOW_DISABLE_BLENDING_AFTER_DRAWING_TEXT = false;
 
@@ -150,8 +161,8 @@ public class Sidebar extends AnimatedWidget {
         super.render(matrixStack, mouseX, mouseY, delta);
 
         // draw fancy separator line
-        if (this.openedCategory != null && this.width() > HOVER_WIDTH) {
-            GL.drawSolidRect(matrixStack, HOVER_WIDTH, 0F, HOVER_WIDTH + 1F, height(), 0xBB000000);
+        if (selected() != null && this.width() > HOVER_WIDTH) {
+            GL.drawLine(matrixStack, HOVER_WIDTH, 0F, HOVER_WIDTH, height(), 1F, 0xBB000000);
         }
     }
 
@@ -181,10 +192,11 @@ public class Sidebar extends AnimatedWidget {
         this.state(State.OPENED);
         this.sidebarAnimation.func = Config.getConfig().animations.sidebar.toggleOpen;
         this.sidebarAnimation.easeSpeed = 20F;
+        Sound.WHOOSH.play();
     }
 
     public void close(boolean fully) {
-        this.openedCategory = null;
+        select(null);
         if (fully) {
             this.state(State.CLOSED);
             this.sidebarAnimation.func = Config.getConfig().animations.sidebar.fullyClose;
@@ -200,6 +212,7 @@ public class Sidebar extends AnimatedWidget {
             this.state(hovered() ? State.HOVERED : State.NOT_HOVERED);
             this.sidebarAnimation.func = Config.getConfig().animations.sidebar.toggleClose;
             this.sidebarAnimation.easeSpeed = 20F;
+            Sound.WHOOSH.play();
         }
         this.updateTabColors();
     }

@@ -12,10 +12,10 @@ public class Monitor {
     }
 
     public static float width() {
-        return MiniMap.CLIENT.getWindow().getScaledWidth();
+        return MiniMap.CLIENT.getWindow().getWidth();
     }
 
     public static float height() {
-        return MiniMap.CLIENT.getWindow().getScaledWidth();
+        return MiniMap.CLIENT.getWindow().getHeight();
     }
 }

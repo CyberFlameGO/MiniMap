@@ -1,7 +1,5 @@
 package net.pl3x.minimap.util;
 
-import net.minecraft.util.math.MathHelper;
-
 import java.awt.Color;
 
 public class Colors {
@@ -24,32 +22,57 @@ public class Colors {
         );
     }
 
-    public static int lerpARGB(float delta, int color0, int color1) {
+    public static int lerpARGB(int color0, int color1, float delta) {
         if (color0 == color1) return color0;
         if (delta >= 1F) return color1;
         if (delta <= 0F) return color0;
         return argb(
-                (int) MathHelper.lerp(delta, alpha(color0), alpha(color1)),
-                (int) MathHelper.lerp(delta, red(color0), red(color1)),
-                (int) MathHelper.lerp(delta, green(color0), green(color1)),
-                (int) MathHelper.lerp(delta, blue(color0), blue(color1))
+                (int) Mathf.lerp(alpha(color0), alpha(color1), delta),
+                (int) Mathf.lerp(red(color0), red(color1), delta),
+                (int) Mathf.lerp(green(color0), green(color1), delta),
+                (int) Mathf.lerp(blue(color0), blue(color1), delta)
         );
     }
 
-    public static int lerpHSB(float delta, int color0, int color1) {
+    public static int inverseLerpARGB(int color0, int color1, float delta) {
+        if (color0 == color1) return color0;
+        if (delta >= 1F) return color1;
+        if (delta <= 0F) return color0;
+        return argb(
+                (int) Mathf.inverseLerp(alpha(color0), alpha(color1), delta),
+                (int) Mathf.inverseLerp(red(color0), red(color1), delta),
+                (int) Mathf.inverseLerp(green(color0), green(color1), delta),
+                (int) Mathf.inverseLerp(blue(color0), blue(color1), delta)
+        );
+    }
+
+    public static int lerpHSB(int color0, int color1, float delta) {
         float[] hsb0 = Color.RGBtoHSB(red(color0), green(color0), blue(color0), null);
         float[] hsb1 = Color.RGBtoHSB(red(color1), green(color1), blue(color1), null);
         return setAlpha(
-                (int) MathHelper.lerp(delta, alpha(color0), alpha(color1)),
+                (int) Mathf.lerp(alpha(color0), alpha(color1), delta),
                 Color.HSBtoRGB(
-                        lerpShortestAngle(delta, hsb0[0], hsb1[0]),
-                        MathHelper.lerp(delta, hsb0[1], hsb1[1]),
-                        MathHelper.lerp(delta, hsb0[2], hsb1[2])
+                        lerpShortestAngle(hsb0[0], hsb1[0], delta),
+                        Mathf.lerp(hsb0[1], hsb1[1], delta),
+                        Mathf.lerp(hsb0[2], hsb1[2], delta)
                 )
         );
     }
 
-    public static float lerpShortestAngle(float delta, float start, float end) {
+    public static int inverseLerpHSB(int color0, int color1, float delta) {
+        float[] hsb0 = Color.RGBtoHSB(red(color0), green(color0), blue(color0), null);
+        float[] hsb1 = Color.RGBtoHSB(red(color1), green(color1), blue(color1), null);
+        return setAlpha(
+                (int) Mathf.inverseLerp(alpha(color0), alpha(color1), delta),
+                Color.HSBtoRGB(
+                        lerpShortestAngle(hsb0[0], hsb1[0], delta),
+                        Mathf.inverseLerp(hsb0[1], hsb1[1], delta),
+                        Mathf.inverseLerp(hsb0[2], hsb1[2], delta)
+                )
+        );
+    }
+
+    public static float lerpShortestAngle(float start, float end, float delta) {
         float distCW = (end >= start ? end - start : 1F - (start - end));
         float distCCW = (start >= end ? start - end : 1F - (end - start));
         float direction = (distCW <= distCCW ? distCW : -1F * distCCW);

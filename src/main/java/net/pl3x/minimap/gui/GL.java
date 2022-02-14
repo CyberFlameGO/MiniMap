@@ -54,7 +54,7 @@ public class GL {
     }
 
     public static void drawSolidCirc(MatrixStack matrixStack, float centerX, float centerY, float radius, int color) {
-        drawSolidCirc(matrixStack.peek().getPositionMatrix(), centerX, centerY, radius, (int) radius, color);
+        drawSolidCirc(matrixStack.peek().getPositionMatrix(), centerX, centerY, radius, (int) radius * 2, color);
     }
 
     public static void drawSolidCirc(Matrix4f matrix, float centerX, float centerY, float radius, int res, int color) {

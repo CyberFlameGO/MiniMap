@@ -1,8 +1,8 @@
 package net.pl3x.minimap.gui.animation;
 
-import net.minecraft.util.math.MathHelper;
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.util.Colors;
+import net.pl3x.minimap.util.Mathf;
 
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +29,7 @@ public abstract class Animation {
             // do not animate
             return end;
         }
-        return MathHelper.lerp(tween(step, func), start, end);
+        return Mathf.lerp(start, end, tween(step, func));
     }
 
     protected int animateARGB(int start, int end, float step, Easing.Func func) {
@@ -37,7 +37,7 @@ public abstract class Animation {
             // do not animate
             return end;
         }
-        return Colors.lerpARGB(tween(step, func), start, end);
+        return Colors.lerpARGB(start, end, tween(step, func));
     }
 
     private float tween(float step, Easing.Func func) {

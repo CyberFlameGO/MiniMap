@@ -52,8 +52,11 @@ public class Mouse {
     public void update() {
         GLFW.glfwGetCursorPos(handle(), this.rawX, this.rawY);
 
-        this.mouseX = (float) (rawX[0] / Monitor.scale());
-        this.mouseY = (float) (rawY[0] / Monitor.scale());
+        //this.mouseX = (float) (rawX[0] / Monitor.scale());
+        //this.mouseY = (float) (rawY[0] / Monitor.scale());
+
+        this.mouseX = (float) rawX[0];
+        this.mouseY = (float) rawY[0];
 
         if (this.windowFocused != MiniMap.CLIENT.isWindowFocused()) {
             this.windowFocused = MiniMap.CLIENT.isWindowFocused();

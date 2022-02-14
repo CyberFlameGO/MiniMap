@@ -2,7 +2,7 @@ package net.pl3x.minimap.gui.animation.sidebar;
 
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.animation.Animation;
-import net.pl3x.minimap.gui.screen.widget.category.Tab;
+import net.pl3x.minimap.gui.screen.widget.element.Tab;
 
 public class IconSlideOut extends Animation {
     private final Tab tab;

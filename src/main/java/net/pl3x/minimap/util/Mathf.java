@@ -27,4 +27,16 @@ public class Mathf {
     public static float sqrt(float value) {
         return (float) Math.sqrt(value);
     }
+
+    public static float lerp(float a, float b, float t) {
+        return a + t * (b - a);
+    }
+
+    public static float inverseLerp(float a, float b, float t) {
+        return (t - a) / (b - a);
+    }
+
+    public static float clamp(float min, float max, float value) {
+        return Math.max(Math.min(value, max), min);
+    }
 }

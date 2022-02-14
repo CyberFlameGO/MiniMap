@@ -24,6 +24,7 @@ public class Texture extends Drawable {
     public static final Texture SKY_OVERWORLD = register(new Texture("gui/sky/overworld"));
     public static final Texture SKY_THE_NETHER = register(new Texture("gui/sky/the_nether"));
     public static final Texture SKY_THE_END = register(new Texture("gui/sky/the_end"));
+    public static final Texture WIDGETS = register(new Texture("gui/widgets"));
 
     public static final Texture CURSOR_ARROW = register(new Texture("cursor/arrow"));
     public static final Texture CURSOR_HAND = register(new Texture("cursor/hand"));

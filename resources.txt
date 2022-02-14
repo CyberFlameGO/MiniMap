@@ -1,0 +1,18 @@
+Fonts:
+  gooddog - https://www.dafont.com/good-dog.font
+  raleway - https://fonts.google.com/specimen/Raleway
+
+Icons:
+  about - https://www.flaticon.com/free-icon/information-button_1176
+  radar - https://www.flaticon.com/free-icon/radar_614511
+  style - https://www.flaticon.com/free-icon/theme_3659789
+  clock - https://www.flaticon.com/free-icon/clock_1827463
+  position - https://www.flaticon.com/premium-icon/maximize_3168081
+  waypoints - https://www.flaticon.com/free-icon/placeholder_592243
+  layers - https://www.flaticon.com/free-icon/layers_481865
+  map - https://www.flaticon.com/premium-icon/map_2918641
+  all mob heads - https://minecraft.fandom.com/wiki/Mob#List_of_mobs
+
+Sounds:
+  whoosh.ogg - https://www.zapsplat.com/music/ui-computer-screen-window-expand-maximise-short-swipe-whoosh-1
+

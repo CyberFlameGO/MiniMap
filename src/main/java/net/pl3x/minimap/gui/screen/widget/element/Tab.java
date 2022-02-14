@@ -1,4 +1,4 @@
-package net.pl3x.minimap.gui.screen.widget.category;
+package net.pl3x.minimap.gui.screen.widget.element;
 
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.OrderedText;
@@ -10,6 +10,7 @@ import net.pl3x.minimap.gui.animation.sidebar.ColorHover;
 import net.pl3x.minimap.gui.animation.sidebar.IconSlideIn;
 import net.pl3x.minimap.gui.font.Font;
 import net.pl3x.minimap.gui.screen.widget.AnimatedWidget;
+import net.pl3x.minimap.gui.screen.widget.Category;
 import net.pl3x.minimap.gui.screen.widget.Sidebar;
 import net.pl3x.minimap.gui.texture.Cursor;
 import net.pl3x.minimap.hardware.Mouse;
@@ -33,24 +34,24 @@ public class Tab extends AnimatedWidget {
     private final ColorHover colorHoverAnimation;
     private int color;
 
-    public Tab(Category category, float x, float y, float delay, Text text, Icon icon, float iconSize) {
-        super(category, x, y, 0F, iconSize);
+    public Tab(Category category, float y, float delay, Text text, Icon icon, float iconSize) {
+        super(category, 2F, y, 0F, iconSize);
 
         this.category = category;
 
         this.icon = icon;
         this.iconSize = iconSize;
-        iconX(x - iconSize);
+        iconX(x() - iconSize);
         iconY(y);
 
         this.text = text;
-        textX(x + iconSize + 5F);
+        textX(x() + iconSize + 5F);
         textY(y + 4F);
 
         this.colorHoverAnimation = new ColorHover(this);
         color(Tab.DEFAULT_COLOR);
 
-        addAnimation(new IconSlideIn(this, this.iconX, x + 2F, delay));
+        addAnimation(new IconSlideIn(this, this.iconX, x() + 2F, delay));
         addAnimation(this.colorHoverAnimation);
     }
 
@@ -112,7 +113,7 @@ public class Tab extends AnimatedWidget {
 
     @Override
     public float width() {
-        return parent().width();
+        return Math.min(Sidebar.INSTANCE.width(), Sidebar.HOVER_WIDTH);
     }
 
     @Override
@@ -121,16 +122,16 @@ public class Tab extends AnimatedWidget {
 
         icon().draw(matrixStack, iconX(), iconY(), iconSize(), color());
 
-        if (parent().width() > Sidebar.DEFAULT_WIDTH) {
-            if (parent().width() < Sidebar.HOVER_WIDTH) {
+        if (width() > Sidebar.DEFAULT_WIDTH) {
+            if (width() < Sidebar.HOVER_WIDTH) {
                 // only trim text if sidebar is between open and
                 // closed states since this is sort of expensive
-                StringVisitable str = Font.RALEWAY_MEDIUM.trimToWidth(text(), (int) (parent().width() - textX()));
-                for (OrderedText orderedText : Font.RALEWAY_MEDIUM.wrapLines(str, Integer.MAX_VALUE)) {
-                    Font.RALEWAY_MEDIUM.draw(matrixStack, orderedText, textX(), textY(), color());
+                StringVisitable str = Font.RALEWAY.trimToWidth(text(), (int) (width() - textX()));
+                for (OrderedText orderedText : Font.RALEWAY.wrapLines(str, Integer.MAX_VALUE)) {
+                    Font.RALEWAY.draw(matrixStack, orderedText, textX(), textY(), color());
                 }
             } else {
-                Font.RALEWAY_MEDIUM.draw(matrixStack, text(), textX(), textY(), color());
+                Font.RALEWAY.draw(matrixStack, text(), textX(), textY(), color());
             }
         }
 
@@ -147,13 +148,13 @@ public class Tab extends AnimatedWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (hovered()) {
-            if (category().sidebar().openedCategory() != category()) {
-                category().sidebar().openedCategory(category());
-                category().sidebar().open();
+            if (Sidebar.INSTANCE.selected() != category()) {
+                Sidebar.INSTANCE.select(category());
+                Sidebar.INSTANCE.open();
             } else {
-                category().sidebar().close(false);
+                Sidebar.INSTANCE.close(false);
             }
-            category().sidebar().updateTabColors();
+            Sidebar.INSTANCE.updateTabColors();
             return true;
         }
         return false;
@@ -162,7 +163,7 @@ public class Tab extends AnimatedWidget {
     public void updateTabColor() {
         if (hovered()) {
             this.colorHoverAnimation.set(HOVER_COLOR, Config.getConfig().animations.sidebar.colorHoverOn);
-        } else if (category().sidebar().openedCategory() == category()) {
+        } else if (Sidebar.INSTANCE.selected() == category()) {
             this.colorHoverAnimation.set(ACTIVE_COLOR, Config.getConfig().animations.sidebar.colorHoverOff);
         } else {
             this.colorHoverAnimation.set(DEFAULT_COLOR, Config.getConfig().animations.sidebar.colorHoverOff);
