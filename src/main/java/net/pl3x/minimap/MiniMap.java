@@ -35,7 +35,7 @@ public class MiniMap {
     public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
     public static final Logger LOG = LogManager.getLogger("MiniMap");
 
-    private final List<Layer> layers = new ArrayList<>();
+    public final List<Layer> layers = new ArrayList<>();
 
     public ClientPlayerEntity player;
 
@@ -51,7 +51,7 @@ public class MiniMap {
     private Task tickTask;
     private long tick;
 
-    private MiniMap() {
+    public MiniMap() {
     }
 
     public void initialize() {
@@ -104,7 +104,7 @@ public class MiniMap {
 
     public boolean dontRender() {
         // todo - temp disable this while we focus on sidebar UI
-        if (true) return true;
+        //if (true) return true;
 
         if (!this.visible) {
             return true; // hidden
@@ -142,13 +142,13 @@ public class MiniMap {
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
         // don't allow Mojang disable blending after drawing text
-        Font.ALLOW_DISABLE_BLENDING_AFTER_DRAWING_TEXT = false;
+        Font.FIX_MOJANGS_TEXT_RENDERER_CRAP = true;
 
         // render layers
         this.layers.forEach(layer -> layer.render(matrixStack));
 
         // allow Mojang disable blending after drawing text
-        Font.ALLOW_DISABLE_BLENDING_AFTER_DRAWING_TEXT = true;
+        Font.FIX_MOJANGS_TEXT_RENDERER_CRAP = false;
 
         // clean up opengl stuff
         RenderSystem.disableBlend();

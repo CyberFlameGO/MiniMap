@@ -26,14 +26,14 @@ public class Font {
     private static final Set<Font> REGISTERED_FONTS = new HashSet<>();
     private static final String PROVIDER_JSON = "{\"providers\":[{\"type\":\"ttf\",\"file\":\"minimap:%s.ttf\",\"shift\":[0, 0],\"size\":%f,\"oversample\":%f}]}";
 
-    public static final Font DEFAULT = register("default_font", MiniMap.CLIENT.textRenderer.fontHeight, 2F);
+    public static final Font DEFAULT = register("default_font", MiniMap.CLIENT.textRenderer.fontHeight, 1F);
     public static final Font GOODDOG = register("gooddog", 32F, 4F);
     public static final Font LATO = register("lato", 20F, 4F);
     public static final Font NOTOSANS = register("notosans", 20F, 4F);
     public static final Font RALEWAY = register("raleway", 28F, 4F);
     public static final Font ROBOTO = register("roboto", 20F, 4F);
 
-    public static boolean ALLOW_DISABLE_BLENDING_AFTER_DRAWING_TEXT = true;
+    public static boolean FIX_MOJANGS_TEXT_RENDERER_CRAP = false;
 
     private static Font register(String name, float height, float oversample) {
         Font font = new Font(name, height, oversample);
@@ -52,7 +52,7 @@ public class Font {
     }
 
     private static TextRenderer generateTextRenderer(Font font) {
-        JsonObject data = JsonHelper.deserialize(new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create(), String.format(PROVIDER_JSON, font.name(), font.height(), font.oversample()), JsonObject.class);
+        JsonObject data = JsonHelper.deserialize(new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create(), String.format(PROVIDER_JSON, font.name, font.height(), font.oversample), JsonObject.class);
         if (data == null) {
             MiniMap.LOG.error("Could not deserialize internal font!");
             return MiniMap.CLIENT.textRenderer;
@@ -71,7 +71,7 @@ public class Font {
                 e.printStackTrace();
             }
         }
-        FontStorage storage = new FontStorage(MiniMap.CLIENT.getTextureManager(), new Identifier(MiniMap.MODID, "font/" + font.name() + "_" + font.height()));
+        FontStorage storage = new FontStorage(MiniMap.CLIENT.getTextureManager(), new Identifier(MiniMap.MODID, "font/" + font.name + "_" + font.height()));
         storage.setFonts(list);
         return new TextRenderer(id -> storage);
     }
@@ -86,10 +86,6 @@ public class Font {
         this.name = name;
         this.height = height;
         this.oversample = oversample;
-    }
-
-    public String name() {
-        return this.name;
     }
 
     public TextRenderer textRenderer() {
@@ -114,10 +110,6 @@ public class Font {
 
     public float height() {
         return this.height;
-    }
-
-    public float oversample() {
-        return this.oversample;
     }
 
     public int centerX(String text, float x) {

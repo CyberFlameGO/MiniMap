@@ -5,12 +5,8 @@
       "height": 32
     },
     "hotspot": {
-      "x": 3,
-      "y": 3
-    },
-    "animation": {
-      "frames": 9,
-      "frametime": 1
+      "x": 10,
+      "y": 8
     }
   }
 }

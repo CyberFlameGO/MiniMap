@@ -27,7 +27,9 @@ public class Texture extends Drawable {
     public static final Texture WIDGETS = register(new Texture("gui/widgets"));
 
     public static final Texture CURSOR_ARROW = register(new Texture("cursor/arrow"));
-    public static final Texture CURSOR_HAND = register(new Texture("cursor/hand"));
+    public static final Texture CURSOR_HAND_GRAB = register(new Texture("cursor/hand_grab"));
+    public static final Texture CURSOR_HAND_OPEN = register(new Texture("cursor/hand_open"));
+    public static final Texture CURSOR_HAND_POINTER = register(new Texture("cursor/hand_pointer"));
 
     private static Texture register(Texture texture) {
         REGISTERED_TEXTURES.add(texture);

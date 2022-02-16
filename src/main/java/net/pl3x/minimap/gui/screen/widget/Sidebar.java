@@ -1,14 +1,11 @@
 package net.pl3x.minimap.gui.screen.widget;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.util.math.MatrixStack;
 import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.animation.sidebar.IconSlideOut;
 import net.pl3x.minimap.gui.animation.sidebar.SidebarAnimation;
-import net.pl3x.minimap.gui.font.Font;
 import net.pl3x.minimap.gui.screen.OverlayScreen;
 import net.pl3x.minimap.gui.screen.category.AboutCategory;
 import net.pl3x.minimap.gui.screen.category.ClockCategory;
@@ -22,7 +19,6 @@ import net.pl3x.minimap.hardware.Monitor;
 import net.pl3x.minimap.hardware.Mouse;
 import net.pl3x.minimap.sound.Sound;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,15 +35,11 @@ public class Sidebar extends AnimatedWidget {
     private Category selected;
     private State state;
 
-    public Sidebar() {
+    private Sidebar() {
         super(null, 0F, 0F, 0F, 0F);
 
         this.sidebarAnimation = new SidebarAnimation(this);
         addAnimation(this.sidebarAnimation);
-
-        HudRenderCallback.EVENT.register((matrixStack, delta) ->
-                render(matrixStack, MiniMap.CLIENT.getLastFrameDuration())
-        );
     }
 
     public Category selected() {
@@ -55,12 +47,14 @@ public class Sidebar extends AnimatedWidget {
     }
 
     public void select(Category category) {
+        boolean hadPrevious = false;
         if (this.selected != null) {
             this.selected.close();
+            hadPrevious = true;
         }
         this.selected = category;
         if (category != null) {
-            this.selected.open();
+            this.selected.open(hadPrevious ? 0F : 2.5F);
         }
     }
 
@@ -108,52 +102,12 @@ public class Sidebar extends AnimatedWidget {
         super.init();
     }
 
-    private void render(MatrixStack matrixStack, float delta) {
-        // quick check to see if we should be rendering anything at all
-        if (state() == State.CLOSED && width() <= 0F) {
-            // nope. lets save some cpu
-            return;
-        }
-
-        boolean useMouse = MiniMap.CLIENT.currentScreen instanceof OverlayScreen;
-
-        // setup opengl stuff
-        matrixStack.push();
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-
-        // fixed scaling
-        float scale = 1F / Monitor.scale();
-        matrixStack.scale(scale, scale, scale);
-
-        // don't allow Mojang disable blending after drawing text
-        Font.ALLOW_DISABLE_BLENDING_AFTER_DRAWING_TEXT = false;
-
-        // update our own mouse positions before rendering anything
-        if (useMouse) {
-            Mouse.INSTANCE.update();
+    @Override
+    public void render(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
+        if (hovered()) {
             Mouse.INSTANCE.cursor(Cursor.ARROW);
         }
 
-        // render everything
-        this.render(matrixStack, Mouse.INSTANCE.x(), Mouse.INSTANCE.y(), delta);
-
-        // render our mouse after everything is rendered
-        if (useMouse) {
-            Mouse.INSTANCE.render(matrixStack, delta);
-        }
-
-        // allow Mojang disable blending after drawing text
-        Font.ALLOW_DISABLE_BLENDING_AFTER_DRAWING_TEXT = true;
-
-        // clean up opengl stuff
-        RenderSystem.disableBlend();
-        matrixStack.pop();
-    }
-
-    @Override
-    public void render(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
         // draw background
         GL.drawSolidRect(matrixStack, 0F, 0F, width(), height(), 0x99000000, 0xBB000000);
 
@@ -191,7 +145,7 @@ public class Sidebar extends AnimatedWidget {
     public void open() {
         this.state(State.OPENED);
         this.sidebarAnimation.func = Config.getConfig().animations.sidebar.toggleOpen;
-        this.sidebarAnimation.easeSpeed = 20F;
+        this.sidebarAnimation.easeSpeed = 7.5F;
         Sound.WHOOSH.play();
     }
 
@@ -211,7 +165,7 @@ public class Sidebar extends AnimatedWidget {
         } else {
             this.state(hovered() ? State.HOVERED : State.NOT_HOVERED);
             this.sidebarAnimation.func = Config.getConfig().animations.sidebar.toggleClose;
-            this.sidebarAnimation.easeSpeed = 20F;
+            this.sidebarAnimation.easeSpeed = 7.5F;
             Sound.WHOOSH.play();
         }
         this.updateTabColors();
@@ -231,9 +185,13 @@ public class Sidebar extends AnimatedWidget {
 
     public void resetState() {
         this.state(State.CLOSED);
-        this.width(0F);
+        this.width(0.1F);
         this.categories.clear();
         children().clear();
+    }
+
+    public boolean closed() {
+        return state() == State.CLOSED && width() <= 0F;
     }
 
     public enum State {

@@ -4,25 +4,24 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.pl3x.minimap.MiniMap;
-import net.pl3x.minimap.gui.screen.widget.Sidebar;
+import net.pl3x.minimap.gui.screen.widget.FullMap;
 import net.pl3x.minimap.hardware.Monitor;
 import net.pl3x.minimap.hardware.Mouse;
 
 public class OverlayScreen extends Screen {
     protected final Screen parent;
 
-    private final boolean debugEnabled;
+    private boolean alreadyInitialized;
+    private boolean debugEnabled;
 
     public OverlayScreen(Screen parent) {
         super(Text.of(""));
         this.parent = parent;
 
-        // disable debug info overlay temporarily
-        this.debugEnabled = MiniMap.CLIENT.options.debugEnabled;
-        MiniMap.CLIENT.options.debugEnabled = false;
-
-        // reset sidebar state
-        Sidebar.INSTANCE.resetState();
+        // don't do anything here. ModMenu creates a new instance
+        // if this class when the list of mods is opened, and it
+        // really screws with the states of fullmap and sidebar.
+        // moved logic down into init() with !alreadyInitialized
     }
 
     public int width() {
@@ -35,6 +34,17 @@ public class OverlayScreen extends Screen {
 
     @Override
     public void init() {
+        if (!alreadyInitialized) {
+            this.alreadyInitialized = true;
+
+            // disable debug info overlay temporarily
+            this.debugEnabled = MiniMap.CLIENT.options.debugEnabled;
+            MiniMap.CLIENT.options.debugEnabled = false;
+
+            // open fullmap and reset all states
+            FullMap.INSTANCE.open();
+        }
+
         MiniMap.INSTANCE.visible = false;
         MiniMap.CLIENT.options.hudHidden = true;
 
@@ -43,7 +53,7 @@ public class OverlayScreen extends Screen {
 
         Mouse.INSTANCE.cursorEnabled(true);
 
-        Sidebar.INSTANCE.init();
+        FullMap.INSTANCE.init();
     }
 
     @Override
@@ -53,7 +63,7 @@ public class OverlayScreen extends Screen {
 
     @Override
     public void tick() {
-        Sidebar.INSTANCE.tick();
+        FullMap.INSTANCE.tick();
     }
 
     @Override
@@ -67,23 +77,19 @@ public class OverlayScreen extends Screen {
     public void onClose() {
         MiniMap.CLIENT.setScreen(this.parent);
 
-        Sidebar.INSTANCE.close(true);
+        FullMap.INSTANCE.close();
 
         // put back debug info overlay
         MiniMap.CLIENT.options.debugEnabled = this.debugEnabled;
     }
 
-    public void openScreen(Screen screen) {
-        MiniMap.CLIENT.setScreen(screen);
-    }
-
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return Sidebar.INSTANCE.mouseClicked(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
+        return FullMap.INSTANCE.mouseClicked(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        return Sidebar.INSTANCE.keyPressed(keyCode, scanCode, modifiers) || super.keyPressed(keyCode, scanCode, modifiers);
+        return FullMap.INSTANCE.keyPressed(keyCode, scanCode, modifiers) || super.keyPressed(keyCode, scanCode, modifiers);
     }
 }

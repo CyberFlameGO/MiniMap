@@ -19,6 +19,10 @@ public class Drawable {
         this.identifier = identifier;
     }
 
+    public void tint(MatrixStack matrixStack, float x, float y, float width, float height, int color) {
+        tint(matrixStack, x, y, x + width, y + height, 0F, 0F, 1F, 1F, color);
+    }
+
     public void tint(MatrixStack matrixStack, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, int color) {
         RenderSystem.setShaderColor(
                 Colors.red(color) / 255F,

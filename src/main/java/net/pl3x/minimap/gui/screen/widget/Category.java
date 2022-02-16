@@ -3,15 +3,15 @@ package net.pl3x.minimap.gui.screen.widget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.pl3x.minimap.gui.Icon;
-import net.pl3x.minimap.gui.animation.sidebar.CategorySlideIn;
+import net.pl3x.minimap.gui.animation.sidebar.CategorySlide;
 import net.pl3x.minimap.gui.screen.widget.element.Tab;
 import net.pl3x.minimap.hardware.Monitor;
 
 public abstract class Category extends AnimatedWidget {
     private final Tab tab;
 
-    protected float baseX;
-    protected float baseY;
+    private float baseX;
+    private float baseY;
 
     public Category(Text text, Icon icon, float y, float delay) {
         super(null, 0F, y, 0F, 0F);
@@ -88,14 +88,14 @@ public abstract class Category extends AnimatedWidget {
         return selected() && super.keyPressed(keyCode, scanCode, modifiers);
     }
 
-    public void open() {
+    public void open(float delay) {
         this.baseY(-Monitor.height());
         animations().clear();
-        addAnimation(new CategorySlideIn(this, baseY(), 0F));
+        addAnimation(new CategorySlide(this, baseY(), 0F, delay));
     }
 
     public void close() {
         animations().clear();
-        addAnimation(new CategorySlideIn(this, baseY(), Monitor.height() * 2F));
+        addAnimation(new CategorySlide(this, baseY(), Monitor.height(), 0F));
     }
 }

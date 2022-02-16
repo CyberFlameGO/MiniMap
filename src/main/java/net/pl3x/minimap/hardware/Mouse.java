@@ -44,6 +44,10 @@ public class Mouse {
         this.cursor = cursor;
     }
 
+    public boolean cursorEnabled() {
+        return this.cursorEnabled;
+    }
+
     public void cursorEnabled(boolean enabled) {
         this.cursorEnabled = enabled;
         visibility(enabled);

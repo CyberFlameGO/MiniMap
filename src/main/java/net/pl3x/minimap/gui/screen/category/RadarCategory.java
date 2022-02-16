@@ -14,9 +14,10 @@ public class RadarCategory extends Category {
 
     @Override
     public void renderContent(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
-        float x = (Monitor.width() + this.baseX) / 2F;
-        float y = this.baseY + 35F;
+        float x = (Monitor.width() + baseX()) / 2F;
+        float y = baseY() + 35F;
 
-        Font.GOODDOG.drawCenteredWithShadow(matrixStack, Lang.CATEGORY_RADAR, x, y, 0xFFFFFFFF);
+        Font.GOODDOG.drawCentered(matrixStack, Lang.CATEGORY_RADAR, x + 3F, y + 3F, 0x88000000);
+        Font.GOODDOG.drawCentered(matrixStack, Lang.CATEGORY_RADAR, x, y, 0xFFFFFFFF);
     }
 }

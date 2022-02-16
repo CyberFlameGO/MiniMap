@@ -46,7 +46,7 @@ public class Tab extends AnimatedWidget {
 
         this.text = text;
         textX(x() + iconSize + 5F);
-        textY(y + 4F);
+        textY(y + 5F);
 
         this.colorHoverAnimation = new ColorHover(this);
         color(Tab.DEFAULT_COLOR);
@@ -136,7 +136,7 @@ public class Tab extends AnimatedWidget {
         }
 
         if (hovered()) {
-            Mouse.INSTANCE.cursor(Cursor.HAND);
+            Mouse.INSTANCE.cursor(Cursor.HAND_POINTER);
         }
     }
 

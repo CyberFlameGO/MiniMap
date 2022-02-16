@@ -1,8 +1,8 @@
 package net.pl3x.minimap.manager;
 
+import net.pl3x.minimap.gui.Tile;
 import net.pl3x.minimap.scheduler.Scheduler;
 import net.pl3x.minimap.scheduler.Task;
-import net.pl3x.minimap.gui.Tile;
 
 import java.util.HashSet;
 import java.util.Iterator;

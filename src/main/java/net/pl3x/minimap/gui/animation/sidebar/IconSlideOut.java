@@ -22,7 +22,7 @@ public class IconSlideOut extends Animation {
         this.tab.iconX(animate(this.start, this.end, step, Config.getConfig().animations.sidebar.fullyClose));
 
         // check if finished
-        if (this.tab.iconX() == this.end) {
+        if (step >= 1F) {
             this.remove = true;
         }
     }

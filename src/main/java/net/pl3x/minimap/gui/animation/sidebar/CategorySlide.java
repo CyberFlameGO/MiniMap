@@ -1,19 +1,20 @@
 package net.pl3x.minimap.gui.animation.sidebar;
 
-import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.animation.Animation;
+import net.pl3x.minimap.gui.animation.Easing;
 import net.pl3x.minimap.gui.screen.widget.Category;
 
-public class CategorySlideIn extends Animation {
+public class CategorySlide extends Animation {
     private final Category category;
     private final float start;
     private final float end;
     private float delay;
 
-    public CategorySlideIn(Category category, float start, float end) {
+    public CategorySlide(Category category, float start, float end, float delay) {
         this.category = category;
         this.start = start;
         this.end = end;
+        this.delay = delay;
     }
 
     @Override
@@ -25,7 +26,7 @@ public class CategorySlideIn extends Animation {
 
         // step each frame
         float step = Math.min((this.deltaSum += delta) / 10F, 1F);
-        this.category.baseY(animate(this.start, this.end, step, Config.getConfig().animations.sidebar.firstOpen));
+        this.category.baseY(animate(this.start, this.end, step, Easing.Back.out));
 
         // check if finished
         if (step >= 1F) {

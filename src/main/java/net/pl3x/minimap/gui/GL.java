@@ -11,7 +11,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Matrix3f;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3f;
-import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.util.Mathf;
 
 public class GL {

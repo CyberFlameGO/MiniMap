@@ -1,3 +1,6 @@
+Cursors:
+  chrome glass - https://www.deviantart.com/yoyos/art/Chrome-Glass-32252748
+
 Fonts:
   gooddog - https://www.dafont.com/good-dog.font
   raleway - https://fonts.google.com/specimen/Raleway

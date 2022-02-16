@@ -15,7 +15,9 @@ public class Cursor extends Drawable {
     private static final Set<Cursor> REGISTERED_CURSORS = new HashSet<>();
 
     public static final Cursor ARROW = register(new Cursor("arrow", Texture.CURSOR_ARROW));
-    public static final Cursor HAND = register(new Cursor("hand", Texture.CURSOR_HAND));
+    public static final Cursor HAND_GRAB = register(new Cursor("hand_grab", Texture.CURSOR_HAND_GRAB));
+    public static final Cursor HAND_OPEN = register(new Cursor("hand_open", Texture.CURSOR_HAND_OPEN));
+    public static final Cursor HAND_POINTER = register(new Cursor("hand_pointer", Texture.CURSOR_HAND_POINTER));
 
     private static Cursor register(Cursor cursor) {
         REGISTERED_CURSORS.add(cursor);

@@ -16,7 +16,7 @@ public class RenderPhaseMixin {
 
     @Inject(method = "endDrawing", at = @At("HEAD"), cancellable = true)
     private void endDrawing(CallbackInfo ci) {
-        if (!Font.ALLOW_DISABLE_BLENDING_AFTER_DRAWING_TEXT) {
+        if (Font.FIX_MOJANGS_TEXT_RENDERER_CRAP) {
             ci.cancel();
         }
     }
