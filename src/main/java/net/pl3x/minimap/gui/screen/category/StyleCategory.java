@@ -11,6 +11,7 @@ import net.pl3x.minimap.gui.font.Font;
 import net.pl3x.minimap.gui.layer.Layer;
 import net.pl3x.minimap.gui.screen.widget.Category;
 import net.pl3x.minimap.gui.screen.widget.element.Checkbox;
+import net.pl3x.minimap.gui.screen.widget.element.Slider;
 import net.pl3x.minimap.hardware.Monitor;
 
 import java.util.List;
@@ -72,26 +73,26 @@ public class StyleCategory extends Category {
                             Config.getConfig().showDirections = value;
                         }
                     }),
-                    new Checkbox(this, Text.of("Update Interval"), x, y += v, new Option<>() {
+                    new Slider(this, Text.of("Update Interval"), x, y += v, 0, 20, new Option<>() {
                         @Override
-                        public Boolean get() {
-                            return false;//Config.getConfig().circular;
+                        public Integer get() {
+                            return Config.getConfig().updateInterval;
                         }
 
                         @Override
-                        public void set(Boolean value) {
-                            //Config.getConfig().circular = value;
+                        public void set(Integer value) {
+                            Config.getConfig().updateInterval = value;
                         }
                     }),
-                    new Checkbox(this, Text.of("Opacity"), x, y += v, new Option<>() {
+                    new Slider(this, Text.of("Opacity"), x, y += v, 0, 0xFF, new Option<>() {
                         @Override
-                        public Boolean get() {
-                            return false;//Config.getConfig().circular;
+                        public Integer get() {
+                            return Config.getConfig().opacity;
                         }
 
                         @Override
-                        public void set(Boolean value) {
-                            //Config.getConfig().circular = value;
+                        public void set(Integer value) {
+                            Config.getConfig().opacity = value;
                         }
                     }),
                     new Checkbox(this, Text.of("Bottom Text"), x, y += v, new Option<>() {

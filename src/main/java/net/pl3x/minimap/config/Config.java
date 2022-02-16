@@ -35,6 +35,8 @@ public class Config {
 
     public int updateInterval = 5;
 
+    public int opacity = 255;
+
     public Animations animations = new Animations();
 
     private static final Gson gson = new GsonBuilder()
