@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.Monitor;
 import net.minecraft.client.util.math.MatrixStack;
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.font.Font;
@@ -17,6 +16,7 @@ import net.pl3x.minimap.gui.layer.Map;
 import net.pl3x.minimap.gui.layer.Mask;
 import net.pl3x.minimap.gui.layer.Players;
 import net.pl3x.minimap.gui.screen.widget.Sidebar;
+import net.pl3x.minimap.hardware.Monitor;
 import net.pl3x.minimap.manager.FileManager;
 import net.pl3x.minimap.manager.TileManager;
 import net.pl3x.minimap.scheduler.Scheduler;
@@ -45,8 +45,9 @@ public class MiniMap {
     public float angle;
     public float centerX;
     public float centerY;
-    private int lastWidth;
-    private int lastHeight;
+
+    private float lastWidth;
+    private float lastHeight;
 
     private Task tickTask;
     private long tick;
@@ -141,6 +142,12 @@ public class MiniMap {
         RenderSystem.enableDepthTest();
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
+        // fixed scaling
+        float scale = 1F / Monitor.scale();
+        if (scale != 1F) {
+            matrixStack.scale(scale, scale, scale);
+        }
+
         // don't allow Mojang disable blending after drawing text
         Font.FIX_MOJANGS_TEXT_RENDERER_CRAP = true;
 
@@ -168,37 +175,41 @@ public class MiniMap {
     }
 
     public void updateWindow() {
-        int width = CLIENT.getWindow().getScaledWidth();
-        int height = CLIENT.getWindow().getScaledHeight();
-
-        if (this.lastWidth == width && this.lastHeight == height) {
+        if (this.lastWidth == Monitor.width() && this.lastHeight == Monitor.height()) {
             return; // nothing changed
         }
 
-        this.lastWidth = width;
-        this.lastHeight = height;
+        this.lastWidth = Monitor.width();
+        this.lastHeight = Monitor.height();
 
+        updateCenter(updateSize());
+    }
+
+    private float updateSize() {
         this.size = Config.getConfig().size;
-        float scale = 1F;
+        float scale = Monitor.scale();
 
-        Monitor monitor = CLIENT.getWindow().getMonitor();
+        net.minecraft.client.util.Monitor monitor = CLIENT.getWindow().getMonitor();
         if (monitor != null) {
-            float windowHeight = CLIENT.getWindow().getHeight();
             float monitorHeight = monitor.getCurrentVideoMode().getHeight();
-            scale = Mathf.clamp(0.5F, 1F, windowHeight / monitorHeight / 0.9F);
+            scale *= Mathf.clamp(0.5F, 1F, Monitor.height() / monitorHeight / 0.9F);
             this.size *= scale;
         }
 
+        return scale;
+    }
+
+    private void updateCenter(float scale) {
         this.centerX = (int) switch (Config.getConfig().anchorX) {
             case LOW -> 0F;
-            case MID -> width / 2F;
-            case HIGH -> width;
+            case MID -> Monitor.width() / 2F;
+            case HIGH -> Monitor.width();
         } + Config.getConfig().anchorOffsetX * scale;
 
         this.centerY = (int) switch (Config.getConfig().anchorY) {
             case LOW -> 0F;
-            case MID -> height / 2F;
-            case HIGH -> height;
+            case MID -> Monitor.height() / 2F;
+            case HIGH -> Monitor.height();
         } + Config.getConfig().anchorOffsetY * scale;
     }
 }

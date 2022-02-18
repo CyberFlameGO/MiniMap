@@ -74,7 +74,9 @@ public class FullMap extends AnimatedWidget {
 
         // fixed scaling
         float scale = 1F / Monitor.scale();
-        matrixStack.scale(scale, scale, scale);
+        if (scale != 1F) {
+            matrixStack.scale(scale, scale, scale);
+        }
 
         // don't allow Mojang disable blending after drawing text
         Font.FIX_MOJANGS_TEXT_RENDERER_CRAP = true;
@@ -129,13 +131,27 @@ public class FullMap extends AnimatedWidget {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return Sidebar.INSTANCE.mouseClicked(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
+    public boolean mouseClicked(float mouseX, float mouseY, int button) {
+        return Sidebar.INSTANCE.mouseClicked(mouseX, mouseY, button)
+                || super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseReleased(float mouseX, float mouseY, int button) {
+        return Sidebar.INSTANCE.mouseReleased(mouseX, mouseY, button)
+                || super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(float mouseX, float mouseY, int button, float deltaX, float deltaY) {
+        return Sidebar.INSTANCE.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
+                || super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        return Sidebar.INSTANCE.keyPressed(keyCode, scanCode, modifiers) || super.keyPressed(keyCode, scanCode, modifiers);
+        return Sidebar.INSTANCE.keyPressed(keyCode, scanCode, modifiers)
+                || super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     public boolean closed() {

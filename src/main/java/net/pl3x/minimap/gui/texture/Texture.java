@@ -41,7 +41,6 @@ public class Texture extends Drawable {
             try {
                 Resource resource = texture.resource();
                 if (resource.hasMetadata()) {
-                    System.out.println(texture.identifier + " has meta");
                     texture.meta = texture.load(resource);
                 } else {
                     texture.meta = new AnimationMetadata();

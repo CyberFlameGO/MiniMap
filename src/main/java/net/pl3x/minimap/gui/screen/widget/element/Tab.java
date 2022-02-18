@@ -41,7 +41,7 @@ public class Tab extends AnimatedWidget {
 
         this.icon = icon;
         this.iconSize = iconSize;
-        iconX(x() - iconSize);
+        iconX(-iconSize);
         iconY(y);
 
         this.text = text;
@@ -146,7 +146,7 @@ public class Tab extends AnimatedWidget {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(float mouseX, float mouseY, int button) {
         if (hovered()) {
             if (Sidebar.INSTANCE.selected() != category()) {
                 Sidebar.INSTANCE.select(category());

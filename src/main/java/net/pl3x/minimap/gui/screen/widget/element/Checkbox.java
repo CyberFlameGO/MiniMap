@@ -67,7 +67,7 @@ public class Checkbox extends AnimatedWidget {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(float mouseX, float mouseY, int button) {
         if (hovered()) {
             this.option.set(!this.option.get());
             animations().clear();
@@ -99,7 +99,7 @@ public class Checkbox extends AnimatedWidget {
         @Override
         public void tick(float delta) {
             // step each frame
-            float step = Math.min((this.deltaSum += delta) / 10F, 1F);
+            float step = Math.min((this.deltaSum += delta) / 5F, 1F);
             this.checkbox.color = animateARGB(this.startColor, this.endColor, step, Easing.Bounce.out);
             this.checkbox.toggleX = animate(this.startX, this.endX, step, Easing.Bounce.out);
 

@@ -39,7 +39,7 @@ public class Directions extends Layer {
     private void draw(MatrixStack matrixStack, String direction, float x, float y) {
         matrixStack.push();
         matrixStack.translate(x, y, 0D);
-        Font.DEFAULT.drawCenteredWithShadow(matrixStack, direction, this.x, this.y);
+        Font.DEFAULT.drawCenteredWithShadow(matrixStack, direction, this.x, this.y, 0xFFFFFF | (Config.getConfig().opacity << 24));
         matrixStack.pop();
     }
 }

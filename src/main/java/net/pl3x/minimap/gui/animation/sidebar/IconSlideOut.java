@@ -12,7 +12,7 @@ public class IconSlideOut extends Animation {
     public IconSlideOut(Tab tab) {
         this.tab = tab;
         this.start = tab.iconX();
-        this.end = -tab.iconSize();
+        this.end = -tab.iconSize() * 1.1F;
     }
 
     @Override

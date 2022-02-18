@@ -18,10 +18,11 @@ public class BottomText extends Layer {
 
         float x = mm.centerX;
         float y = mm.centerY + mm.size / 2F + Font.DEFAULT.height() * 2F;
+        int color = 0xFFFFFF | (Config.getConfig().opacity << 24);
 
         matrixStack.push();
         for (int i = 0; i < this.text.length; i++) {
-            Font.DEFAULT.drawCenteredWithShadow(matrixStack, this.text[i], x, y + Font.DEFAULT.height() * i);
+            Font.DEFAULT.drawCenteredWithShadow(matrixStack, this.text[i], x, y + Font.DEFAULT.height() * i, color);
         }
         matrixStack.pop();
     }

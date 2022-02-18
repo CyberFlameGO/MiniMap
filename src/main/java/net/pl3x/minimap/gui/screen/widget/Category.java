@@ -77,7 +77,7 @@ public abstract class Category extends AnimatedWidget {
     public abstract void renderContent(MatrixStack matrixStack, float mouseX, float mouseY, float delta);
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(float mouseX, float mouseY, int button) {
         // only listen to mouse clicks if this category is selected
         return this.tab.mouseClicked(mouseX, mouseY, button) || (selected() && super.mouseClicked(mouseX, mouseY, button));
     }

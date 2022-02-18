@@ -5,6 +5,7 @@ import net.pl3x.minimap.MiniMap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class Widget {
     private final Widget parent;
@@ -17,6 +18,8 @@ public abstract class Widget {
 
     private boolean hovered;
     private boolean wasHovered;
+    private Widget focused;
+    private boolean dragging;
 
     private final List<Widget> children = new ArrayList<>();
 
@@ -78,7 +81,7 @@ public abstract class Widget {
 
     public void render(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
         // check if mouse is hovering this widget
-        this.hovered = mouseX >= x() && mouseX <= x() + width() && mouseY >= y() && mouseY <= y() + height();
+        this.hovered = isMouseOver(mouseX, mouseY);
         if (this.wasHovered != this.hovered && MiniMap.CLIENT.isWindowFocused()) {
             onHoverChange();
             this.wasHovered = this.hovered;
@@ -93,11 +96,39 @@ public abstract class Widget {
     public void onHoverChange() {
     }
 
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean isMouseOver(float mouseX, float mouseY) {
+        return mouseX >= x() && mouseX <= x() + width() && mouseY >= y() && mouseY <= y() + height();
+    }
+
+    public Optional<Widget> hoveredElement(float mouseX, float mouseY) {
+        for (Widget widget : children()) {
+            if (!widget.isMouseOver(mouseX, mouseY)) continue;
+            return Optional.of(widget);
+        }
+        return Optional.empty();
+    }
+
+    public boolean mouseClicked(float mouseX, float mouseY, int button) {
         for (Widget widget : children()) {
             if (widget.mouseClicked(mouseX, mouseY, button)) {
+                this.focused = widget;
+                if (button == 0) {
+                    this.dragging = true;
+                }
                 return true;
             }
+        }
+        return false;
+    }
+
+    public boolean mouseReleased(float mouseX, float mouseY, int button) {
+        this.dragging = false;
+        return this.hoveredElement(mouseX, mouseY).filter(widget -> widget.mouseReleased(mouseX, mouseY, button)).isPresent();
+    }
+
+    public boolean mouseDragged(float mouseX, float mouseY, int button, float deltaX, float deltaY) {
+        if (button == 0 && this.dragging && this.focused != null) {
+            return this.focused.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
         }
         return false;
     }

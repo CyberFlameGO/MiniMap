@@ -24,10 +24,6 @@ public class Mouse {
     private Mouse() {
     }
 
-    private long handle() {
-        return MiniMap.CLIENT.getWindow().getHandle();
-    }
-
     public float x() {
         return this.mouseX;
     }
@@ -54,10 +50,7 @@ public class Mouse {
     }
 
     public void update() {
-        GLFW.glfwGetCursorPos(handle(), this.rawX, this.rawY);
-
-        //this.mouseX = (float) (rawX[0] / Monitor.scale());
-        //this.mouseY = (float) (rawY[0] / Monitor.scale());
+        GLFW.glfwGetCursorPos(Monitor.getId(), this.rawX, this.rawY);
 
         this.mouseX = (float) rawX[0];
         this.mouseY = (float) rawY[0];
@@ -83,6 +76,6 @@ public class Mouse {
             cursor(null);
         }
         this.cursorRender = cursorRender;
-        GLFW.glfwSetInputMode(handle(), GLFW.GLFW_CURSOR, cursorRender ? GLFW.GLFW_CURSOR_HIDDEN : GLFW.GLFW_CURSOR_NORMAL);
+        GLFW.glfwSetInputMode(Monitor.getId(), GLFW.GLFW_CURSOR, cursorRender ? GLFW.GLFW_CURSOR_HIDDEN : GLFW.GLFW_CURSOR_NORMAL);
     }
 }

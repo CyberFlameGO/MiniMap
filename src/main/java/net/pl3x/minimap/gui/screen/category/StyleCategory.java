@@ -1,5 +1,6 @@
 package net.pl3x.minimap.gui.screen.category;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.pl3x.minimap.MiniMap;
@@ -8,7 +9,6 @@ import net.pl3x.minimap.config.Lang;
 import net.pl3x.minimap.config.option.Option;
 import net.pl3x.minimap.gui.Icon;
 import net.pl3x.minimap.gui.font.Font;
-import net.pl3x.minimap.gui.layer.Layer;
 import net.pl3x.minimap.gui.screen.widget.Category;
 import net.pl3x.minimap.gui.screen.widget.element.Checkbox;
 import net.pl3x.minimap.gui.screen.widget.element.Slider;
@@ -25,11 +25,10 @@ public class StyleCategory extends Category {
     public void init() {
         float x = -200F;
         float y = 100F;
-        float v = 30F;
 
         if (children().isEmpty()) {
             children().addAll(List.of(
-                    new Checkbox(this, Text.of("Circular"), x, y += v, new Option<>() {
+                    new Checkbox(this, Text.of("Circular"), x, y += 30F, new Option<>() {
                         @Override
                         public Boolean get() {
                             return Config.getConfig().circular;
@@ -40,7 +39,7 @@ public class StyleCategory extends Category {
                             Config.getConfig().circular = value;
                         }
                     }),
-                    new Checkbox(this, Text.of("North Locked"), x, y += v, new Option<>() {
+                    new Checkbox(this, Text.of("North Locked"), x, y += 30F, new Option<>() {
                         @Override
                         public Boolean get() {
                             return Config.getConfig().northLocked;
@@ -51,7 +50,7 @@ public class StyleCategory extends Category {
                             Config.getConfig().northLocked = value;
                         }
                     }),
-                    new Checkbox(this, Text.of("Frame"), x, y += v, new Option<>() {
+                    new Checkbox(this, Text.of("Frame"), x, y += 30F, new Option<>() {
                         @Override
                         public Boolean get() {
                             return Config.getConfig().showFrame;
@@ -62,7 +61,7 @@ public class StyleCategory extends Category {
                             Config.getConfig().showFrame = value;
                         }
                     }),
-                    new Checkbox(this, Text.of("Directions"), x, y += v, new Option<>() {
+                    new Checkbox(this, Text.of("Directions"), x, y += 30F, new Option<>() {
                         @Override
                         public Boolean get() {
                             return Config.getConfig().showDirections;
@@ -73,7 +72,7 @@ public class StyleCategory extends Category {
                             Config.getConfig().showDirections = value;
                         }
                     }),
-                    new Slider(this, Text.of("Update Interval"), x, y += v, 0, 20, new Option<>() {
+                    new Slider(this, Text.of("Update Interval"), x, y += 30F, 0, 20, new Option<>() {
                         @Override
                         public Integer get() {
                             return Config.getConfig().updateInterval;
@@ -84,7 +83,7 @@ public class StyleCategory extends Category {
                             Config.getConfig().updateInterval = value;
                         }
                     }),
-                    new Slider(this, Text.of("Opacity"), x, y += v, 0, 0xFF, new Option<>() {
+                    new Slider(this, Text.of("Opacity"), x, y += 50, 0, 0xFF, new Option<>() {
                         @Override
                         public Integer get() {
                             return Config.getConfig().opacity;
@@ -95,7 +94,7 @@ public class StyleCategory extends Category {
                             Config.getConfig().opacity = value;
                         }
                     }),
-                    new Checkbox(this, Text.of("Bottom Text"), x, y += v, new Option<>() {
+                    new Checkbox(this, Text.of("Bottom Text"), x, y += 50, new Option<>() {
                         @Override
                         public Boolean get() {
                             return false;//Config.getConfig().circular;
@@ -125,19 +124,19 @@ public class StyleCategory extends Category {
         float mmX = MiniMap.INSTANCE.centerX;
         float mmY = MiniMap.INSTANCE.centerY;
 
-        matrixStack.push();
-        matrixStack.scale(2F, 2F, 2F);
-
         MiniMap.INSTANCE.centerX = (x + 150F) / 2F;
         MiniMap.INSTANCE.centerY = (y + 175F) / 2F;
 
-        for (Layer layer : MiniMap.INSTANCE.layers) {
-            layer.render(matrixStack);
-        }
+        matrixStack.push();
+        matrixStack.scale(2F, 2F, 2F);
+
+        RenderSystem.setShaderColor(1F, 1F, 1F, Config.getConfig().opacity / 255F);
+        MiniMap.INSTANCE.layers.forEach(layer -> layer.render(matrixStack));
+        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+
+        matrixStack.pop();
 
         MiniMap.INSTANCE.centerX = mmX;
         MiniMap.INSTANCE.centerY = mmY;
-
-        matrixStack.pop();
     }
 }

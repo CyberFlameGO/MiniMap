@@ -75,12 +75,12 @@ public class Sidebar extends AnimatedWidget {
     public void init() {
         if (this.categories.isEmpty()) {
             this.categories.addAll(List.of(
-                    new StyleCategory(20F, 0F),
-                    new PositionCategory(70F, 1.5F),
-                    new RadarCategory(120F, 3F),
-                    new WaypointsCategory(170F, 4.5F),
-                    new LayersCategory(220F, 6F),
-                    new ClockCategory(0270F, 7.5F),
+                    new StyleCategory(20F, 3F),
+                    new PositionCategory(70F, 4F),
+                    new RadarCategory(120F, 5F),
+                    new WaypointsCategory(170F, 6F),
+                    new LayersCategory(220F, 7F),
+                    new ClockCategory(0270F, 8F),
                     new AboutCategory(320F, 9F)
             ));
             children().addAll(this.categories);
@@ -114,7 +114,7 @@ public class Sidebar extends AnimatedWidget {
         // draw children on top of background
         super.render(matrixStack, mouseX, mouseY, delta);
 
-        // draw fancy separator line
+        // draw super fancy separator line
         if (selected() != null && this.width() > HOVER_WIDTH) {
             GL.drawLine(matrixStack, HOVER_WIDTH, 0F, HOVER_WIDTH, height(), 1F, 0xBB000000);
         }

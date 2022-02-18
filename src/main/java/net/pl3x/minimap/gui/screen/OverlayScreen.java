@@ -85,7 +85,17 @@ public class OverlayScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return FullMap.INSTANCE.mouseClicked(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
+        return FullMap.INSTANCE.mouseClicked((float) mouseX * Monitor.scale(), (float) mouseY * Monitor.scale(), button);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        return FullMap.INSTANCE.mouseReleased((float) mouseX * Monitor.scale(), (float) mouseY * Monitor.scale(), button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        return FullMap.INSTANCE.mouseDragged((float) mouseX * Monitor.scale(), (float) mouseY * Monitor.scale(), button, (float) deltaX, (float) deltaY);
     }
 
     @Override

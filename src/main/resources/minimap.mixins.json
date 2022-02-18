@@ -6,7 +6,8 @@
   "refmap": "minimap.refmap.json",
   "mixins": [
     "MinecraftServerAccess",
-    "RenderPhaseMixin"
+    "RenderPhaseMixin",
+    "TextRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
