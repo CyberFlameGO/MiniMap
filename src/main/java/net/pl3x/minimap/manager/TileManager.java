@@ -24,6 +24,7 @@ public class TileManager {
     }
 
     public void start() {
+        this.tiles.clear();
         this.tickTask = Scheduler.INSTANCE.addTask(0, true, this::tick);
     }
 
@@ -32,6 +33,7 @@ public class TileManager {
             this.tickTask.cancel();
             this.tickTask = null;
         }
+        this.tiles.clear();
     }
 
     public void tick() {
@@ -57,7 +59,6 @@ public class TileManager {
             tile = loadTile(key);
             this.tiles.put(key, tile);
         }
-        tile.markUsed();
         return tile;
     }
 

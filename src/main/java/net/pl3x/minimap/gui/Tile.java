@@ -41,27 +41,30 @@ public class Tile {
 
         this.directory = FileManager.INSTANCE.getWorldDir(this.world);
         this.file = this.directory.resolve(this.regionX + "_" + this.regionZ + ".png");
-
-        markUsed();
     }
 
     public Image imageBase() {
+        markUsed();
         return this.imageBase;
     }
 
     public Image imageBiome() {
+        markUsed();
         return this.imageBiome;
     }
 
     public Image imageHeight() {
+        markUsed();
         return this.imageHeight;
     }
 
     public Image imageWater() {
+        markUsed();
         return this.imageWater;
     }
 
     public Image imageLight() {
+        markUsed();
         return this.imageLight;
     }
 
@@ -99,11 +102,25 @@ public class Tile {
     }
 
     public void upload() {
+        markUsed();
         this.imageBase.upload(this);
         //this.imageBiome.upload(this);
         this.imageHeight.upload(this);
         this.imageWater.upload(this);
         this.imageLight.upload(this);
+    }
+
+    public boolean initialize() {
+        if (this.lastUsed == 0) {
+            this.imageBase.initialize();
+            this.imageBiome.initialize();
+            this.imageHeight.initialize();
+            this.imageWater.initialize();
+            this.imageLight.initialize();
+            markUsed();
+            return true;
+        }
+        return false;
     }
 
     public record Key(Identifier identifier, int regionX, int regionZ) {

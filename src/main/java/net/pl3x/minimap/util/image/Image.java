@@ -35,6 +35,10 @@ public class Image {
     }
 
     public void initialize() {
+        if (!RenderSystem.isOnRenderThread()) {
+            RenderSystem.recordRenderCall(this::initialize);
+            return;
+        }
         if (this.texture == null) {
             this.texture = new NativeImageBackedTexture(MiniMap.TILE_SIZE, MiniMap.TILE_SIZE, true);
             MiniMap.CLIENT.getTextureManager().registerTexture(this.identifier, this.texture);
@@ -51,7 +55,6 @@ public class Image {
 
     public NativeImage getImage() {
         if (this.texture == null) {
-            initialize();
             return null;
         }
         return this.texture.getImage();
@@ -59,7 +62,6 @@ public class Image {
 
     public void upload(Tile tile) {
         if (this.texture == null) {
-            initialize();
             return;
         }
 
@@ -76,7 +78,6 @@ public class Image {
 
     private void draw(MatrixStack matrixStack, Identifier identifier, float x0, float y0, float x1, float y1) {
         if (this.texture == null) {
-            initialize();
             return;
         }
         if (this.texture.getImage() == null) {
@@ -97,7 +98,6 @@ public class Image {
 
     private void updateLight(Tile tile) {
         if (this.texture == null) {
-            initialize();
             return;
         }
         if (this.lightTexture == null) {

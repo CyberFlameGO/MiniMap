@@ -46,7 +46,6 @@ public class FullMap extends AnimatedWidget {
             // nope. lets save some cpu
             return;
         }
-        //System.out.println("hmm " + this.state + " " + Sidebar.INSTANCE.state());
 
         // get mouse ready
         boolean useMouse = Mouse.INSTANCE.cursorEnabled() && MiniMap.CLIENT.currentScreen instanceof OverlayScreen;
