@@ -1,19 +1,22 @@
 package net.pl3x.minimap.util;
 
+import net.minecraft.util.math.MathHelper;
+
 public class Mathf {
     public static final float PI = (float) Math.PI;
     public static final float SQRT_OF_2 = Mathf.sqrt(2F);
+    public static final float DEG_TO_RAD = PI / 180F;
 
     public static float cosRads(float degree) {
-        return (float) Math.cos(Math.toRadians(degree));
+        return MathHelper.cos(degree * DEG_TO_RAD);
     }
 
     public static float sinRads(float degree) {
-        return (float) Math.sin(Math.toRadians(degree));
+        return MathHelper.sin(degree * DEG_TO_RAD);
     }
 
     public static float cos(float value) {
-        return (float) Math.cos(value);
+        return MathHelper.cos(value);
     }
 
     public static float pow(float value, float power) {
@@ -21,7 +24,7 @@ public class Mathf {
     }
 
     public static float sin(float value) {
-        return (float) Math.sin(value);
+        return MathHelper.sin(value);
     }
 
     public static float sqrt(float value) {
@@ -37,6 +40,6 @@ public class Mathf {
     }
 
     public static float clamp(float min, float max, float value) {
-        return Math.max(Math.min(value, max), min);
+        return MathHelper.clamp(value, min, max);
     }
 }

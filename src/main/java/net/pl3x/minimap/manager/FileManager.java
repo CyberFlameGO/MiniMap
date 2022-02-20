@@ -3,7 +3,6 @@ package net.pl3x.minimap.manager;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.mixin.MinecraftServerAccess;
 
@@ -52,8 +51,7 @@ public class FileManager {
         this.tilesDir = null;
     }
 
-    public Path getWorldDir(World world) {
-        Identifier identifier = world.getRegistryKey().getValue();
+    public Path getWorldDir(Identifier identifier) {
         Path path = this.worldDirs.get(identifier);
         if (path == null) {
             path = resolve(this.tilesDir, identifier.toString());

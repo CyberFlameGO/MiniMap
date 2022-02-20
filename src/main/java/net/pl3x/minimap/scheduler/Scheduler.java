@@ -9,7 +9,13 @@ import java.util.List;
 public class Scheduler {
     public static final Scheduler INSTANCE = new Scheduler();
 
+    public static long currentTick() {
+        return INSTANCE.currentTick;
+    }
+
     private final List<Task> tasks = new ArrayList<>();
+
+    private long currentTick;
 
     private Scheduler() {
     }
@@ -22,11 +28,11 @@ public class Scheduler {
         Iterator<Task> iter = this.tasks.iterator();
         while (iter.hasNext()) {
             Task task = iter.next();
-            if (task.tick++ < task.delay) {
-                continue;
-            }
             if (task.cancelled()) {
                 iter.remove();
+                continue;
+            }
+            if (task.tick++ < task.delay) {
                 continue;
             }
             task.run();
@@ -36,6 +42,7 @@ public class Scheduler {
             }
             iter.remove();
         }
+        this.currentTick++;
     }
 
     public Task addTask(Task task) {

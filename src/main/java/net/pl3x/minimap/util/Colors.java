@@ -79,6 +79,10 @@ public class Colors {
         return (start + (direction * delta));
     }
 
+    public static int rgb2bgr(int color) {
+        // Minecraft flips red and blue for some reason. let's flip them back
+        return (alpha(color) << 24) | (blue(color) << 16) | (green(color) << 8) | red(color);
+    }
     public static int alpha(int argb) {
         return argb >> 24 & 0xFF;
     }

@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.pl3x.minimap.config.Config;
+import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.font.Font;
 import net.pl3x.minimap.gui.layer.Background;
 import net.pl3x.minimap.gui.layer.BottomText;
@@ -16,7 +17,9 @@ import net.pl3x.minimap.gui.layer.Map;
 import net.pl3x.minimap.gui.layer.Mask;
 import net.pl3x.minimap.gui.layer.Players;
 import net.pl3x.minimap.gui.screen.widget.Sidebar;
+import net.pl3x.minimap.gui.texture.Texture;
 import net.pl3x.minimap.hardware.Monitor;
+import net.pl3x.minimap.manager.ChunkScanner;
 import net.pl3x.minimap.manager.FileManager;
 import net.pl3x.minimap.manager.TileManager;
 import net.pl3x.minimap.scheduler.Scheduler;
@@ -77,6 +80,7 @@ public class MiniMap {
 
         FileManager.INSTANCE.start();
         TileManager.INSTANCE.start();
+        ChunkScanner.INSTANCE.start();
 
         this.layers.add(new Mask());
         this.layers.add(new Background());
@@ -95,6 +99,7 @@ public class MiniMap {
             this.tickTask = null;
         }
 
+        ChunkScanner.INSTANCE.stop();
         TileManager.INSTANCE.stop();
         FileManager.INSTANCE.stop();
 
@@ -156,6 +161,14 @@ public class MiniMap {
 
         // allow Mojang disable blending after drawing text
         Font.FIX_MOJANGS_TEXT_RENDERER_CRAP = false;
+
+        // todo - temp draw all loaded tiles
+        matrixStack.push();
+        matrixStack.scale(2, 2, 2);
+        TileManager.INSTANCE.tiles.forEach((key, tile) -> tile.draw(matrixStack, delta));
+        GL.rotateScene(matrixStack, player.getBlockX() + 196, player.getBlockZ() + 196, angle);
+        Texture.PLAYER.draw(matrixStack, player.getBlockX() - 256 + 196, player.getBlockZ() - 256 + 196, 512, 512);
+        matrixStack.pop();
 
         // clean up opengl stuff
         RenderSystem.disableBlend();

@@ -4,14 +4,19 @@ import net.pl3x.minimap.gui.Tile;
 import net.pl3x.minimap.scheduler.Scheduler;
 import net.pl3x.minimap.scheduler.Task;
 
-import java.util.HashSet;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.Map;
 
 public class TileManager {
     public static final TileManager INSTANCE = new TileManager();
 
-    public final Set<Tile> tiles = new HashSet<>();
+    public final Map<Tile.Key, Tile> tiles = new HashMap<>();
 
     public Task tickTask;
 
@@ -30,18 +35,45 @@ public class TileManager {
     }
 
     public void tick() {
-        // todo
+        unloadStaleTiles();
     }
 
     public void unloadStaleTiles() {
-        long now = System.currentTimeMillis();
-        Iterator<Tile> iter = tiles.iterator();
+        long now = Scheduler.currentTick();
+        Iterator<Map.Entry<Tile.Key, Tile>> iter = tiles.entrySet().iterator();
         while (iter.hasNext()) {
-            Tile tile = iter.next();
-            if (tile.getLastUsed() + 10000L < now) {
+            Map.Entry<Tile.Key, Tile> entry = iter.next();
+            Tile tile = entry.getValue();
+            if (tile.getLastUsed() + 100 < now) { // ~5 seconds
                 tile.unload();
                 iter.remove();
             }
         }
+    }
+
+    public Tile getTile(Tile.Key key) {
+        Tile tile = this.tiles.get(key);
+        if (tile == null) {
+            tile = loadTile(key);
+            this.tiles.put(key, tile);
+        }
+        tile.markUsed();
+        return tile;
+    }
+
+    public Tile loadTile(Tile.Key key) {
+        Tile tile = new Tile(key);
+        Path file = tile.getFile();
+        if (Files.exists(file)) {
+            try {
+                BufferedImage buffer = ImageIO.read(file.toFile());
+                if (buffer != null) {
+                    //tile.setImage(buffer);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return tile;
     }
 }
