@@ -2,6 +2,7 @@ package net.pl3x.minimap.mixin;
 
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.world.biome.Biome;
+import net.pl3x.minimap.manager.ThreadManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,7 +16,7 @@ public class ClientWorldMixin {
 
     @Inject(method = "getGeneratorStoredBiome", at = @At("HEAD"), cancellable = true)
     private void getGeneratorStoredBiome(int biomeX, int biomeY, int biomeZ, CallbackInfoReturnable<Biome> cir) {
-        if (Thread.currentThread().getName().startsWith("chunk-scanner")) {
+        if (Thread.currentThread().getName().startsWith(ThreadManager.UPDATER_THREAD_NAME)) {
             cir.setReturnValue(null);
             cir.cancel();
         }

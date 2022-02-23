@@ -1,45 +1,52 @@
 package net.pl3x.minimap.gui.layer;
 
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.font.Font;
 import net.pl3x.minimap.util.Biomes;
 import net.pl3x.minimap.util.Clock;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BottomText extends Layer {
-    private String[] text = new String[0];
+    private final List<Text> text = new ArrayList<>();
 
     @Override
     public void render(MatrixStack matrixStack) {
-        if (StringUtils.isBlank(Config.getConfig().bottomText)) {
+        if (this.text.isEmpty()) {
             return;
         }
 
         float x = mm.getCenterX();
         float y = mm.getCenterY() + mm.getSize() / 2F + Font.DEFAULT.height() * 2F;
         int color = 0xFFFFFF | (Config.getConfig().opacity << 24);
+        int i = 0;
 
         matrixStack.push();
-        for (int i = 0; i < this.text.length; i++) {
-            Font.DEFAULT.drawCenteredWithShadow(matrixStack, this.text[i], x, y + Font.DEFAULT.height() * i, color);
+        for (Text text : this.text) {
+            Font.DEFAULT.drawCenteredWithShadow(matrixStack, text, x, y + Font.DEFAULT.height() * i++, color);
         }
         matrixStack.pop();
     }
 
     @Override
     public void update() {
-        this.text = Config.getConfig().bottomText.split("\n");
-        for (int i = 0; i < this.text.length; i++) {
-            if (StringUtils.isBlank(this.text[i])) {
+        this.text.clear();
+        String[] lines = Config.getConfig().bottomText.split("\n");
+        for (String line : lines) {
+            if (StringUtils.isBlank(line)) {
                 continue;
             }
-            this.text[i] = this.text[i]
+            this.text.add(new TranslatableText(line
                     .replace("{x}", Integer.toString(mm.getPlayer().getBlockX()))
                     .replace("{y}", Integer.toString(mm.getPlayer().getBlockY()))
                     .replace("{z}", Integer.toString(mm.getPlayer().getBlockZ()))
                     .replace("{biome}", Biomes.INSTANCE.getBiomeName(mm.getPlayer()))
-                    .replace("{clock}", Clock.INSTANCE.getTime(mm.getWorld()));
+                    .replace("{clock}", Clock.INSTANCE.getTime(mm.getWorld()))));
         }
     }
 }

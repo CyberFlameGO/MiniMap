@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.gui.animation.Easing;
 import net.pl3x.minimap.manager.FileManager;
+import net.pl3x.minimap.manager.ThreadManager;
 import net.pl3x.minimap.util.Anchor;
 
 import java.io.BufferedReader;
@@ -71,12 +72,14 @@ public class Config {
     }
 
     public static void save() {
-        try (FileWriter writer = new FileWriter(FileManager.INSTANCE.configFile.toFile())) {
-            gson.toJson(config, writer);
-            writer.flush();
-            MiniMap.LOG.info("Saved config");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ThreadManager.INSTANCE.runAsync(() -> {
+            try (FileWriter writer = new FileWriter(FileManager.INSTANCE.configFile.toFile())) {
+                gson.toJson(config, writer);
+                writer.flush();
+                MiniMap.LOG.info("Saved config");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }, ThreadManager.INSTANCE.getIOExecutor());
     }
 }

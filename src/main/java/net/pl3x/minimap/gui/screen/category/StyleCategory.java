@@ -37,6 +37,7 @@ public class StyleCategory extends Category {
                         @Override
                         public void set(Boolean value) {
                             Config.getConfig().circular = value;
+                            Config.save();
                         }
                     }),
                     new Checkbox(this, Text.of("North Locked"), x, y += 30F, new Option<>() {
@@ -48,6 +49,7 @@ public class StyleCategory extends Category {
                         @Override
                         public void set(Boolean value) {
                             Config.getConfig().northLocked = value;
+                            Config.save();
                         }
                     }),
                     new Checkbox(this, Text.of("Frame"), x, y += 30F, new Option<>() {
@@ -59,6 +61,7 @@ public class StyleCategory extends Category {
                         @Override
                         public void set(Boolean value) {
                             Config.getConfig().showFrame = value;
+                            Config.save();
                         }
                     }),
                     new Checkbox(this, Text.of("Directions"), x, y += 30F, new Option<>() {
@@ -70,6 +73,7 @@ public class StyleCategory extends Category {
                         @Override
                         public void set(Boolean value) {
                             Config.getConfig().showDirections = value;
+                            Config.save();
                         }
                     }),
                     new Slider(this, Text.of("Update Interval"), x, y += 30F, 0, 20, new Option<>() {
@@ -81,6 +85,7 @@ public class StyleCategory extends Category {
                         @Override
                         public void set(Integer value) {
                             Config.getConfig().updateInterval = value;
+                            Config.save();
                         }
                     }),
                     new Slider(this, Text.of("Opacity"), x, y += 50, 0, 0xFF, new Option<>() {
@@ -92,17 +97,19 @@ public class StyleCategory extends Category {
                         @Override
                         public void set(Integer value) {
                             Config.getConfig().opacity = value;
+                            Config.save();
                         }
                     }),
                     new Checkbox(this, Text.of("Bottom Text"), x, y += 50, new Option<>() {
                         @Override
                         public Boolean get() {
-                            return false;//Config.getConfig().circular;
+                            return false;//Config.getConfig().bottomText;
                         }
 
                         @Override
                         public void set(Boolean value) {
-                            //Config.getConfig().circular = value;
+                            //Config.getConfig().bottomText = value;
+                            //Config.save();
                         }
                     })
             ));

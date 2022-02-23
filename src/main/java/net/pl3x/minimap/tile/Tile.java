@@ -164,13 +164,13 @@ public class Tile {
                 if (Config.getConfig().layers.biomes) {
                     color = getBiomes().getPixel(x, z);
                 }
-                if (Config.getConfig().layers.height) {
+                if (Config.getConfig().layers.heightmap) {
                     color = Colors.mix(color, getHeight().getPixel(x, z));
                 }
                 if (Config.getConfig().layers.fluids) {
                     color = Colors.mix(color, getFluids().getPixel(x, z));
                 }
-                if (Config.getConfig().layers.light) {
+                if (Config.getConfig().layers.lightmap) {
                     color = Colors.mix(color, (int) Mathf.clamp(0, 0xFF, (0xFF * Mathf.inverseLerp(0, 15, 15 - (this.world.getDimension().hasCeiling() ? 5 : skylight)) - Colors.alpha(getLight().getPixel(x, z))) / 1.2F) << 24);
                 }
                 image.setColor(x, z, color);

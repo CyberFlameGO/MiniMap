@@ -15,7 +15,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.pl3x.minimap.MiniMap;
-import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.animation.Easing;
 import net.pl3x.minimap.scheduler.Scheduler;
 import net.pl3x.minimap.scheduler.Task;
@@ -88,7 +87,7 @@ public class ChunkScanner {
 
             this.running = true;
 
-            ThreadManager.INSTANCE.runAsync(this.asyncScanTask, () -> this.running = false);
+            ThreadManager.INSTANCE.runAsync(this.asyncScanTask, () -> this.running = false, ThreadManager.INSTANCE.getUpdaterExecutor());
         }
     }
 
@@ -157,7 +156,8 @@ public class ChunkScanner {
                         // reset fluid tracker
                         fluidPos = null;
 
-                        if (Config.getConfig().layers.base) {
+                        // base layer
+                        {
                             if (world.getDimension().hasCeiling()) {
                                 // start from bottom up until we find air
                                 pos.setY(world.getBottomY());
@@ -182,7 +182,8 @@ public class ChunkScanner {
                             return;
                         }
 
-                        if (Config.getConfig().layers.biomes) {
+                        // biomes layer
+                        {
                             // get the biome of the current block
                             // see ClientWorldMixin for a hack that
                             // allows this method to return null
@@ -199,7 +200,8 @@ public class ChunkScanner {
                             return;
                         }
 
-                        if (Config.getConfig().layers.height) {
+                        // height layer
+                        {
                             height = 0x22 << 24;
                             if (z + 1 < 16 && iterateDown(world, getY(chunk, pos2, blockX, blockZ, x, z + 1)).getY() < pos.getY()) {
                                 // south neighbor block is lower, mark this block a darker shade
@@ -224,7 +226,8 @@ public class ChunkScanner {
                             return;
                         }
 
-                        if (Config.getConfig().layers.fluids) {
+                        // fluids layer
+                        {
                             fluidColor = 0;
                             if (fluidPos != null) {
                                 // setup initial fluid stuff
@@ -254,7 +257,8 @@ public class ChunkScanner {
                             return;
                         }
 
-                        if (Config.getConfig().layers.light) {
+                        // light layer
+                        {
                             // store light levels as black pixels - we will invert this during rendering
                             light = world.getLightLevel(LightType.BLOCK, (fluidPos == null ? pos : fluidPos).up());
                             alpha = (int) (Mathf.inverseLerp(0, 15, light) * 0xFF);

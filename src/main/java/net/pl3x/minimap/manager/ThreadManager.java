@@ -9,36 +9,39 @@ import java.util.concurrent.Executors;
 
 public class ThreadManager {
     public static final ThreadManager INSTANCE = new ThreadManager();
+    public static final String UPDATER_THREAD_NAME = "Minimap-Updater";
+    public static final String IO_THREAD_NAME = "Minimap-IO";
 
-    private ExecutorService executor;
+    private ExecutorService updaterExecutor;
+    private ExecutorService ioExecutor;
 
     private ThreadManager() {
     }
 
-    public void reset() {
-        if (this.executor != null) {
-            this.executor.shutdown();
-            this.executor = null;
-        }
-    }
-
-    private ExecutorService getExecutor() {
+    public ExecutorService getUpdaterExecutor() {
         int threads = Config.getConfig().threads;
         if (threads < 1) {
             threads = Runtime.getRuntime().availableProcessors() / 3;
         }
-        if (this.executor == null) {
-            this.executor = Executors.newFixedThreadPool(Math.max(1, threads), new ThreadFactoryBuilder().setNameFormat("MinimapUpdater-%d").setThreadFactory(Executors.defaultThreadFactory()).build());
+        if (this.updaterExecutor == null) {
+            this.updaterExecutor = Executors.newFixedThreadPool(Math.max(1, threads), new ThreadFactoryBuilder().setNameFormat(UPDATER_THREAD_NAME + "-%d").build());
         }
-        return this.executor;
+        return this.updaterExecutor;
     }
 
-    public void runAsync(Runnable task) {
-        runAsync(task, null);
+    public ExecutorService getIOExecutor() {
+        if (this.ioExecutor == null) {
+            this.ioExecutor = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat(IO_THREAD_NAME + "-%d").build());
+        }
+        return this.ioExecutor;
     }
 
-    public void runAsync(Runnable task, Runnable whenComplete) {
-        CompletableFuture.runAsync(task, getExecutor())
+    public void runAsync(Runnable task, ExecutorService executor) {
+        runAsync(task, null, executor);
+    }
+
+    public void runAsync(Runnable task, Runnable whenComplete, ExecutorService executor) {
+        CompletableFuture.runAsync(task, executor)
                 .exceptionally(throwable -> {
                     throwable.printStackTrace();
                     return null;

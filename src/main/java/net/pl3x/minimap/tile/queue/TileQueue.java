@@ -33,6 +33,6 @@ public class TileQueue {
                     Thread.currentThread().interrupt();
                 }
             }
-        });
+        }, ThreadManager.INSTANCE.getIOExecutor());
     }
 }
