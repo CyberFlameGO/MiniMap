@@ -1,27 +1,50 @@
 package net.pl3x.minimap.gui.layer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
 import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.GL;
-import net.pl3x.minimap.gui.texture.Texture;
+import net.pl3x.minimap.gui.texture.Drawable;
+import net.pl3x.minimap.manager.TileManager;
+import net.pl3x.minimap.tile.Tile;
 import net.pl3x.minimap.util.Mathf;
+import net.pl3x.minimap.util.Numbers;
 import org.lwjgl.opengl.GL11;
 
+import java.util.concurrent.CompletableFuture;
+
 public class Map extends Layer {
+    private final AsyncUpdate asyncUpdateTask;
+
+    private final Identifier mapId = new Identifier(MiniMap.MODID, "map_layer");
+    private NativeImageBackedTexture map;
+
+    private boolean running;
+
+    public Map() {
+        this.asyncUpdateTask = new AsyncUpdate();
+    }
+
     @Override
     public void render(MatrixStack matrixStack) {
-        float halfSize = mm.size / 2F;
-        float scale = mm.size / mm.deltaZoom;
+        if (this.map == null || this.map.getImage() == null) {
+            return;
+        }
+
+        float halfSize = mm.getSize() / 2F;
+        float scale = mm.getSize() / mm.getDeltaZoom();
         float scale2 = scale * 2F;
 
-        float x0 = mm.centerX - halfSize + scale;
-        float x1 = x0 + mm.size - scale2;
-        float y0 = mm.centerY - halfSize + scale;
-        float y1 = y0 + mm.size - scale2;
+        float x0 = mm.getCenterX() - halfSize + scale;
+        float x1 = x0 + mm.getSize() - scale2;
+        float y0 = mm.getCenterY() - halfSize + scale;
+        float y1 = y0 + mm.getSize() - scale2;
 
-        float u = (MiniMap.TILE_SIZE / 2F - mm.deltaZoom / 2F) / MiniMap.TILE_SIZE; // resizes with zoom _and_ size
+        float u = (MiniMap.TILE_SIZE / 2F - mm.getDeltaZoom() / 2F) / MiniMap.TILE_SIZE; // resizes with zoom _and_ size
         float v = 1F - u;
 
         // uses blend which only writes where high alpha values exist from above
@@ -30,13 +53,86 @@ public class Map extends Layer {
         matrixStack.push();
         if (!Config.getConfig().northLocked) {
             // rotate map opposite of player angle
-            GL.rotateScene(matrixStack, mm.centerX, mm.centerY, -mm.angle);
+            GL.rotateScene(matrixStack, mm.getCenterX(), mm.getCenterY(), -mm.getAngle());
             if (!Config.getConfig().circular) {
                 // scale map if square and not north locked to hide missing pixels in corners when rotating
-                GL.scaleScene(matrixStack, mm.centerX, mm.centerY, Mathf.SQRT_OF_2);
+                GL.scaleScene(matrixStack, mm.getCenterX(), mm.getCenterY(), Mathf.SQRT_OF_2);
             }
         }
-        Texture.MINIMAP.draw(matrixStack, x0, y0, x1, y1, u, v);
+        Drawable.draw(matrixStack, this.mapId, x0, y0, x1, y1, u, u, v, v);
         matrixStack.pop();
+    }
+
+    @Override
+    public void update() {
+        if (this.running) {
+            // still updating previous run.
+            // skip this run to prevent tearing
+            return;
+        }
+
+        // check if we have a map texture
+        if (this.map == null) {
+            // load the map texture
+            this.map = new NativeImageBackedTexture(MiniMap.TILE_SIZE, MiniMap.TILE_SIZE, true);
+            MiniMap.CLIENT.getTextureManager().registerTexture(this.mapId, this.map);
+            return;
+        }
+
+        this.asyncUpdateTask.image = this.map.getImage();
+        if (this.asyncUpdateTask.image == null) {
+            // image isn't ready yet
+            return;
+        }
+
+        this.running = true;
+
+        CompletableFuture.runAsync(this.asyncUpdateTask)
+                .exceptionally(throwable -> {
+                    throwable.printStackTrace();
+                    return null;
+                })
+                .whenComplete((result, throwable) -> {
+                    this.running = false;
+                    this.map.upload();
+                });
+    }
+
+    private static class AsyncUpdate implements Runnable {
+        private NativeImage image;
+
+        Tile tile;
+        NativeImage source;
+        int blockX, blockZ;
+        double playerX, playerZ;
+
+        @Override
+        public void run() {
+            this.playerX = MiniMap.INSTANCE.getPlayer().getX() - MiniMap.TILE_SIZE / 2D;
+            this.playerZ = MiniMap.INSTANCE.getPlayer().getZ() - MiniMap.TILE_SIZE / 2D;
+
+            for (int x = 0; x < MiniMap.TILE_SIZE; x++) {
+                for (int z = 0; z < MiniMap.TILE_SIZE; z++) {
+                    this.blockX = (int) Math.round(this.playerX + x);
+                    this.blockZ = (int) Math.round(this.playerZ + z);
+
+                    this.tile = TileManager.INSTANCE.getTile(MiniMap.INSTANCE.getWorld(), Numbers.blockToRegion(this.blockX), Numbers.blockToRegion(this.blockZ), false);
+                    if (this.tile == null || !this.tile.isReady()) {
+                        // tile not ready
+                        this.image.setColor(x, z, 0);
+                        continue;
+                    }
+
+                    this.source = this.tile.getTexture().getImage();
+                    if (this.source == null) {
+                        // source image not ready
+                        this.image.setColor(x, z, 0);
+                        continue;
+                    }
+
+                    this.image.setColor(x, z, this.source.getColor(this.blockX & (MiniMap.TILE_SIZE - 1), this.blockZ & (MiniMap.TILE_SIZE - 1)));
+                }
+            }
+        }
     }
 }

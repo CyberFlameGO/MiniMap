@@ -45,7 +45,7 @@ public class OverlayScreen extends Screen {
             FullMap.INSTANCE.open();
         }
 
-        MiniMap.INSTANCE.visible = false;
+        MiniMap.INSTANCE.setVisible(false);
         MiniMap.CLIENT.options.hudHidden = true;
 
         this.width = (int) (width() * Monitor.scale());
@@ -68,7 +68,7 @@ public class OverlayScreen extends Screen {
 
     @Override
     public void removed() {
-        MiniMap.INSTANCE.visible = true;
+        MiniMap.INSTANCE.setVisible(true);
         MiniMap.CLIENT.options.hudHidden = false;
         Mouse.INSTANCE.cursorEnabled(false);
     }

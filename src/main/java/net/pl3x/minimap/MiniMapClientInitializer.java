@@ -15,10 +15,16 @@ public class MiniMapClientInitializer implements ClientModInitializer {
             return;
         }
 
+        // initialize our own tick scheduler
         Scheduler.INSTANCE.initialize();
+
+        // initialize resource handler
         ResourceManager.INSTANCE.initialize();
+
+        // initialize our hardware handler
         Keyboard.INSTANCE.initialize();
 
+        // initialize the minimap
         MiniMap.INSTANCE.initialize();
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> MiniMap.INSTANCE.start());

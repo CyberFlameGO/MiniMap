@@ -121,22 +121,20 @@ public class StyleCategory extends Category {
 
         // draw minimap layers for preview
 
-        float mmX = MiniMap.INSTANCE.centerX;
-        float mmY = MiniMap.INSTANCE.centerY;
+        float mmX = MiniMap.INSTANCE.getCenterX();
+        float mmY = MiniMap.INSTANCE.getCenterY();
+        float size = MiniMap.INSTANCE.getSize();
 
-        MiniMap.INSTANCE.centerX = (x + 150F) / 2F;
-        MiniMap.INSTANCE.centerY = (y + 175F) / 2F;
-
-        matrixStack.push();
-        matrixStack.scale(2F, 2F, 2F);
+        MiniMap.INSTANCE.setCenterX(x + 150F);
+        MiniMap.INSTANCE.setCenterY(y + 185F);
+        MiniMap.INSTANCE.setSize(196);
 
         RenderSystem.setShaderColor(1F, 1F, 1F, Config.getConfig().opacity / 255F);
-        MiniMap.INSTANCE.layers.forEach(layer -> layer.render(matrixStack));
+        MiniMap.INSTANCE.getLayers().forEach(layer -> layer.render(matrixStack));
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
-        matrixStack.pop();
-
-        MiniMap.INSTANCE.centerX = mmX;
-        MiniMap.INSTANCE.centerY = mmY;
+        MiniMap.INSTANCE.setCenterX(mmX);
+        MiniMap.INSTANCE.setCenterY(mmY);
+        MiniMap.INSTANCE.setSize(size);
     }
 }

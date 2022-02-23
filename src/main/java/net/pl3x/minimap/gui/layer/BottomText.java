@@ -16,8 +16,8 @@ public class BottomText extends Layer {
             return;
         }
 
-        float x = mm.centerX;
-        float y = mm.centerY + mm.size / 2F + Font.DEFAULT.height() * 2F;
+        float x = mm.getCenterX();
+        float y = mm.getCenterY() + mm.getSize() / 2F + Font.DEFAULT.height() * 2F;
         int color = 0xFFFFFF | (Config.getConfig().opacity << 24);
 
         matrixStack.push();
@@ -35,11 +35,11 @@ public class BottomText extends Layer {
                 continue;
             }
             this.text[i] = this.text[i]
-                    .replace("{x}", Integer.toString(mm.player.getBlockX()))
-                    .replace("{y}", Integer.toString(mm.player.getBlockY()))
-                    .replace("{z}", Integer.toString(mm.player.getBlockZ()))
-                    .replace("{biome}", Biomes.INSTANCE.getBiomeName(mm.player))
-                    .replace("{clock}", Clock.INSTANCE.getTime(mm.player.world));
+                    .replace("{x}", Integer.toString(mm.getPlayer().getBlockX()))
+                    .replace("{y}", Integer.toString(mm.getPlayer().getBlockY()))
+                    .replace("{z}", Integer.toString(mm.getPlayer().getBlockZ()))
+                    .replace("{biome}", Biomes.INSTANCE.getBiomeName(mm.getPlayer()))
+                    .replace("{clock}", Clock.INSTANCE.getTime(mm.getWorld()));
         }
     }
 }

@@ -5,8 +5,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.world.ClientWorld;
 import net.pl3x.minimap.config.Config;
-import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.font.Font;
 import net.pl3x.minimap.gui.layer.Background;
 import net.pl3x.minimap.gui.layer.BottomText;
@@ -38,16 +38,19 @@ public class MiniMap {
     public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
     public static final Logger LOG = LogManager.getLogger("MiniMap");
 
-    public final List<Layer> layers = new ArrayList<>();
+    private final List<Layer> layers = new ArrayList<>();
 
-    public ClientPlayerEntity player;
+    private ClientPlayerEntity player;
+    private ClientWorld world;
 
-    public boolean visible = true;
-    public float size;
-    public float deltaZoom;
-    public float angle;
-    public float centerX;
-    public float centerY;
+    private Texture background = Texture.SKY_OVERWORLD;
+
+    private boolean visible = true;
+    private float size;
+    private float deltaZoom;
+    private float angle;
+    private float centerX;
+    private float centerY;
 
     private float lastWidth;
     private float lastHeight;
@@ -56,6 +59,70 @@ public class MiniMap {
     private long tick;
 
     public MiniMap() {
+    }
+
+    public List<Layer> getLayers() {
+        return this.layers;
+    }
+
+    public ClientPlayerEntity getPlayer() {
+        return this.player;
+    }
+
+    public ClientWorld getWorld() {
+        return this.world;
+    }
+
+    public void setWorld(ClientWorld world) {
+        this.world = world;
+    }
+
+    public Texture getBackground() {
+        return this.background;
+    }
+
+    public void setBackground(Texture texture) {
+        this.background = texture;
+    }
+
+    public boolean isVisible() {
+        return this.visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    public float getSize() {
+        return this.size;
+    }
+
+    public void setSize(float size) {
+        this.size = size;
+    }
+
+    public float getDeltaZoom() {
+        return this.deltaZoom;
+    }
+
+    public float getAngle() {
+        return this.angle;
+    }
+
+    public float getCenterX() {
+        return this.centerX;
+    }
+
+    public void setCenterX(float x) {
+        this.centerX = x;
+    }
+
+    public float getCenterY() {
+        return this.centerY;
+    }
+
+    public void setCenterY(float y) {
+        this.centerY = y;
     }
 
     public void initialize() {
@@ -101,7 +168,6 @@ public class MiniMap {
 
         ChunkScanner.INSTANCE.stop();
         TileManager.INSTANCE.stop();
-        FileManager.INSTANCE.stop();
 
         Sidebar.INSTANCE.close(true);
 
@@ -109,10 +175,7 @@ public class MiniMap {
     }
 
     public boolean dontRender() {
-        // todo - temp disable this while we focus on sidebar UI
-        //if (true) return true;
-
-        if (!this.visible) {
+        if (!isVisible()) {
             return true; // hidden
         }
 
@@ -161,14 +224,6 @@ public class MiniMap {
 
         // allow Mojang disable blending after drawing text
         Font.FIX_MOJANGS_TEXT_RENDERER_CRAP = false;
-
-        // todo - temp draw all loaded tiles
-        matrixStack.push();
-        matrixStack.scale(2, 2, 2);
-        TileManager.INSTANCE.tiles.forEach((key, tile) -> tile.draw(matrixStack, delta));
-        GL.rotateScene(matrixStack, player.getBlockX() + 196, player.getBlockZ() + 196, angle);
-        Texture.PLAYER.draw(matrixStack, player.getBlockX() - 256 + 196, player.getBlockZ() - 256 + 196, 512, 512);
-        matrixStack.pop();
 
         // clean up opengl stuff
         RenderSystem.disableBlend();
@@ -223,6 +278,6 @@ public class MiniMap {
             case LOW -> 0F;
             case MID -> Monitor.height() / 2F;
             case HIGH -> Monitor.height();
-        } + Config.getConfig().anchorOffsetY * scale;
+        } + Config.getConfig().anchorOffsetY * scale + 50;
     }
 }

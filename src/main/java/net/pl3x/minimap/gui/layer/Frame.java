@@ -13,13 +13,13 @@ public class Frame extends Layer {
             return;
         }
 
-        float x = mm.centerX - mm.size / 2F;
-        float y = mm.centerY - mm.size / 2F;
+        float x = mm.getCenterX() - mm.getSize() / 2F;
+        float y = mm.getCenterY() - mm.getSize() / 2F;
 
         // use a blend that supports translucent pixels for all the remaining textures
         RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         Texture texture = Config.getConfig().circular ? Texture.FRAME_CIRCLE : Texture.FRAME_SQUARE;
-        texture.draw(matrixStack, x, y, mm.size, mm.size);
+        texture.draw(matrixStack, x, y, mm.getSize(), mm.getSize());
     }
 }

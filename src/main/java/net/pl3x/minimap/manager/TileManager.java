@@ -1,14 +1,10 @@
 package net.pl3x.minimap.manager;
 
-import net.pl3x.minimap.gui.Tile;
+import net.minecraft.client.world.ClientWorld;
 import net.pl3x.minimap.scheduler.Scheduler;
 import net.pl3x.minimap.scheduler.Task;
+import net.pl3x.minimap.tile.Tile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -16,7 +12,7 @@ import java.util.Map;
 public class TileManager {
     public static final TileManager INSTANCE = new TileManager();
 
-    public final Map<Tile.Key, Tile> tiles = new HashMap<>();
+    public final Map<String, Tile> tiles = new HashMap<>();
 
     public Task tickTask;
 
@@ -33,6 +29,10 @@ public class TileManager {
             this.tickTask.cancel();
             this.tickTask = null;
         }
+        this.tiles.forEach((key, tile) -> {
+            tile.setReady(false);
+            tile.save();
+        });
         this.tiles.clear();
     }
 
@@ -41,40 +41,35 @@ public class TileManager {
     }
 
     public void unloadStaleTiles() {
-        long now = Scheduler.currentTick();
-        Iterator<Map.Entry<Tile.Key, Tile>> iter = tiles.entrySet().iterator();
+        long now = Scheduler.INSTANCE.getCurrentTick();
+        Iterator<Tile> iter = this.tiles.values().iterator();
         while (iter.hasNext()) {
-            Map.Entry<Tile.Key, Tile> entry = iter.next();
-            Tile tile = entry.getValue();
+            Tile tile = iter.next();
             if (tile.getLastUsed() + 100 < now) { // ~5 seconds
-                tile.unload();
+                tile.setReady(false);
+                tile.save();
                 iter.remove();
+                continue;
+            }
+            if (tile.getLastSaved() + 600 < now) { // ~30 seconds
+                tile.save();
             }
         }
     }
 
-    public Tile getTile(Tile.Key key) {
+    public Tile getTile(ClientWorld world, int regionX, int regionZ, boolean load) {
+        String key = String.format("%s_%d_%d", world.getRegistryKey().getValue(), regionX, regionZ);
         Tile tile = this.tiles.get(key);
-        if (tile == null) {
-            tile = loadTile(key);
+        if (tile == null && load) {
+            tile = loadTile(world, regionX, regionZ);
             this.tiles.put(key, tile);
         }
         return tile;
     }
 
-    public Tile loadTile(Tile.Key key) {
-        Tile tile = new Tile(key);
-        Path file = tile.getFile();
-        if (Files.exists(file)) {
-            try {
-                BufferedImage buffer = ImageIO.read(file.toFile());
-                if (buffer != null) {
-                    //tile.setImage(buffer);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+    private Tile loadTile(ClientWorld world, int regionX, int regionZ) {
+        Tile tile = new Tile(world, regionX, regionZ);
+        tile.load();
         return tile;
     }
 }

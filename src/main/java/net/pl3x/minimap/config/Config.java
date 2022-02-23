@@ -34,9 +34,11 @@ public class Config {
     public int zoom = 3;
 
     public int updateInterval = 5;
+    public int threads = -1;
 
     public int opacity = 255;
 
+    public Layers layers = new Layers();
     public Animations animations = new Animations();
 
     private static final Gson gson = new GsonBuilder()

@@ -9,17 +9,17 @@ import net.pl3x.minimap.gui.texture.Texture;
 public class Players extends Layer {
     @Override
     public void render(MatrixStack matrixStack) {
-        float halfSize = mm.size / 2F;
-        float mapScale = mm.size / mm.deltaZoom;
-        float mapScale2 = mapScale * 2F;
-        float offset = mapScale / mapScale2;
+        float halfSize = mm.getSize() / 2F;
+        //float mapScale = mm.size / mm.deltaZoom;
+        //float mapScale2 = mapScale * 2F;
+        float offset = 0;//mapScale / mapScale2;
 
-        float x0 = mm.centerX - halfSize + mapScale;
-        float x1 = x0 + mm.size - mapScale2;
-        float y0 = mm.centerY - halfSize + mapScale;
-        float y1 = y0 + mm.size - mapScale2;
+        float x0 = mm.getCenterX() - halfSize;// + mapScale;
+        float x1 = x0 + mm.getSize();// - mapScale2;
+        float y0 = mm.getCenterY() - halfSize;// + mapScale;
+        float y1 = y0 + mm.getSize();// - mapScale2;
 
-        float u = (MiniMap.TILE_SIZE / 2F - halfSize) / MiniMap.TILE_SIZE; // doesn't resize with size or zoom
+        float u = 0.375F;//(MiniMap.TILE_SIZE / 2F - halfSize) / MiniMap.TILE_SIZE; // doesn't resize with size or zoom
         float v = 1F - u;
 
         // https://crafthead.net/helm/0b54d4f1-8ce9-46b3-a723-4ffdeeae3d7d
@@ -30,7 +30,7 @@ public class Players extends Layer {
         matrixStack.push();
         if (Config.getConfig().northLocked) {
             // only rotate if map is northlocked
-            GL.rotateScene(matrixStack, mm.centerX, mm.centerY, mm.angle);
+            GL.rotateScene(matrixStack, mm.getCenterX(), mm.getCenterY(), mm.getAngle());
         }
         Texture.PLAYER.draw(matrixStack, x0 + offset, y0, x1 + offset, y1, u, v);
         matrixStack.pop();

@@ -9,15 +9,15 @@ import java.util.List;
 public class Scheduler {
     public static final Scheduler INSTANCE = new Scheduler();
 
-    public static long currentTick() {
-        return INSTANCE.currentTick;
-    }
-
     private final List<Task> tasks = new ArrayList<>();
 
     private long currentTick;
 
     private Scheduler() {
+    }
+
+    public long getCurrentTick() {
+        return this.currentTick;
     }
 
     public void initialize() {

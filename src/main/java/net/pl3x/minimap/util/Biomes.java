@@ -16,8 +16,6 @@ import java.util.Map;
 public class Biomes {
     public static final Biomes INSTANCE = new Biomes();
 
-    public static boolean ALLOW_NULL_BIOMES = false;
-
     private Biomes() {
     }
 
@@ -120,16 +118,15 @@ public class Biomes {
         private final RegistryKey<Biome> biome;
         private final int color;
 
-        Color() {
-            this(BiomeKeys.PLAINS, 0);
-        }
-
         Color(RegistryKey<Biome> biome, int color) {
             this.biome = biome;
             this.color = color;
         }
 
         public static int get(World world, Biome biome) {
+            if (biome == null) {
+                return 0;
+            }
             RegistryKey<Biome> key = Biomes.INSTANCE.registry(world).getKey(biome).orElse(null);
             return key == null ? 0 : get(key);
         }

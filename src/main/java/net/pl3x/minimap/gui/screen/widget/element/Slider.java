@@ -59,7 +59,7 @@ public class Slider extends AnimatedWidget {
     public void render(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
         super.render(matrixStack, mouseX, mouseY, delta);
 
-        Font.NOTOSANS.draw(matrixStack, this.label.getString() + " " + this.option.get(), x() + this.size * 2.5F + 1F, y() + 2F + 1F, 0x88000000);
+        Font.NOTOSANS.draw(matrixStack, this.label.getString() + " " + this.option.get(), x() + 1F, y() + 1F, 0x88000000);
         Font.NOTOSANS.draw(matrixStack, this.label.getString() + " " + this.option.get(), x(), y(), 0xFFFFFFFF);
 
         Texture.WIDGETS.tint(matrixStack, x(), y() + 20, x() + this.size / 2, y() + this.size + 20, 0F / 25.6F, 1F / 25.6F, 0.5F / 25.6F, 2F / 25.6F, 0xFF79848c);

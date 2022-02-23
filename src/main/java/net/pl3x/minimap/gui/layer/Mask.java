@@ -9,9 +9,9 @@ import org.lwjgl.opengl.GL11;
 public class Mask extends Layer {
     @Override
     public void render(MatrixStack matrixStack) {
-        float size2 = mm.size * 2F;
-        float x = mm.centerX - mm.size;
-        float y = mm.centerY - mm.size;
+        float size2 = mm.getSize() * 2F;
+        float x = mm.getCenterX() - mm.getSize();
+        float y = mm.getCenterY() - mm.getSize();
 
         // uses blend which writes to the alpha channel where black pixels exist.
         // the mask is twice as large as the map texture and the black pixels are the map size.

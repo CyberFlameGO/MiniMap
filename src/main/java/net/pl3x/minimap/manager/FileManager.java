@@ -3,6 +3,7 @@ package net.pl3x.minimap.manager;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.mixin.MinecraftServerAccess;
 
@@ -29,7 +30,8 @@ public class FileManager {
     }
 
     public void start() {
-        stop();
+        this.worldDirs.clear();
+        this.tilesDir = null;
 
         if (MiniMap.CLIENT.isInSingleplayer()) {
             MinecraftServerAccess server = (MinecraftServerAccess) MiniMap.CLIENT.getServer();
@@ -42,13 +44,12 @@ public class FileManager {
             if (server == null) {
                 throw new RuntimeException("Cannot obtain multiplayer server ip address");
             }
-            this.tilesDir = resolve(this.dataDir, "multiplayer" + server.address);
+            this.tilesDir = resolve(this.dataDir, "multiplayer/" + server.address);
         }
     }
 
-    public void stop() {
-        this.worldDirs.clear();
-        this.tilesDir = null;
+    public Path getWorldDir(World world) {
+        return getWorldDir(world.getRegistryKey().getValue());
     }
 
     public Path getWorldDir(Identifier identifier) {

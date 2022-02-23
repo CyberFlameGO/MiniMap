@@ -83,6 +83,7 @@ public class Colors {
         // Minecraft flips red and blue for some reason. let's flip them back
         return (alpha(color) << 24) | (blue(color) << 16) | (green(color) << 8) | red(color);
     }
+
     public static int alpha(int argb) {
         return argb >> 24 & 0xFF;
     }
@@ -104,7 +105,16 @@ public class Colors {
     }
 
     public static int mix(int color0, int color1) {
-        return argb(alpha(color0) * alpha(color1) / 0xFF, red(color0) * red(color1) / 0xFF, green(color0) * green(color1) / 0xFF, blue(color0) * blue(color1) / 0xFF);
+        int a = alpha(color0);
+        if (a == 0) {
+            return 0;
+        }
+        float ratio = alpha(color1) / 255F;
+        float iRatio = 1F - ratio;
+        int r = (int) ((red(color0) * iRatio) + (red(color1) * ratio));
+        int g = (int) ((green(color0) * iRatio) + (green(color1) * ratio));
+        int b = (int) ((blue(color0) * iRatio) + (blue(color1) * ratio));
+        return (a << 24 | r << 16 | g << 8 | b);
     }
 
     public static int setAlpha(int alpha, int color) {

@@ -30,21 +30,25 @@ public class Drawable {
                 Colors.blue(color) / 255F,
                 Colors.alpha(color) / 255F
         );
-        draw(matrixStack, x0, y0, x1, y1, u0, v0, u1, v1);
+        draw(matrixStack, this.identifier, x0, y0, x1, y1, u0, v0, u1, v1);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
     }
 
     public void draw(MatrixStack matrixStack, float x, float y, float width, float height) {
-        draw(matrixStack, x, y, x + width, y + height, 0F, 0F, 1F, 1F);
+        draw(matrixStack, this.identifier, x, y, x + width, y + height, 0F, 0F, 1F, 1F);
     }
 
     public void draw(MatrixStack matrixStack, float x0, float y0, float x1, float y1, float u, float v) {
-        draw(matrixStack, x0, y0, x1, y1, u, u, v, v);
+        draw(matrixStack, this.identifier, x0, y0, x1, y1, u, u, v, v);
     }
 
     public void draw(MatrixStack matrixStack, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1) {
+        draw(matrixStack, this.identifier, x0, y0, x1, y1, u0, v0, u1, v1);
+    }
+
+    public static void draw(MatrixStack matrixStack, Identifier identifier, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, this.identifier);
+        RenderSystem.setShaderTexture(0, identifier);
         Matrix4f model = matrixStack.peek().getPositionMatrix();
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);

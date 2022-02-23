@@ -15,11 +15,11 @@ public class Directions extends Layer {
             return;
         }
 
-        this.x = mm.centerX;
-        this.y = mm.centerY + 2F; // not sure why this offset is needed
+        this.x = mm.getCenterX();
+        this.y = mm.getCenterY() + 2F; // not sure why this offset is needed
 
-        float angle = Config.getConfig().northLocked ? 0 : mm.angle;
-        float distance = mm.size / 2F + Font.DEFAULT.height() / 2F;
+        float angle = Config.getConfig().northLocked ? 0 : mm.getAngle();
+        float distance = mm.getSize() / 2F + Font.DEFAULT.height() / 2F;
         if (!Config.getConfig().circular && !Config.getConfig().northLocked && angle != 0F) {
             distance /= Mathf.cosRads(45F - Math.abs(45F + (-Math.abs(angle) % 90F)));
         }

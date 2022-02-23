@@ -4,18 +4,24 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.util.math.MatrixStack;
 import net.pl3x.minimap.MiniMap;
+import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.font.Font;
 import net.pl3x.minimap.gui.screen.OverlayScreen;
 import net.pl3x.minimap.gui.texture.Cursor;
 import net.pl3x.minimap.gui.texture.Texture;
 import net.pl3x.minimap.hardware.Monitor;
 import net.pl3x.minimap.hardware.Mouse;
+import net.pl3x.minimap.manager.TileManager;
+import net.pl3x.minimap.tile.Tile;
+import net.pl3x.minimap.util.Numbers;
 import org.lwjgl.opengl.GL11;
 
 public class FullMap extends AnimatedWidget {
     public static final FullMap INSTANCE = new FullMap();
 
     private State state;
+    private int centerX;
+    private int centerZ;
 
     private FullMap() {
         super(null, 0F, 0F, 0F, 0F);
@@ -107,11 +113,34 @@ public class FullMap extends AnimatedWidget {
 
         super.render(matrixStack, mouseX, mouseY, delta);
 
-        for (int x = 0; x < Monitor.width() + 512; x += 512) {
-            for (int y = 0; y < Monitor.height() + 512; y += 512) {
-                Texture.MINIMAP.draw(matrixStack, x, y, 512, 512);
+        if (MiniMap.INSTANCE.getBackground() != null) {
+            RenderSystem.setShaderColor(1F, 1F, 1F, 0.95F);
+            MiniMap.INSTANCE.getBackground().draw(matrixStack, 0F, 0F, Monitor.width(), Monitor.height(), 0F, 0F, Monitor.width() / MiniMap.TILE_SIZE, Monitor.height() / MiniMap.TILE_SIZE);
+            RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+        }
+
+        int halfWidth = Math.round(Monitor.width() / 2F);
+        int halfHeight = Math.round(Monitor.height() / 2F);
+
+        int limitX = MiniMap.TILE_SIZE * (int) Math.ceil((float) halfWidth / MiniMap.TILE_SIZE);
+        int limitZ = MiniMap.TILE_SIZE * (int) Math.ceil((float) halfHeight / MiniMap.TILE_SIZE);
+
+        for (int screenX = -limitX; screenX <= limitX; screenX += MiniMap.TILE_SIZE) {
+            for (int screenZ = -limitZ; screenZ <= limitZ; screenZ += MiniMap.TILE_SIZE) {
+                int blockX = screenX - (this.centerX & (MiniMap.TILE_SIZE - 1));
+                int blockZ = screenZ - (this.centerZ & (MiniMap.TILE_SIZE - 1));
+
+                Tile tile = TileManager.INSTANCE.getTile(MiniMap.INSTANCE.getWorld(), Numbers.blockToRegion(blockX + this.centerX), Numbers.blockToRegion(blockZ + this.centerZ), true);
+                if (tile != null && tile.isReady()) {
+                    tile.draw(matrixStack, blockX + halfWidth, blockZ + halfHeight);
+                }
             }
         }
+
+        matrixStack.push();
+        GL.rotateScene(matrixStack, halfWidth, halfHeight, MiniMap.INSTANCE.getAngle());
+        Texture.PLAYER.draw(matrixStack, halfWidth - MiniMap.TILE_SIZE, halfHeight - MiniMap.TILE_SIZE, MiniMap.TILE_SIZE * 2, MiniMap.TILE_SIZE * 2);
+        matrixStack.pop();
     }
 
     @Override
@@ -122,6 +151,8 @@ public class FullMap extends AnimatedWidget {
     public void open() {
         this.state = State.OPENED;
         Sidebar.INSTANCE.resetState();
+        this.centerX = MiniMap.INSTANCE.getPlayer().getBlockX();
+        this.centerZ = MiniMap.INSTANCE.getPlayer().getBlockZ();
     }
 
     public void close() {
