@@ -71,7 +71,7 @@ public class EntityMarker extends AnimatedWidget {
         matrixStack.push();
         matrixStack.translate(width() * -Mathf.sinRads(-angle), height() * -Mathf.cosRads(-angle), 0D);
         GL.rotateScene(matrixStack, x(), y(), angle);
-        Icon.ARROW.draw(matrixStack, x() - width() / 2F, y() - height() / 2F, width(), 0xFFFFFFFF);
+        Icon.ARROW.draw(matrixStack, x() - w, y() - h, width(), 0xFFFFFFFF);
         matrixStack.pop();
 
         // skin layers
@@ -87,7 +87,7 @@ public class EntityMarker extends AnimatedWidget {
             w *= 1.2F;
             h *= 1.2F;
             if (item instanceof DyeableArmorItem armor) {
-                Drawable.tint(matrixStack, helmet.texture, x() - w, y() - h, x() + w, y() + h, 1 / 8F, 1 / 4F, 2 / 8F, 2 / 4F, armor.getColor(stack));
+                Drawable.tint(matrixStack, helmet.texture, x() - w, y() - h, x() + w, y() + h, 1 / 8F, 1 / 4F, 2 / 8F, 2 / 4F, armor.getColor(stack) | 0xFF << 24);
             } else {
                 Drawable.draw(matrixStack, helmet.texture, x() - w, y() - h, x() + w, y() + h, 1 / 8F, 1 / 4F, 2 / 8F, 2 / 4F);
             }

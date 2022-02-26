@@ -23,7 +23,8 @@ public class Map extends Layer {
     private NativeImageBackedTexture map;
 
     public Map() {
-        this.asyncUpdateTask = new AsyncUpdate();
+        super();
+        this.asyncUpdateTask = new AsyncUpdate(this.mm);
     }
 
     @Override
@@ -41,7 +42,7 @@ public class Map extends Layer {
         float y0 = mm.getCenterY() - halfSize + scale;
         float y1 = y0 + mm.getSize() - scale2;
 
-        float u = (MiniMap.TILE_SIZE / 2F - mm.getDeltaZoom() / 2F) / MiniMap.TILE_SIZE; // resizes with zoom _and_ size
+        float u = (MiniMap.TILE_SIZE - mm.getDeltaZoom()) / MiniMap.TILE_SIZE / 2F;
         float v = 1F - u;
 
         // uses blend which only writes where high alpha values exist
@@ -93,7 +94,7 @@ public class Map extends Layer {
                         this.map.upload();
                     }
                 },
-                ThreadManager.INSTANCE.getUpdaterExecutor());
+                ThreadManager.INSTANCE.getLayerUpdaterExecutor());
     }
 
     @Override
@@ -102,6 +103,8 @@ public class Map extends Layer {
     }
 
     private static class AsyncUpdate implements Runnable {
+        private final MiniMap mm;
+
         private NativeImage image;
         private boolean running;
         private boolean cancelled;
@@ -111,13 +114,17 @@ public class Map extends Layer {
         int blockX, blockZ;
         double playerX, playerZ;
 
+        private AsyncUpdate(MiniMap mm) {
+            this.mm = mm;
+        }
+
         @Override
         public void run() {
             if (this.cancelled) {
                 return;
             }
-            this.playerX = MiniMap.INSTANCE.getPlayer().getX() - MiniMap.TILE_SIZE / 2D;
-            this.playerZ = MiniMap.INSTANCE.getPlayer().getZ() - MiniMap.TILE_SIZE / 2D;
+            this.playerX = mm.getPlayer().getX() - MiniMap.TILE_SIZE / 2D;
+            this.playerZ = mm.getPlayer().getZ() - MiniMap.TILE_SIZE / 2D;
 
             for (int x = 0; x < MiniMap.TILE_SIZE; x++) {
                 for (int z = 0; z < MiniMap.TILE_SIZE; z++) {
@@ -128,7 +135,7 @@ public class Map extends Layer {
                     this.blockX = (int) Math.round(this.playerX + x);
                     this.blockZ = (int) Math.round(this.playerZ + z);
 
-                    this.tile = TileManager.INSTANCE.getTile(MiniMap.INSTANCE.getWorld(), Numbers.blockToRegion(this.blockX), Numbers.blockToRegion(this.blockZ), false);
+                    this.tile = TileManager.INSTANCE.getTile(mm.getWorld(), Numbers.blockToRegion(this.blockX), Numbers.blockToRegion(this.blockZ), false);
                     if (this.tile == null || !this.tile.isReady()) {
                         // tile not ready
                         this.image.setColor(x, z, 0);

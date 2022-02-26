@@ -10,39 +10,53 @@ import java.util.concurrent.Executors;
 public class ThreadManager {
     public static final ThreadManager INSTANCE = new ThreadManager();
     public static final String CHUNK_SCANNER_THREAD_NAME = "Minimap-Chunk-Scanner";
-    public static final String UPDATER_THREAD_NAME = "Minimap-Layer-Updater";
-    public static final String DISK_IO_THREAD_NAME = "Minimap-Disk-IO";
+    public static final String LAYER_UPDATER_THREAD_NAME = "Minimap-Layer-Updater";
+    public static final String TILE_UPDATER_THREAD_NAME = "Minimap-Tile-Updater";
+    public static final String READ_IO_THREAD_NAME = "Minimap-IO-Read";
+    public static final String WRITE_IO_THREAD_NAME = "Minimap-IO-Write";
 
     private ExecutorService chunkScannerExecutor;
-    private ExecutorService updaterExecutor;
-    private ExecutorService diskIOExecutor;
+    private ExecutorService layerUpdaterExecutor;
+    private ExecutorService tileUpdaterExecutor;
+    private ExecutorService readIOExecutor;
+    private ExecutorService writeIOExecutor;
 
     private ThreadManager() {
     }
 
     public ExecutorService getChunkScannerExecutor() {
-        int threads = Config.getConfig().threads;
-        if (threads < 1) {
-            threads = Runtime.getRuntime().availableProcessors() / 3;
-        }
         if (this.chunkScannerExecutor == null) {
-            this.chunkScannerExecutor = Executors.newFixedThreadPool(Math.max(1, threads), new ThreadFactoryBuilder().setNameFormat(CHUNK_SCANNER_THREAD_NAME + "-%d").build());
+            this.chunkScannerExecutor = Executors.newFixedThreadPool(Math.max(1, getThreads()), new ThreadFactoryBuilder().setNameFormat(CHUNK_SCANNER_THREAD_NAME + "-%d").build());
         }
         return this.chunkScannerExecutor;
     }
 
-    public ExecutorService getDiskIOExecutor() {
-        if (this.diskIOExecutor == null) {
-            this.diskIOExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat(DISK_IO_THREAD_NAME).build());
+    public ExecutorService getReadIOExecutor() {
+        if (this.readIOExecutor == null) {
+            this.readIOExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat(READ_IO_THREAD_NAME).build());
         }
-        return this.diskIOExecutor;
+        return this.readIOExecutor;
     }
 
-    public ExecutorService getUpdaterExecutor() {
-        if (this.updaterExecutor == null) {
-            this.updaterExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat(UPDATER_THREAD_NAME).build());
+    public ExecutorService getWriteIOExecutor() {
+        if (this.writeIOExecutor == null) {
+            this.writeIOExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat(WRITE_IO_THREAD_NAME).build());
         }
-        return this.updaterExecutor;
+        return this.writeIOExecutor;
+    }
+
+    public ExecutorService getLayerUpdaterExecutor() {
+        if (this.layerUpdaterExecutor == null) {
+            this.layerUpdaterExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat(LAYER_UPDATER_THREAD_NAME).build());
+        }
+        return this.layerUpdaterExecutor;
+    }
+
+    public ExecutorService getTileUpdaterExecutor() {
+        if (this.tileUpdaterExecutor == null) {
+            this.tileUpdaterExecutor = Executors.newFixedThreadPool(Math.max(1, getThreads()), new ThreadFactoryBuilder().setNameFormat(TILE_UPDATER_THREAD_NAME).build());
+        }
+        return this.tileUpdaterExecutor;
     }
 
     public void runAsync(Runnable task, ExecutorService executor) {
@@ -63,5 +77,13 @@ public class ThreadManager {
                         whenComplete.run();
                     }
                 });
+    }
+
+    private int getThreads() {
+        int threads = Config.getConfig().threads;
+        if (threads < 1) {
+            threads = Runtime.getRuntime().availableProcessors() / 3;
+        }
+        return threads;
     }
 }

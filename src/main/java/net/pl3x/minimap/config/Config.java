@@ -72,7 +72,7 @@ public class Config {
     }
 
     public static void save() {
-        DiskIOQueue.INSTANCE.add(() -> {
+        DiskIOQueue.INSTANCE.write(() -> {
             try (FileWriter writer = new FileWriter(FileManager.INSTANCE.configFile.toFile())) {
                 gson.toJson(config, writer);
                 writer.flush();

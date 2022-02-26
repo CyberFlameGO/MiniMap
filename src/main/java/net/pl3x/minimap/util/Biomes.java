@@ -2,11 +2,11 @@ package net.pl3x.minimap.util;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
 
@@ -20,35 +20,35 @@ public class Biomes {
     }
 
     public Biome getBiome(ClientPlayerEntity player) {
-        return getBiome(player.world, player.getBlockPos());
+        return getBiome(player.clientWorld, player.getBlockPos());
     }
 
-    public Biome getBiome(World world, BlockPos pos) {
+    public Biome getBiome(ClientWorld world, BlockPos pos) {
         return world.getBiome(pos);
     }
 
     public String getBiomeName(ClientPlayerEntity player) {
-        return getBiomeName(player.world, getBiome(player));
+        return getBiomeName(player.clientWorld, getBiome(player));
     }
 
-    public String getBiomeName(World world, Biome biome) {
+    public String getBiomeName(ClientWorld world, Biome biome) {
         Identifier identifier = getKey(world, biome);
         return I18n.translate(identifier == null ? "unknown" : "biome.minecraft." + identifier.getPath());
     }
 
-    public Identifier getKey(World world, BlockPos pos) {
+    public Identifier getKey(ClientWorld world, BlockPos pos) {
         return getKey(world, world.getBiome(pos));
     }
 
-    public Identifier getKey(World world, Biome biome) {
+    public Identifier getKey(ClientWorld world, Biome biome) {
         return registry(world).getId(biome);
     }
 
-    public Registry<Biome> registry(World world) {
+    public Registry<Biome> registry(ClientWorld world) {
         return world.getRegistryManager().get(Registry.BIOME_KEY);
     }
 
-    public static int color(World world, Biome biome) {
+    public static int color(ClientWorld world, Biome biome) {
         return Color.get(world, biome);
     }
 
@@ -123,7 +123,7 @@ public class Biomes {
             this.color = color;
         }
 
-        public static int get(World world, Biome biome) {
+        public static int get(ClientWorld world, Biome biome) {
             if (biome == null) {
                 return 0;
             }

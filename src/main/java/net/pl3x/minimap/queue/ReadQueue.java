@@ -13,7 +13,7 @@ import java.nio.file.Files;
 public class ReadQueue implements QueueAction {
     private final Tile tile;
 
-    ReadQueue(Tile tile) {
+    public ReadQueue(Tile tile) {
         this.tile = tile;
     }
 

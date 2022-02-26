@@ -10,8 +10,11 @@ import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.texture.Drawable;
 import net.pl3x.minimap.manager.FileManager;
+import net.pl3x.minimap.manager.ThreadManager;
+import net.pl3x.minimap.queue.DiskIOQueue;
+import net.pl3x.minimap.queue.ReadQueue;
+import net.pl3x.minimap.queue.WriteQueue;
 import net.pl3x.minimap.scheduler.Scheduler;
-import net.pl3x.minimap.queue.QueueAction;
 import net.pl3x.minimap.util.Colors;
 import net.pl3x.minimap.util.Mathf;
 
@@ -35,6 +38,7 @@ public class Tile {
     private boolean ready;
     private long lastUsed;
     private long lastSaved;
+    private long lastUploaded;
 
     public Tile(ClientWorld world, int regionX, int regionZ) {
         this.identifier = new Identifier(MiniMap.MODID, String.format("tile_%s_%d_%d", world.getRegistryKey().getValue().toString().replace(":", "-"), regionX, regionZ));
@@ -64,51 +68,46 @@ public class Tile {
     }
 
     public void load() {
-        use();
-        QueueAction.read(this);
+        DiskIOQueue.INSTANCE.read(new ReadQueue(this));
     }
 
     public void save() {
         this.lastSaved = Scheduler.INSTANCE.getCurrentTick();
-        QueueAction.write(this);
+        if (this.ready) {
+            // only save if tile is ready to avoid saving blank png before we loaded
+            DiskIOQueue.INSTANCE.write(new WriteQueue(this));
+        }
     }
 
     public Identifier getIdentifier() {
-        use();
         return this.identifier;
     }
 
     public NativeImageBackedTexture getTexture() {
-        use();
         return this.texture;
     }
 
     public Image getBase() {
-        use();
         return this.base;
     }
 
     public Image getBiomes() {
-        use();
         return this.biomes;
     }
 
     public Image getHeight() {
-        use();
         return this.height;
     }
 
     public Image getFluids() {
-        use();
         return this.water;
     }
 
     public Image getLight() {
-        use();
         return this.light;
     }
 
-    private void use() {
+    public void use() {
         this.lastUsed = Scheduler.INSTANCE.getCurrentTick();
     }
 
@@ -120,6 +119,10 @@ public class Tile {
         return this.lastSaved;
     }
 
+    public long getLastUploaded() {
+        return this.lastUploaded;
+    }
+
     public boolean isReady() {
         return this.ready && getTexture() != null;
     }
@@ -128,14 +131,7 @@ public class Tile {
         this.ready = ready;
     }
 
-    public void unload() {
-        this.ready = false;
-        this.save();
-    }
-
     public void upload() {
-        use();
-
         // first upload, create and register texture
         if (this.texture == null) {
             // can only register on render thread
@@ -154,34 +150,40 @@ public class Tile {
             return;
         }
 
-        int color = 0xFF << 24;
-        float skylight = this.world.getStarBrightness(1F) * 15;
-        for (int x = 0; x < MiniMap.TILE_SIZE; x++) {
-            for (int z = 0; z < MiniMap.TILE_SIZE; z++) {
-                if (Config.getConfig().layers.base) {
-                    color = getBase().getPixel(x, z);
-                }
-                if (Config.getConfig().layers.biomes) {
-                    color = getBiomes().getPixel(x, z);
-                }
-                if (Config.getConfig().layers.heightmap) {
-                    color = Colors.mix(color, getHeight().getPixel(x, z));
-                }
-                if (Config.getConfig().layers.fluids) {
-                    color = Colors.mix(color, getFluids().getPixel(x, z));
-                }
-                if (Config.getConfig().layers.lightmap) {
-                    color = Colors.mix(color, (int) Mathf.clamp(0, 0xFF, (0xFF * Mathf.inverseLerp(0, 15, 15 - (this.world.getDimension().hasCeiling() ? 5 : skylight)) - Colors.alpha(getLight().getPixel(x, z))) / 1.2F) << 24);
-                }
-                image.setColor(x, z, color);
-            }
-        }
-
-        this.texture.upload();
+        ThreadManager.INSTANCE.runAsync(
+                () -> {
+                    int color = 0xFF << 24;
+                    float skylight = this.world.getStarBrightness(1F) * 15;
+                    for (int x = 0; x < MiniMap.TILE_SIZE; x++) {
+                        for (int z = 0; z < MiniMap.TILE_SIZE; z++) {
+                            if (Config.getConfig().layers.base) {
+                                color = getBase().getPixel(x, z);
+                            }
+                            if (Config.getConfig().layers.biomes) {
+                                color = getBiomes().getPixel(x, z);
+                            }
+                            if (Config.getConfig().layers.heightmap) {
+                                color = Colors.mix(color, getHeight().getPixel(x, z));
+                            }
+                            if (Config.getConfig().layers.fluids) {
+                                color = Colors.mix(color, getFluids().getPixel(x, z));
+                            }
+                            if (Config.getConfig().layers.lightmap) {
+                                color = Colors.mix(color, (int) Mathf.clamp(0, 0xFF, (0xFF * Mathf.inverseLerp(0, 15, 15 - (this.world.getDimension().hasCeiling() ? 5 : skylight)) - Colors.alpha(getLight().getPixel(x, z))) / 1.2F) << 24);
+                            }
+                            image.setColor(x, z, color);
+                        }
+                    }
+                },
+                () -> {
+                    this.lastUploaded = Scheduler.INSTANCE.getCurrentTick();
+                    this.texture.upload();
+                },
+                ThreadManager.INSTANCE.getTileUpdaterExecutor()
+        );
     }
 
     public void draw(MatrixStack matrixStack, float x, float z) {
-        use();
         Drawable.draw(matrixStack, this.getIdentifier(), x, z, x + MiniMap.TILE_SIZE, z + MiniMap.TILE_SIZE, 0, 0, 1, 1);
     }
 }

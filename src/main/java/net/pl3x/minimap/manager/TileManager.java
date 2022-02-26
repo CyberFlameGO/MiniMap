@@ -37,19 +37,18 @@ public class TileManager {
     }
 
     public void tick() {
-        unloadStaleTiles();
-    }
-
-    public void unloadStaleTiles() {
         long now = Scheduler.INSTANCE.getCurrentTick();
         Iterator<Tile> iter = this.tiles.values().iterator();
         while (iter.hasNext()) {
             Tile tile = iter.next();
             if (tile.getLastUsed() + 100 < now) { // ~5 seconds
-                tile.setReady(false);
                 tile.save();
+                tile.setReady(false);
                 iter.remove();
                 continue;
+            }
+            if (tile.getLastUploaded() + 20 < now) { // 1 second
+                tile.upload();
             }
             if (tile.getLastSaved() + 600 < now) { // ~30 seconds
                 tile.save();
@@ -63,6 +62,9 @@ public class TileManager {
         if (tile == null && load) {
             tile = loadTile(world, regionX, regionZ);
             this.tiles.put(key, tile);
+        }
+        if (tile != null) {
+            tile.use();
         }
         return tile;
     }

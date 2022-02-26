@@ -7,32 +7,58 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class DiskIOQueue {
     public static final DiskIOQueue INSTANCE = new DiskIOQueue();
 
-    private final LinkedBlockingQueue<QueueAction> queue = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<QueueAction> readQueue = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<QueueAction> writeQueue = new LinkedBlockingQueue<>();
 
-    private boolean running;
+    private boolean reading;
+    private boolean writing;
 
     private DiskIOQueue() {
     }
 
-    public void add(QueueAction action) {
-        this.queue.add(action);
-        runAsyncInfiniteLoop();
+    public void read(QueueAction action) {
+        this.readQueue.add(action);
+        runAsyncReadInfiniteLoop();
     }
 
-    private void runAsyncInfiniteLoop() {
-        if (this.running) {
+    public void write(QueueAction action) {
+        this.writeQueue.add(action);
+        runAsyncWriteInfiniteLoop();
+    }
+
+    private void runAsyncReadInfiniteLoop() {
+        if (this.reading) {
             return;
         }
-        this.running = true;
+        this.reading = true;
         ThreadManager.INSTANCE.runAsync(() -> {
-            while (this.running) {
+            while (this.reading) {
                 try {
-                    this.queue.take().run();
+                    this.readQueue.take().run();
                 } catch (InterruptedException e) {
-                    this.running = false;
+                    e.printStackTrace();
+                    this.reading = false;
                     Thread.currentThread().interrupt();
                 }
             }
-        }, ThreadManager.INSTANCE.getDiskIOExecutor());
+        }, ThreadManager.INSTANCE.getReadIOExecutor());
+    }
+
+    private void runAsyncWriteInfiniteLoop() {
+        if (this.writing) {
+            return;
+        }
+        this.writing = true;
+        ThreadManager.INSTANCE.runAsync(() -> {
+            while (this.writing) {
+                try {
+                    this.writeQueue.take().run();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    this.writing = false;
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }, ThreadManager.INSTANCE.getWriteIOExecutor());
     }
 }

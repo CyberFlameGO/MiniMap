@@ -1,6 +1,6 @@
 package net.pl3x.minimap.util;
 
-import net.minecraft.world.World;
+import net.minecraft.client.world.ClientWorld;
 import net.pl3x.minimap.config.Config;
 
 import java.util.Calendar;
@@ -18,7 +18,7 @@ public class Clock {
     private Clock() {
     }
 
-    public String getTime(World world) {
+    public String getTime(ClientWorld world) {
         long now = System.currentTimeMillis();
         if (now - this.lastChecked > 500L) {
             updateTime(world);
@@ -27,7 +27,7 @@ public class Clock {
         return this.time;
     }
 
-    private void updateTime(World world) {
+    private void updateTime(ClientWorld world) {
         int hours, minutes;
 
         if (Config.getConfig().clockRealTime) {

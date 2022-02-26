@@ -19,7 +19,7 @@ import java.nio.file.StandardCopyOption;
 public class WriteQueue implements QueueAction {
     private final Tile tile;
 
-    WriteQueue(Tile tile) {
+    public WriteQueue(Tile tile) {
         this.tile = tile;
     }
 
