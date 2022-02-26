@@ -281,6 +281,6 @@ public class MiniMap {
             case LOW -> 0F;
             case MID -> Monitor.height() / 2F;
             case HIGH -> Monitor.height();
-        } + Config.getConfig().anchorOffsetY * scale + 50;
+        } + Config.getConfig().anchorOffsetY * scale;
     }
 }
