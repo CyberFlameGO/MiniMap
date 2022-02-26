@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.gui.animation.Easing;
 import net.pl3x.minimap.manager.FileManager;
-import net.pl3x.minimap.manager.ThreadManager;
+import net.pl3x.minimap.queue.DiskIOQueue;
 import net.pl3x.minimap.util.Anchor;
 
 import java.io.BufferedReader;
@@ -72,7 +72,7 @@ public class Config {
     }
 
     public static void save() {
-        ThreadManager.INSTANCE.runAsync(() -> {
+        DiskIOQueue.INSTANCE.add(() -> {
             try (FileWriter writer = new FileWriter(FileManager.INSTANCE.configFile.toFile())) {
                 gson.toJson(config, writer);
                 writer.flush();
@@ -80,6 +80,6 @@ public class Config {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }, ThreadManager.INSTANCE.getIOExecutor());
+        });
     }
 }

@@ -19,8 +19,6 @@ public class Texture extends Drawable {
     public static final Texture FRAME_SQUARE = register(new Texture("gui/map/frame_square"));
     public static final Texture MASK_CIRCLE = register(new Texture("gui/map/mask_circle"));
     public static final Texture MASK_SQUARE = register(new Texture("gui/map/mask_square"));
-    public static final Texture MINIMAP = register(new Texture("gui/minimap"));
-    public static final Texture PLAYER = register(new Texture("gui/player"));
     public static final Texture SKY_OVERWORLD = register(new Texture("gui/sky/overworld"));
     public static final Texture SKY_THE_NETHER = register(new Texture("gui/sky/the_nether"));
     public static final Texture SKY_THE_END = register(new Texture("gui/sky/the_end"));

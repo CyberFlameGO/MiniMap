@@ -25,6 +25,7 @@ import net.pl3x.minimap.manager.TileManager;
 import net.pl3x.minimap.scheduler.Scheduler;
 import net.pl3x.minimap.scheduler.Task;
 import net.pl3x.minimap.util.Mathf;
+import net.pl3x.minimap.util.Numbers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -166,6 +167,8 @@ public class MiniMap {
             this.tickTask = null;
         }
 
+        this.layers.forEach(Layer::stop);
+
         ChunkScanner.INSTANCE.stop();
         TileManager.INSTANCE.stop();
 
@@ -202,7 +205,7 @@ public class MiniMap {
         }
 
         // angle of player rotation
-        this.angle = (this.player.getYaw(delta) - 180F) % 360F;
+        this.angle = Numbers.normalizeDegrees(this.player.getYaw(delta));
 
         // setup opengl stuff
         matrixStack.push();

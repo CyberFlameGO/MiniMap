@@ -11,7 +11,7 @@ import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.texture.Drawable;
 import net.pl3x.minimap.manager.FileManager;
 import net.pl3x.minimap.scheduler.Scheduler;
-import net.pl3x.minimap.tile.queue.QueueAction;
+import net.pl3x.minimap.queue.QueueAction;
 import net.pl3x.minimap.util.Colors;
 import net.pl3x.minimap.util.Mathf;
 

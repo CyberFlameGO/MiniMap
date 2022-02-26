@@ -5,14 +5,14 @@ import net.pl3x.minimap.scheduler.Scheduler;
 import net.pl3x.minimap.scheduler.Task;
 import net.pl3x.minimap.tile.Tile;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TileManager {
     public static final TileManager INSTANCE = new TileManager();
 
-    public final Map<String, Tile> tiles = new HashMap<>();
+    public final Map<String, Tile> tiles = new ConcurrentHashMap<>();
 
     public Task tickTask;
 

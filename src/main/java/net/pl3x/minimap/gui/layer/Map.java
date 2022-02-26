@@ -9,21 +9,18 @@ import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.texture.Drawable;
+import net.pl3x.minimap.manager.ThreadManager;
 import net.pl3x.minimap.manager.TileManager;
 import net.pl3x.minimap.tile.Tile;
 import net.pl3x.minimap.util.Mathf;
 import net.pl3x.minimap.util.Numbers;
 import org.lwjgl.opengl.GL11;
 
-import java.util.concurrent.CompletableFuture;
-
 public class Map extends Layer {
     private final AsyncUpdate asyncUpdateTask;
 
     private final Identifier mapId = new Identifier(MiniMap.MODID, "map_layer");
     private NativeImageBackedTexture map;
-
-    private boolean running;
 
     public Map() {
         this.asyncUpdateTask = new AsyncUpdate();
@@ -47,7 +44,7 @@ public class Map extends Layer {
         float u = (MiniMap.TILE_SIZE / 2F - mm.getDeltaZoom() / 2F) / MiniMap.TILE_SIZE; // resizes with zoom _and_ size
         float v = 1F - u;
 
-        // uses blend which only writes where high alpha values exist from above
+        // uses blend which only writes where high alpha values exist
         RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
 
         matrixStack.push();
@@ -65,7 +62,7 @@ public class Map extends Layer {
 
     @Override
     public void update() {
-        if (this.running) {
+        if (this.asyncUpdateTask.running) {
             // still updating previous run.
             // skip this run to prevent tearing
             return;
@@ -79,27 +76,35 @@ public class Map extends Layer {
             return;
         }
 
-        this.asyncUpdateTask.image = this.map.getImage();
-        if (this.asyncUpdateTask.image == null) {
+        NativeImage image = this.map.getImage();
+        if (image == null) {
             // image isn't ready yet
             return;
         }
 
-        this.running = true;
+        this.asyncUpdateTask.running = true;
+        this.asyncUpdateTask.image = image;
 
-        CompletableFuture.runAsync(this.asyncUpdateTask)
-                .exceptionally(throwable -> {
-                    throwable.printStackTrace();
-                    return null;
-                })
-                .whenComplete((result, throwable) -> {
-                    this.running = false;
-                    this.map.upload();
-                });
+        ThreadManager.INSTANCE.runAsync(
+                this.asyncUpdateTask,
+                () -> {
+                    this.asyncUpdateTask.running = false;
+                    if (!this.asyncUpdateTask.cancelled) {
+                        this.map.upload();
+                    }
+                },
+                ThreadManager.INSTANCE.getUpdaterExecutor());
+    }
+
+    @Override
+    public void stop() {
+        this.asyncUpdateTask.cancelled = true;
     }
 
     private static class AsyncUpdate implements Runnable {
         private NativeImage image;
+        private boolean running;
+        private boolean cancelled;
 
         Tile tile;
         NativeImage source;
@@ -108,11 +113,18 @@ public class Map extends Layer {
 
         @Override
         public void run() {
+            if (this.cancelled) {
+                return;
+            }
             this.playerX = MiniMap.INSTANCE.getPlayer().getX() - MiniMap.TILE_SIZE / 2D;
             this.playerZ = MiniMap.INSTANCE.getPlayer().getZ() - MiniMap.TILE_SIZE / 2D;
 
             for (int x = 0; x < MiniMap.TILE_SIZE; x++) {
                 for (int z = 0; z < MiniMap.TILE_SIZE; z++) {
+                    if (this.cancelled) {
+                        return;
+                    }
+
                     this.blockX = (int) Math.round(this.playerX + x);
                     this.blockZ = (int) Math.round(this.playerZ + z);
 

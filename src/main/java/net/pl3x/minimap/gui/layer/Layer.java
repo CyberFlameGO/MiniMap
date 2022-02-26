@@ -14,4 +14,7 @@ public abstract class Layer {
 
     public void update() {
     }
+
+    public void stop() {
+    }
 }

@@ -1,17 +1,17 @@
-package net.pl3x.minimap.tile.queue;
+package net.pl3x.minimap.queue;
 
 import net.pl3x.minimap.manager.ThreadManager;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class TileQueue {
-    public static final TileQueue INSTANCE = new TileQueue();
+public class DiskIOQueue {
+    public static final DiskIOQueue INSTANCE = new DiskIOQueue();
 
     private final LinkedBlockingQueue<QueueAction> queue = new LinkedBlockingQueue<>();
 
     private boolean running;
 
-    private TileQueue() {
+    private DiskIOQueue() {
     }
 
     public void add(QueueAction action) {
@@ -33,6 +33,6 @@ public class TileQueue {
                     Thread.currentThread().interrupt();
                 }
             }
-        }, ThreadManager.INSTANCE.getIOExecutor());
+        }, ThreadManager.INSTANCE.getDiskIOExecutor());
     }
 }

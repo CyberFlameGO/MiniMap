@@ -16,7 +16,7 @@ public class ClientWorldMixin {
 
     @Inject(method = "getGeneratorStoredBiome", at = @At("HEAD"), cancellable = true)
     private void getGeneratorStoredBiome(int biomeX, int biomeY, int biomeZ, CallbackInfoReturnable<Biome> cir) {
-        if (Thread.currentThread().getName().startsWith(ThreadManager.UPDATER_THREAD_NAME)) {
+        if (Thread.currentThread().getName().startsWith(ThreadManager.CHUNK_SCANNER_THREAD_NAME)) {
             cir.setReturnValue(null);
             cir.cancel();
         }

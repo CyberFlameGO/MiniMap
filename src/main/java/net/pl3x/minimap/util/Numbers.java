@@ -27,4 +27,8 @@ public final class Numbers {
     public static int blockToChunk(int n) {
         return n >> 4;
     }
+
+    public static float normalizeDegrees(float degrees) {
+        return (degrees - 180F) % 360F;
+    }
 }

@@ -14,6 +14,8 @@ Icons:
   waypoints - https://www.flaticon.com/free-icon/placeholder_592243
   layers - https://www.flaticon.com/free-icon/layers_481865
   map - https://www.flaticon.com/premium-icon/map_2918641
+  arrow - https://www.flaticon.com/free-icon/right-arrow_724954
+  player marker - https://minecraft.fandom.com/wiki/Map?file=Map_icons.png
   all mob heads - https://minecraft.fandom.com/wiki/Mob#List_of_mobs
 
 Sounds:

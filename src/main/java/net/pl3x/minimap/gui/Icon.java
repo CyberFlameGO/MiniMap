@@ -85,7 +85,9 @@ public enum Icon {
     POSITION(4, 15),
     WAYPOINTS(5, 15),
     LAYERS(6, 15),
-    ICON(7, 15);
+    MAP(7, 15),
+    ARROW(8, 15),
+    PLAYER(9, 15);
 
     private final int u, v;
 
@@ -118,7 +120,7 @@ public enum Icon {
         return (v() + 1) / 16F;
     }
 
-    public void draw(MatrixStack matrixStack, float x, float y, float size, int color) {
-        Texture.ICONS.tint(matrixStack, x, y, x + size, y + size, u0(), v0(), u1(), v1(), color);
+    public void draw(MatrixStack matrixStack, float x, float y, float size, int tint) {
+        Texture.ICONS.tint(matrixStack, x, y, x + size, y + size, u0(), v0(), u1(), v1(), tint);
     }
 }

@@ -1,4 +1,4 @@
-package net.pl3x.minimap.tile.queue;
+package net.pl3x.minimap.queue;
 
 import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.tile.Image;
@@ -13,6 +13,8 @@ import javax.imageio.stream.ImageOutputStream;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public class WriteQueue implements QueueAction {
     private final Tile tile;
@@ -31,6 +33,7 @@ public class WriteQueue implements QueueAction {
     }
 
     private void write(Image image) {
+        // create directories if they don't exist
         if (!Files.exists(image.path().getParent())) {
             try {
                 Files.createDirectories(image.path().getParent());
@@ -39,8 +42,13 @@ public class WriteQueue implements QueueAction {
                 return;
             }
         }
+
+        // write file to tmp on disk
+        // this helps prevent corrupt pngs
         ImageWriter writer = null;
-        try (ImageOutputStream out = ImageIO.createImageOutputStream(Files.newOutputStream(image.path()))) {
+        Exception error = null;
+        Path tmpPath = image.path().resolveSibling(image.path().getFileName() + ".tmp");
+        try (ImageOutputStream out = ImageIO.createImageOutputStream(Files.newOutputStream(tmpPath))) {
             BufferedImage buffer = new BufferedImage(MiniMap.TILE_SIZE, MiniMap.TILE_SIZE, BufferedImage.TYPE_INT_ARGB);
             ImageTypeSpecifier type = ImageTypeSpecifier.createFromRenderedImage(buffer);
             writer = ImageIO.getImageWriters(type, "png").next();
@@ -54,10 +62,29 @@ public class WriteQueue implements QueueAction {
             writer.setOutput(out);
             writer.write(null, new IIOImage(buffer, null, null), param);
         } catch (IOException e) {
-            e.printStackTrace();
+            // store error so we can return early after finally
+            error = e;
         } finally {
             if (writer != null) {
                 writer.dispose();
+            }
+        }
+
+        // error out if we couldn't save tmp file
+        if (error != null) {
+            MiniMap.LOG.warn("Could not save tile image: " + image.path());
+            error.printStackTrace();
+            return;
+        }
+
+        // move tmp file into proper place
+        try {
+            Files.move(tmpPath, image.path(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (IOException e1) {
+            try {
+                Files.move(tmpPath, image.path(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e2) {
+                e2.printStackTrace();
             }
         }
     }

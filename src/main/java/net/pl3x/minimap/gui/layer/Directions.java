@@ -1,9 +1,11 @@
 package net.pl3x.minimap.gui.layer;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.util.math.MatrixStack;
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.font.Font;
 import net.pl3x.minimap.util.Mathf;
+import org.lwjgl.opengl.GL11;
 
 public class Directions extends Layer {
     private float x;
@@ -24,8 +26,8 @@ public class Directions extends Layer {
             distance /= Mathf.cosRads(45F - Math.abs(45F + (-Math.abs(angle) % 90F)));
         }
 
-        // use a blend that supports translucent pixels for all the remaining textures
-        //RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        // use a blend that supports translucent pixels
+        RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         matrixStack.push();
         //matrixStack.scale(scale, scale, scale);

@@ -4,11 +4,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.util.math.MatrixStack;
 import net.pl3x.minimap.MiniMap;
-import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.font.Font;
 import net.pl3x.minimap.gui.screen.OverlayScreen;
+import net.pl3x.minimap.gui.screen.widget.element.EntityMarker;
 import net.pl3x.minimap.gui.texture.Cursor;
-import net.pl3x.minimap.gui.texture.Texture;
 import net.pl3x.minimap.hardware.Monitor;
 import net.pl3x.minimap.hardware.Mouse;
 import net.pl3x.minimap.manager.TileManager;
@@ -18,6 +17,9 @@ import org.lwjgl.opengl.GL11;
 
 public class FullMap extends AnimatedWidget {
     public static final FullMap INSTANCE = new FullMap();
+
+    // todo - move this to a new layer
+    private final EntityMarker playerMarker;
 
     private State state;
     private int centerX;
@@ -29,6 +31,9 @@ public class FullMap extends AnimatedWidget {
         HudRenderCallback.EVENT.register((matrixStack, delta) ->
                 render(matrixStack, MiniMap.CLIENT.getLastFrameDuration())
         );
+
+        // todo - move this to a new layer
+        this.playerMarker = new EntityMarker(this, null);
     }
 
     @Override
@@ -137,9 +142,13 @@ public class FullMap extends AnimatedWidget {
             }
         }
 
+        // todo - move this to a new layer
         matrixStack.push();
-        GL.rotateScene(matrixStack, halfWidth, halfHeight, MiniMap.INSTANCE.getAngle());
-        Texture.PLAYER.draw(matrixStack, halfWidth - MiniMap.TILE_SIZE, halfHeight - MiniMap.TILE_SIZE, MiniMap.TILE_SIZE * 2, MiniMap.TILE_SIZE * 2);
+        this.playerMarker.x(halfWidth);
+        this.playerMarker.y(halfHeight);
+        this.playerMarker.width(16);
+        this.playerMarker.height(16);
+        this.playerMarker.render(matrixStack, true, delta);
         matrixStack.pop();
     }
 

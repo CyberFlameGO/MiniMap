@@ -1,4 +1,4 @@
-package net.pl3x.minimap.tile.queue;
+package net.pl3x.minimap.queue;
 
 import net.pl3x.minimap.tile.Image;
 import net.pl3x.minimap.tile.Tile;
@@ -29,19 +29,21 @@ public class ReadQueue implements QueueAction {
     }
 
     private void read(Image image) {
+        if (!Files.exists(image.path())) {
+            return;
+        }
+
         ImageReader reader = null;
-        if (Files.exists(image.path())) {
-            try (ImageInputStream in = ImageIO.createImageInputStream(Files.newInputStream(image.path()))) {
-                reader = ImageIO.getImageReadersByFormatName("png").next();
-                reader.setInput(in, true, false);
-                BufferedImage buffer = reader.read(0);
-                image.setPixels(buffer);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (reader != null) {
-                    reader.dispose();
-                }
+        try (ImageInputStream in = ImageIO.createImageInputStream(Files.newInputStream(image.path()))) {
+            reader = ImageIO.getImageReadersByFormatName("png").next();
+            reader.setInput(in, true, false);
+            BufferedImage buffer = reader.read(0);
+            image.setPixels(buffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                reader.dispose();
             }
         }
     }

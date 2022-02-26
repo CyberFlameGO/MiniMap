@@ -87,7 +87,7 @@ public class ChunkScanner {
 
             this.running = true;
 
-            ThreadManager.INSTANCE.runAsync(this.asyncScanTask, () -> this.running = false, ThreadManager.INSTANCE.getUpdaterExecutor());
+            ThreadManager.INSTANCE.runAsync(this.asyncScanTask, () -> this.running = false, ThreadManager.INSTANCE.getChunkScannerExecutor());
         }
     }
 
