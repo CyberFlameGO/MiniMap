@@ -1,12 +1,13 @@
 plugins {
     id 'fabric-loom' version '0.11-SNAPSHOT'
+    id 'com.modrinth.minotaur' version '1.2.1'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version + "-" + (System.getenv("BUILD_NUMBER") ?: "SNAPSHOT")
+version = project.mod_version + "-" + (System.getenv("GITHUB_RUN_NUMBER") ?: "SNAPSHOT")
 group = project.maven_group
 
 repositories {
@@ -41,4 +42,15 @@ tasks.withType(JavaCompile).configureEach {
 
 loom {
     mixin.defaultRefmapName = "minimap.refmap.json"
+}
+
+import com.modrinth.minotaur.TaskModrinthUpload
+task modrinth (type: TaskModrinthUpload) {
+    token = "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" //System.getenv("MODRINTH_TOKEN")
+    projectId = "PA9cUri3"
+    versionNumber = project.version
+    uploadFile = remapJar
+    addGameVersion(project.mod_version)
+    addLoader('fabric')
+    dependencies = []
 }
