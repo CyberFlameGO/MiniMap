@@ -45,8 +45,9 @@ loom {
 }
 
 import com.modrinth.minotaur.TaskModrinthUpload
-task modrinth (type: TaskModrinthUpload) {
-    token = "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" //System.getenv("MODRINTH_TOKEN")
+
+task modrinth(type: TaskModrinthUpload) {
+    token = System.getenv("MODRINTH_TOKEN")
     projectId = "PA9cUri3"
     versionNumber = project.version
     uploadFile = remapJar
