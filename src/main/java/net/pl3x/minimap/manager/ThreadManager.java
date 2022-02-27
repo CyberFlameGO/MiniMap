@@ -14,12 +14,14 @@ public class ThreadManager {
     public static final String TILE_UPDATER_THREAD_NAME = "Minimap-Tile-Updater";
     public static final String READ_IO_THREAD_NAME = "Minimap-IO-Read";
     public static final String WRITE_IO_THREAD_NAME = "Minimap-IO-Write";
+    public static final String HTTP_IO_THREAD_NAME = "Minimap-IO-Http";
 
     private ExecutorService chunkScannerExecutor;
     private ExecutorService layerUpdaterExecutor;
     private ExecutorService tileUpdaterExecutor;
     private ExecutorService readIOExecutor;
     private ExecutorService writeIOExecutor;
+    private ExecutorService httpIOExecutor;
 
     private ThreadManager() {
     }
@@ -29,6 +31,20 @@ public class ThreadManager {
             this.chunkScannerExecutor = Executors.newFixedThreadPool(Math.max(1, getThreads()), new ThreadFactoryBuilder().setNameFormat(CHUNK_SCANNER_THREAD_NAME + "-%d").build());
         }
         return this.chunkScannerExecutor;
+    }
+
+    public ExecutorService getLayerUpdaterExecutor() {
+        if (this.layerUpdaterExecutor == null) {
+            this.layerUpdaterExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat(LAYER_UPDATER_THREAD_NAME).build());
+        }
+        return this.layerUpdaterExecutor;
+    }
+
+    public ExecutorService getTileUpdaterExecutor() {
+        if (this.tileUpdaterExecutor == null) {
+            this.tileUpdaterExecutor = Executors.newFixedThreadPool(Math.max(1, getThreads()), new ThreadFactoryBuilder().setNameFormat(TILE_UPDATER_THREAD_NAME).build());
+        }
+        return this.tileUpdaterExecutor;
     }
 
     public ExecutorService getReadIOExecutor() {
@@ -45,18 +61,11 @@ public class ThreadManager {
         return this.writeIOExecutor;
     }
 
-    public ExecutorService getLayerUpdaterExecutor() {
-        if (this.layerUpdaterExecutor == null) {
-            this.layerUpdaterExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat(LAYER_UPDATER_THREAD_NAME).build());
+    public ExecutorService getHttpIOExecutor() {
+        if (this.httpIOExecutor == null) {
+            this.httpIOExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat(HTTP_IO_THREAD_NAME).build());
         }
-        return this.layerUpdaterExecutor;
-    }
-
-    public ExecutorService getTileUpdaterExecutor() {
-        if (this.tileUpdaterExecutor == null) {
-            this.tileUpdaterExecutor = Executors.newFixedThreadPool(Math.max(1, getThreads()), new ThreadFactoryBuilder().setNameFormat(TILE_UPDATER_THREAD_NAME).build());
-        }
-        return this.tileUpdaterExecutor;
+        return this.httpIOExecutor;
     }
 
     public void runAsync(Runnable task, ExecutorService executor) {

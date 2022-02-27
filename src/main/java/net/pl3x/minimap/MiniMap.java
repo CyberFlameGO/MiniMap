@@ -26,6 +26,7 @@ import net.pl3x.minimap.scheduler.Scheduler;
 import net.pl3x.minimap.scheduler.Task;
 import net.pl3x.minimap.util.Mathf;
 import net.pl3x.minimap.util.Numbers;
+import net.pl3x.minimap.util.UpdateChecker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -128,6 +129,8 @@ public class MiniMap {
 
     public void initialize() {
         HudRenderCallback.EVENT.register(MiniMap.INSTANCE::render);
+
+        LOG.info(UpdateChecker.INSTANCE.getCurrentVersion() + " initialized");
     }
 
     public void start() {
