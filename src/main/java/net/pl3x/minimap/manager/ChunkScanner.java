@@ -193,10 +193,10 @@ public class ChunkScanner {
                         // height layer
                         {
                             int height = 0x22;
-                            height = getHeightColor(world, chunk, pos, pos2.set(pos.getX(), 0, pos.getZ() + 1), minY, maxY, height, 0x44);
+                            height = getHeightColor(world, chunk, pos, pos2.set(pos.getX() - 1, 0, pos.getZ()), minY, maxY, height, 0x00);
                             height = getHeightColor(world, chunk, pos, pos2.set(pos.getX() + 1, 0, pos.getZ()), minY, maxY, height, 0x44);
                             height = getHeightColor(world, chunk, pos, pos2.set(pos.getX(), 0, pos.getZ() - 1), minY, maxY, height, 0x00);
-                            height = getHeightColor(world, chunk, pos, pos2.set(pos.getX() - 1, 0, pos.getZ()), minY, maxY, height, 0x00);
+                            height = getHeightColor(world, chunk, pos, pos2.set(pos.getX(), 0, pos.getZ() + 1), minY, maxY, height, 0x44);
                             if (height >= 0) {
                                 tile.getHeight().setPixel(pixelX, pixelZ, height << 24);
                             }
