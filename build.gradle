@@ -7,7 +7,8 @@ sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version + "-" + (System.getenv("GITHUB_RUN_NUMBER") ?: "SNAPSHOT")
+build_num = System.getenv("GITHUB_RUN_NUMBER") ?: "SNAPSHOT"
+version = project.mod_version + "-" + build_num
 group = project.maven_group
 
 repositories {
@@ -47,11 +48,12 @@ loom {
 import com.modrinth.minotaur.TaskModrinthUpload
 
 task modrinth(type: TaskModrinthUpload) {
-    token = System.getenv("MODRINTH_TOKEN")
+    token = "${System.getenv("MODRINTH_TOKEN")}"
     projectId = "PA9cUri3"
-    versionNumber = project.version
-    uploadFile = remapJar
-    addGameVersion(project.mod_version)
-    addLoader('fabric')
-    dependencies = []
+    versionName = "$project.mod_version build $build_num"
+    versionNumber = "$project.version"
+    uploadFile = "remapJar"
+    changelog = "${System.getenv("COMMIT_MESSAGE")}"
+    addGameVersion("$project.mod_version")
+    addLoader("fabric")
 }
