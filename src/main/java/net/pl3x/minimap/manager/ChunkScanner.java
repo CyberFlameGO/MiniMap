@@ -12,6 +12,7 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.LightType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.EmptyChunk;
 import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.gui.animation.Easing;
 import net.pl3x.minimap.scheduler.Scheduler;
@@ -140,7 +141,9 @@ public class ChunkScanner {
                         }
 
                         // current block position in the world at the highest Y coordinate
-                        getY(world, chunk, pos, blockX, blockZ, x, 1, z, minY, maxY);
+                        pos.set(blockX + x, 0, blockZ + z);
+                        pos.setY(chunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, pos.getX(), pos.getZ()) + 1);
+                        getStartY(world, chunk, pos, minY, maxY);
 
                         // current pixel in the tile image
                         int pixelX = pos.getX() & MiniMap.TILE_SIZE - 1;
@@ -189,24 +192,14 @@ public class ChunkScanner {
 
                         // height layer
                         {
-                            int height = 0x22 << 24;
-                            if (z + 1 < 16 && iterateDown(world, getY(world, chunk, pos2, blockX, blockZ, x, 1, z + 1, minY, maxY), minY).getY() < pos.getY()) {
-                                // south neighbor block is lower, mark this block a darker shade
-                                height = 0x44 << 24;
+                            int height = 0x22;
+                            height = getHeightColor(world, chunk, pos, pos2.set(pos.getX(), 0, pos.getZ() + 1), minY, maxY, height, 0x44);
+                            height = getHeightColor(world, chunk, pos, pos2.set(pos.getX() + 1, 0, pos.getZ()), minY, maxY, height, 0x44);
+                            height = getHeightColor(world, chunk, pos, pos2.set(pos.getX(), 0, pos.getZ() - 1), minY, maxY, height, 0x00);
+                            height = getHeightColor(world, chunk, pos, pos2.set(pos.getX() - 1, 0, pos.getZ()), minY, maxY, height, 0x00);
+                            if (height >= 0) {
+                                tile.getHeight().setPixel(pixelX, pixelZ, height << 24);
                             }
-                            if (x + 1 < 16 && iterateDown(world, getY(world, chunk, pos2, blockX, blockZ, x + 1, 1, z, minY, maxY), minY).getY() < pos.getY()) {
-                                // east neighbor block is lower, mark this block a darker shade
-                                height = 0x44 << 24;
-                            }
-                            if (z - 1 > 0 && iterateDown(world, getY(world, chunk, pos2, blockX, blockZ, x, 1, z - 1, minY, maxY), minY).getY() < pos.getY()) {
-                                // north neighbor block is lower, mark this block a lighter shade
-                                height = 0x00;
-                            }
-                            if (x - 1 > 0 && iterateDown(world, getY(world, chunk, pos2, blockX, blockZ, x - 1, 1, z, minY, maxY), minY).getY() < pos.getY()) {
-                                // west neighbor block is lower, mark this block a lighter shade
-                                height = 0x00;
-                            }
-                            tile.getHeight().setPixel(pixelX, pixelZ, height);
                         }
 
                         if (this.cancelled) {
@@ -257,8 +250,15 @@ public class ChunkScanner {
             }
         }
 
-        private BlockPos.Mutable getY(ClientWorld world, Chunk chunk, BlockPos.Mutable pos, int blockX, int blockZ, int offsetX, int offsetY, int offsetZ, int minY, int maxY) {
-            pos.set(blockX + offsetX, chunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, offsetX, offsetZ) + offsetY, blockZ + offsetZ);
+        private int getHeightColor(ClientWorld world, Chunk chunk, BlockPos.Mutable pos, BlockPos.Mutable pos2, int minY, int maxY, int oldColor, int newColor) {
+            if (oldColor < 0 || world.getChunk(pos2) instanceof EmptyChunk) {
+                return -1;
+            }
+            pos2.setY(world.getChunk(pos2).sampleHeightmap(Heightmap.Type.WORLD_SURFACE, pos2.getX(), pos2.getZ()) + 1);
+            return iterateDown(world, getStartY(world, chunk, pos2, minY, maxY), minY).getY() < pos.getY() ? newColor : oldColor;
+        }
+
+        private BlockPos.Mutable getStartY(ClientWorld world, Chunk chunk, BlockPos.Mutable pos, int minY, int maxY) {
             // todo - add option for seeing through ceiling
             if (world.getDimension().hasCeiling()) {
                 // todo - possibly add option for bottomup/topdown scanning
