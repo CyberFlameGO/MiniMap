@@ -6,5 +6,5 @@ indent_style = space
 insert_final_newline = true
 max_line_length = off
 
-[{*.json, *.mcmeta}]
+[{*.json, *.mcmeta, *.yml}]
 indent_size = 2

@@ -4,7 +4,7 @@ on: [ push ]
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: "!contains(github.event.commits[0].message, '[ci-skip]')"
+    if: "!contains(github.event.head_commit.message, '[ci-skip]')"
     steps:
       - uses: actions/checkout@v2
       - uses: gradle/wrapper-validation-action@v1
@@ -12,6 +12,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      - name: Import gradle properties
+        shell: bash
+        run: cat gradle.properties >> $GITHUB_ENV
       - name: Build
         run: ./gradlew build --stacktrace
       - name: Publish
@@ -19,3 +22,14 @@ jobs:
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+      - uses: sarisia/actions-status-discord@v1
+        env:
+          MINECRAFT_VERSION: ${{ env.minecraft_version }}
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          if: success()
+          nodetail: true
+          title: New build of MiniMap is ready!
+          description: |
+            Version $MINECRAFT_VERSION build $GITHUB_RUN_NUMBER
+            Click [here](https://modrinth.com/mod/minimap) to download!
