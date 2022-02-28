@@ -247,6 +247,9 @@ public class ChunkScanner {
                         }
                     }
                 }
+
+                // mark tile dirty
+                tile.markDirty();
             }
         }
 

@@ -36,6 +36,7 @@ public class Tile {
     private NativeImageBackedTexture texture;
 
     private boolean ready;
+    private boolean dirty;
     private long lastUsed;
     private long lastSaved;
     private long lastUploaded;
@@ -72,8 +73,13 @@ public class Tile {
     }
 
     public void save() {
-        this.lastSaved = Scheduler.INSTANCE.getCurrentTick();
+        if (!this.dirty) {
+            // nothing needs to save
+            return;
+        }
         if (this.ready) {
+            this.lastSaved = Scheduler.INSTANCE.getCurrentTick();
+            this.dirty = false;
             // only save if tile is ready to avoid saving blank png before we loaded
             DiskIOQueue.INSTANCE.write(new WriteQueue(this));
         }
@@ -131,6 +137,10 @@ public class Tile {
         this.ready = ready;
     }
 
+    public void markDirty() {
+        this.dirty = true;
+    }
+
     public void upload() {
         // first upload, create and register texture
         if (this.texture == null) {
@@ -151,35 +161,35 @@ public class Tile {
         }
 
         ThreadManager.INSTANCE.runAsync(
-                () -> {
-                    int color = 0xFF << 24;
-                    float skylight = this.world.getStarBrightness(1F) * 15;
-                    for (int x = 0; x < MiniMap.TILE_SIZE; x++) {
-                        for (int z = 0; z < MiniMap.TILE_SIZE; z++) {
-                            if (Config.getConfig().layers.base) {
-                                color = getBase().getPixel(x, z);
-                            }
-                            if (Config.getConfig().layers.biomes) {
-                                color = getBiomes().getPixel(x, z);
-                            }
-                            if (Config.getConfig().layers.heightmap) {
-                                color = Colors.mix(color, getHeight().getPixel(x, z));
-                            }
-                            if (Config.getConfig().layers.fluids) {
-                                color = Colors.mix(color, getFluids().getPixel(x, z));
-                            }
-                            if (Config.getConfig().layers.lightmap) {
-                                color = Colors.mix(color, (int) Mathf.clamp(0, 0xFF, (0xFF * Mathf.inverseLerp(0, 15, 15 - (this.world.getDimension().hasCeiling() ? 5 : skylight)) - Colors.alpha(getLight().getPixel(x, z))) / 1.2F) << 24);
-                            }
-                            image.setColor(x, z, color);
+            () -> {
+                int color = 0xFF << 24;
+                float skylight = this.world.getStarBrightness(1F) * 15;
+                for (int x = 0; x < MiniMap.TILE_SIZE; x++) {
+                    for (int z = 0; z < MiniMap.TILE_SIZE; z++) {
+                        if (Config.getConfig().layers.base) {
+                            color = getBase().getPixel(x, z);
                         }
+                        if (Config.getConfig().layers.biomes) {
+                            color = getBiomes().getPixel(x, z);
+                        }
+                        if (Config.getConfig().layers.heightmap) {
+                            color = Colors.mix(color, getHeight().getPixel(x, z));
+                        }
+                        if (Config.getConfig().layers.fluids) {
+                            color = Colors.mix(color, getFluids().getPixel(x, z));
+                        }
+                        if (Config.getConfig().layers.lightmap) {
+                            color = Colors.mix(color, (int) Mathf.clamp(0, 0xFF, (0xFF * Mathf.inverseLerp(0, 15, 15 - (this.world.getDimension().hasCeiling() ? 5 : skylight)) - Colors.alpha(getLight().getPixel(x, z))) / 1.2F) << 24);
+                        }
+                        image.setColor(x, z, color);
                     }
-                },
-                () -> {
-                    this.lastUploaded = Scheduler.INSTANCE.getCurrentTick();
-                    this.texture.upload();
-                },
-                ThreadManager.INSTANCE.getTileUpdaterExecutor()
+                }
+            },
+            () -> {
+                this.lastUploaded = Scheduler.INSTANCE.getCurrentTick();
+                this.texture.upload();
+            },
+            ThreadManager.INSTANCE.getTileUpdaterExecutor()
         );
     }
 
