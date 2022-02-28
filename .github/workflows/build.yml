@@ -29,5 +29,5 @@ jobs:
           nodetail: true
           title: New build of MiniMap is ready!
           description: |
-            Version ${{ env.minecraft_version }} build ${{ env.GITHUB_RUN_NUMBER }}
+            Version ${{ env.minecraft_version }} build ${{ github.GITHUB_RUN_NUMBER }}
             Click [here](https://modrinth.com/mod/minimap) to download!
