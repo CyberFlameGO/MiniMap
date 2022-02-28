@@ -30,4 +30,3 @@ jobs:
           description: |
             Version ${{ env.minecraft_version }} build ${{ github.run_number }}
             Click [here](https://modrinth.com/mod/minimap) to download!
-
