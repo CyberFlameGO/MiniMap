@@ -20,7 +20,7 @@ jobs:
         run: ./gradlew modrinth --stacktrace
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          COMMIT_MESSAGE: ${{ github.event.commits.*.message }}
       - uses: sarisia/actions-status-discord@v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
