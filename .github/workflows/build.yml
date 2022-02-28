@@ -23,13 +23,11 @@ jobs:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
       - uses: sarisia/actions-status-discord@v1
-        env:
-          MINECRAFT_VERSION: ${{ env.minecraft_version }}
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           if: success()
           nodetail: true
           title: New build of MiniMap is ready!
           description: |
-            Version ${{ MINECRAFT_VERSION }} build ${{ GITHUB_RUN_NUMBER }}
+            Version ${{ env.minecraft_version }} build ${{ env.GITHUB_RUN_NUMBER }}
             Click [here](https://modrinth.com/mod/minimap) to download!
