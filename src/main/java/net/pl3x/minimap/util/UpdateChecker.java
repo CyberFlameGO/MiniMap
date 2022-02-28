@@ -3,9 +3,18 @@ package net.pl3x.minimap.util;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.toast.Toast;
+import net.minecraft.client.toast.ToastManager;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.sound.SoundEvents;
 import net.pl3x.minimap.MiniMap;
+import net.pl3x.minimap.gui.font.Font;
+import net.pl3x.minimap.gui.texture.Texture;
 import net.pl3x.minimap.manager.ThreadManager;
 import net.pl3x.minimap.scheduler.Scheduler;
 import net.pl3x.minimap.scheduler.Task;
@@ -52,11 +61,18 @@ public class UpdateChecker {
             @Override
             public void run() {
                 long now = System.currentTimeMillis();
-                if (this.lastChecked + 900000 > now) {
+                if (this.lastChecked + 900000 > now) { // 15 minutes
                     return;
                 }
                 this.lastChecked = now;
-                ThreadManager.INSTANCE.runAsync(() -> checkForUpdates(), ThreadManager.INSTANCE.getHttpIOExecutor());
+                ThreadManager.INSTANCE.runAsync(() -> {
+                    try {
+                        checkForUpdates();
+                    } catch (Exception e) {
+                        MiniMap.LOG.warn("Error checking for updates");
+                        latestVersion = Status.ERROR;
+                    }
+                }, ThreadManager.INSTANCE.getHttpIOExecutor());
             }
         });
     }
@@ -78,6 +94,10 @@ public class UpdateChecker {
     }
 
     public void checkForUpdates() {
+        // reset latest version while we check
+        this.latestVersion = Status.CHECKING;
+        MiniMap.LOG.info("Checking for updates...");
+
         String response = "{}";
         try {
             URIBuilder builder = new URIBuilder(String.format(MODRINTH_URL, MiniMap.MODID, "version"));
@@ -99,11 +119,49 @@ public class UpdateChecker {
         Collections.reverse(versions);
 
         this.latestVersion = versions.get(0);
-        this.hasUpdate = getCurrentVersion() > 0 && getLatestVersion() - getCurrentVersion() > 0;
 
-        System.out.println("latest: " + getLatestVersion());
-        System.out.println("current: " + getCurrentVersion());
-        System.out.println("diff: " + (getLatestVersion() - getCurrentVersion()));
-        System.out.println("has update: " + hasUpdate());
+        this.hasUpdate = getCurrentVersion() > 0 && getLatestVersion() > 0 && getLatestVersion() - getCurrentVersion() > 0;
+
+        if (hasUpdate()) {
+            MiniMap.LOG.info("Updates found!");
+            MiniMap.CLIENT.getToastManager().add(new UpdateToast());
+        } else {
+            MiniMap.LOG.info("No updates found.");
+        }
+    }
+
+    public static class Status {
+        public static final int CHECKING = -1;
+        public static final int ERROR = -2;
+    }
+
+    public class UpdateToast implements Toast {
+        private boolean soundPlayed;
+
+        @Override
+        public Visibility draw(MatrixStack matrixStack, ToastManager manager, long startTime) {
+
+            // draw toast background
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
+            RenderSystem.setShaderTexture(0, Toast.TEXTURE);
+            RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+            manager.drawTexture(matrixStack, 0, 0, 0, 0, this.getWidth(), this.getHeight());
+
+            // draw text
+            Font.DEFAULT.drawCentered(matrixStack, "MiniMap Update Available", 92.5F, 11.5F, 0xFF55ff55);
+            Font.DEFAULT.drawCentered(matrixStack, String.format("%s build %d", minecraftVersion, latestVersion), 92.5F, 22.5F, -1);
+
+            // draw icon
+            Texture.ICON.draw(matrixStack, 6, 6, 26, 26, 0, 0, 1, 1);
+
+            // play update alert sound
+            if (!this.soundPlayed && startTime > 0L) {
+                this.soundPlayed = true;
+                // todo get custom update alert sound
+                MiniMap.CLIENT.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, 1F, 1F));
+            }
+
+            return startTime >= 5000L ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
+        }
     }
 }

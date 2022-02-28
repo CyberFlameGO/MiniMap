@@ -120,7 +120,11 @@ public enum Icon {
         return (v() + 1) / 16F;
     }
 
-    public void draw(MatrixStack matrixStack, float x, float y, float size, int tint) {
+    public void draw(MatrixStack matrixStack, float x, float y, float size) {
+        Texture.ICONS.draw(matrixStack, x, y, x + size, y + size, u0(), v0(), u1(), v1());
+    }
+
+    public void tint(MatrixStack matrixStack, float x, float y, float size, int tint) {
         Texture.ICONS.tint(matrixStack, x, y, x + size, y + size, u0(), v0(), u1(), v1(), tint);
     }
 }

@@ -43,13 +43,13 @@ public class Config {
     public Animations animations = new Animations();
 
     private static final Gson gson = new GsonBuilder()
-            .disableHtmlEscaping()
-            .serializeNulls()
-            .setLenient()
-            .setPrettyPrinting()
-            .enableComplexMapKeySerialization()
-            .registerTypeAdapter(Easing.Func.class, new Easing.Adapter())
-            .create();
+        .disableHtmlEscaping()
+        .serializeNulls()
+        .setLenient()
+        .setPrettyPrinting()
+        .enableComplexMapKeySerialization()
+        .registerTypeAdapter(Easing.Func.class, new Easing.Adapter())
+        .create();
 
     private static Config config;
 

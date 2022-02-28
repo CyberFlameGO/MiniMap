@@ -25,66 +25,66 @@ public class LayersCategory extends Category {
 
         if (children().isEmpty()) {
             children().addAll(List.of(
-                    new Checkbox(this, Text.of("Base Layer"), x, y += 30F, new Option<>() {
-                        @Override
-                        public Boolean get() {
-                            return Config.getConfig().layers.base;
-                        }
+                new Checkbox(this, Text.of("Base Layer"), x, y += 30F, new Option<>() {
+                    @Override
+                    public Boolean get() {
+                        return Config.getConfig().layers.base;
+                    }
 
-                        @Override
-                        public void set(Boolean value) {
-                            Config.getConfig().layers.base = value;
-                            Config.save();
-                        }
-                    }),
-                    new Checkbox(this, Text.of("Biomes Layer"), x, y += 30F, new Option<>() {
-                        @Override
-                        public Boolean get() {
-                            return Config.getConfig().layers.biomes;
-                        }
+                    @Override
+                    public void set(Boolean value) {
+                        Config.getConfig().layers.base = value;
+                        Config.save();
+                    }
+                }),
+                new Checkbox(this, Text.of("Biomes Layer"), x, y += 30F, new Option<>() {
+                    @Override
+                    public Boolean get() {
+                        return Config.getConfig().layers.biomes;
+                    }
 
-                        @Override
-                        public void set(Boolean value) {
-                            Config.getConfig().layers.biomes = value;
-                            Config.save();
-                        }
-                    }),
-                    new Checkbox(this, Text.of("Heightmap Layer"), x, y += 30F, new Option<>() {
-                        @Override
-                        public Boolean get() {
-                            return Config.getConfig().layers.heightmap;
-                        }
+                    @Override
+                    public void set(Boolean value) {
+                        Config.getConfig().layers.biomes = value;
+                        Config.save();
+                    }
+                }),
+                new Checkbox(this, Text.of("Heightmap Layer"), x, y += 30F, new Option<>() {
+                    @Override
+                    public Boolean get() {
+                        return Config.getConfig().layers.heightmap;
+                    }
 
-                        @Override
-                        public void set(Boolean value) {
-                            Config.getConfig().layers.heightmap = value;
-                            Config.save();
-                        }
-                    }),
-                    new Checkbox(this, Text.of("Fluids Layer"), x, y += 30F, new Option<>() {
-                        @Override
-                        public Boolean get() {
-                            return Config.getConfig().layers.fluids;
-                        }
+                    @Override
+                    public void set(Boolean value) {
+                        Config.getConfig().layers.heightmap = value;
+                        Config.save();
+                    }
+                }),
+                new Checkbox(this, Text.of("Fluids Layer"), x, y += 30F, new Option<>() {
+                    @Override
+                    public Boolean get() {
+                        return Config.getConfig().layers.fluids;
+                    }
 
-                        @Override
-                        public void set(Boolean value) {
-                            Config.getConfig().layers.fluids = value;
-                            Config.save();
-                        }
-                    }),
-                    new Checkbox(this, Text.of("Lightmap Layer"), x, y += 30F, new Option<>() {
-                        @Override
-                        public Boolean get() {
-                            return Config.getConfig().layers.lightmap;
-                        }
+                    @Override
+                    public void set(Boolean value) {
+                        Config.getConfig().layers.fluids = value;
+                        Config.save();
+                    }
+                }),
+                new Checkbox(this, Text.of("Lightmap Layer"), x, y + 30F, new Option<>() {
+                    @Override
+                    public Boolean get() {
+                        return Config.getConfig().layers.lightmap;
+                    }
 
-                        @Override
-                        public void set(Boolean value) {
-                            Config.getConfig().layers.lightmap = value;
-                            Config.save();
-                        }
-                    })
+                    @Override
+                    public void set(Boolean value) {
+                        Config.getConfig().layers.lightmap = value;
+                        Config.save();
+                    }
+                })
             ));
         }
 

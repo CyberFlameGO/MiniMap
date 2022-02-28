@@ -29,10 +29,10 @@ public class Drawable {
 
     public static void tint(MatrixStack matrixStack, Identifier texture, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, int color) {
         RenderSystem.setShaderColor(
-                Colors.red(color) / 255F,
-                Colors.green(color) / 255F,
-                Colors.blue(color) / 255F,
-                Colors.alpha(color) / 255F
+            Colors.red(color) / 255F,
+            Colors.green(color) / 255F,
+            Colors.blue(color) / 255F,
+            Colors.alpha(color) / 255F
         );
         draw(matrixStack, texture, x0, y0, x1, y1, u0, v0, u1, v1);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);

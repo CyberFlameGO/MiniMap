@@ -47,11 +47,11 @@ public class BottomText extends Layer {
                 continue;
             }
             this.text.add(new TranslatableText(line
-                    .replace("{x}", Integer.toString(mm.getPlayer().getBlockX()))
-                    .replace("{y}", Integer.toString(mm.getPlayer().getBlockY()))
-                    .replace("{z}", Integer.toString(mm.getPlayer().getBlockZ()))
-                    .replace("{biome}", Biomes.INSTANCE.getBiomeName(mm.getPlayer()))
-                    .replace("{clock}", Clock.INSTANCE.getTime(mm.getWorld()))));
+                .replace("{x}", Integer.toString(mm.getPlayer().getBlockX()))
+                .replace("{y}", Integer.toString(mm.getPlayer().getBlockY()))
+                .replace("{z}", Integer.toString(mm.getPlayer().getBlockZ()))
+                .replace("{biome}", Biomes.INSTANCE.getBiomeName(mm.getPlayer()))
+                .replace("{clock}", Clock.INSTANCE.getTime(mm.getWorld()))));
         }
     }
 }

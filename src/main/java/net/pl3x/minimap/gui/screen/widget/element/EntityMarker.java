@@ -1,6 +1,5 @@
 package net.pl3x.minimap.gui.screen.widget.element;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ArmorItem;
@@ -18,7 +17,6 @@ import net.pl3x.minimap.gui.screen.widget.Widget;
 import net.pl3x.minimap.gui.texture.Cursor;
 import net.pl3x.minimap.gui.texture.Drawable;
 import net.pl3x.minimap.hardware.Mouse;
-import net.pl3x.minimap.util.Colors;
 import net.pl3x.minimap.util.Mathf;
 import net.pl3x.minimap.util.Numbers;
 
@@ -60,7 +58,7 @@ public class EntityMarker extends AnimatedWidget {
             // only rotate if map is northlocked
             GL.rotateScene(matrixStack, x(), y(), angle);
         }
-        Icon.PLAYER.draw(matrixStack, x() - width() / 2F, y() - height() / 2F, width(), 0xFFFFFFFF);
+        Icon.PLAYER.draw(matrixStack, x() - width() / 2F, y() - height() / 2F, width());
     }
 
     private void headStyle(MatrixStack matrixStack, AbstractClientPlayerEntity player, float angle, float delta) {
@@ -71,7 +69,7 @@ public class EntityMarker extends AnimatedWidget {
         matrixStack.push();
         matrixStack.translate(width() * -Mathf.sinRads(-angle), height() * -Mathf.cosRads(-angle), 0D);
         GL.rotateScene(matrixStack, x(), y(), angle);
-        Icon.ARROW.draw(matrixStack, x() - w, y() - h, width(), 0xFFFFFFFF);
+        Icon.ARROW.draw(matrixStack, x() - w, y() - h, width());
         matrixStack.pop();
 
         // skin layers

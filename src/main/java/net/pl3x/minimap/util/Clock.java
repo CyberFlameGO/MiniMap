@@ -43,9 +43,9 @@ public class Clock {
         boolean pm = hours >= 12;
 
         this.time = Config.getConfig().clockFormat
-                .replace("HH", String.format("%02d", hours))
-                .replace("hh", String.valueOf((hours %= 12) == 0 ? 12 : hours))
-                .replace("mm", String.format("%02d", minutes))
-                .replace("a", pm ? "PM" : "AM");
+            .replace("HH", String.format("%02d", hours))
+            .replace("hh", String.valueOf((hours %= 12) == 0 ? 12 : hours))
+            .replace("mm", String.format("%02d", minutes))
+            .replace("a", pm ? "PM" : "AM");
     }
 }

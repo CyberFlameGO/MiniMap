@@ -120,7 +120,7 @@ public class Tab extends AnimatedWidget {
     public void render(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
         super.render(matrixStack, mouseX, mouseY, delta);
 
-        icon().draw(matrixStack, iconX(), iconY(), iconSize(), color());
+        icon().tint(matrixStack, iconX(), iconY(), iconSize(), color());
 
         if (width() > Sidebar.DEFAULT_WIDTH) {
             if (width() < Sidebar.HOVER_WIDTH) {

@@ -74,18 +74,18 @@ public class ThreadManager {
 
     public void runAsync(Runnable task, Runnable whenComplete, ExecutorService executor) {
         CompletableFuture.runAsync(task, executor)
-                .exceptionally(throwable -> {
+            .exceptionally(throwable -> {
+                throwable.printStackTrace();
+                return null;
+            })
+            .whenComplete((result, throwable) -> {
+                if (throwable != null) {
                     throwable.printStackTrace();
-                    return null;
-                })
-                .whenComplete((result, throwable) -> {
-                    if (throwable != null) {
-                        throwable.printStackTrace();
-                    }
-                    if (whenComplete != null) {
-                        whenComplete.run();
-                    }
-                });
+                }
+                if (whenComplete != null) {
+                    whenComplete.run();
+                }
+            });
     }
 
     private int getThreads() {

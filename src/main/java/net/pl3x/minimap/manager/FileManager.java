@@ -63,8 +63,8 @@ public class FileManager {
 
     private Path resolve(Path path, String value) {
         String sanitized = value
-                .replace(":", "-")
-                .toLowerCase(Locale.ROOT);
+            .replace(":", "-")
+            .toLowerCase(Locale.ROOT);
         return path.resolve(sanitized);
     }
 }

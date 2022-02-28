@@ -34,10 +34,10 @@ public class Cursor extends Drawable {
                     cursor.meta = new CursorMetadata();
                 }
                 cursor.texture.meta = new AnimationMetadata(
-                        cursor.meta.width(),
-                        cursor.meta.height(),
-                        cursor.meta.frames(),
-                        cursor.meta.frametime()
+                    cursor.meta.width(),
+                    cursor.meta.height(),
+                    cursor.meta.frames(),
+                    cursor.meta.frametime()
                 );
                 MiniMap.LOG.info("Loaded mouse cursor " + cursor.identifier);
             } catch (IOException e) {

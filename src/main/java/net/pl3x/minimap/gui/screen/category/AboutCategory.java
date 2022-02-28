@@ -10,6 +10,7 @@ import net.pl3x.minimap.gui.font.Font;
 import net.pl3x.minimap.gui.screen.widget.Category;
 import net.pl3x.minimap.gui.texture.Texture;
 import net.pl3x.minimap.hardware.Monitor;
+import net.pl3x.minimap.util.UpdateChecker;
 
 public class AboutCategory extends Category {
     public AboutCategory(float y, float delay) {
@@ -33,14 +34,36 @@ public class AboutCategory extends Category {
         Font.NOTOSANS.drawCentered(matrixStack, "William Blake Galbreath", x + 1F, y + 160 + 1F, 0x88000000);
         Font.NOTOSANS.drawCentered(matrixStack, "William Blake Galbreath", x, y + 160, 0xFFFFFFFF);
 
-        Font.NOTOSANS.drawCentered(matrixStack, "Version: 0.0.1", x + 1F, y + 230 + 1F, 0x88000000);
-        Font.NOTOSANS.drawCentered(matrixStack, "Version: 0.0.1", x, y + 230, 0xFFFFFFFF);
+        String mc = UpdateChecker.INSTANCE.getMinecraftVersion();
+        int current = UpdateChecker.INSTANCE.getCurrentVersion();
+        int latest = UpdateChecker.INSTANCE.getLatestVersion();
 
-        //Text text = new TranslatableText("Checking for updates...");
-        Text text = new TranslatableText("Up to date").formatted(Formatting.GREEN);
-        //Text text = new TranslatableText("Update Available (0.0.2)").formatted(Formatting.RED);
+        // todo cache this component somewhere
+        Text currentVersion = new TranslatableText("Current Version: " + mc + (current < 0 ? " SNAPSHOT" : " build " + current));
 
-        Font.ROBOTO.drawCentered(matrixStack, text.copy().formatted(Formatting.RESET), x + 1F, y + 260 + 1F, 0x88000000);
-        Font.ROBOTO.drawCentered(matrixStack, text, x, y + 260, 0xFFFFFFFF);
+        Font.NOTOSANS.drawCentered(matrixStack, currentVersion, x + 1F, y + 230 + 1F, 0x88000000);
+        Font.NOTOSANS.drawCentered(matrixStack, currentVersion, x, y + 230, 0xFFFFFFFF);
+
+        // todo cache this component somewhere
+        Text text;
+        if (latest > 0) {
+            text = new TranslatableText("Latest Version: " + mc + " build " + latest);
+        } else if (latest == UpdateChecker.Status.CHECKING) {
+            text = new TranslatableText("Checking for updates...").formatted(Formatting.LIGHT_PURPLE);
+        } else if (latest == UpdateChecker.Status.ERROR) {
+            text = new TranslatableText("Error checking for updates!").formatted(Formatting.RED);
+        } else if (latest == current) {
+            text = new TranslatableText("Up to date!").formatted(Formatting.GREEN);
+        } else {
+            text = new TranslatableText("Unknown").formatted(Formatting.GOLD);
+        }
+
+        Font.NOTOSANS.drawCentered(matrixStack, text.copy().formatted(Formatting.RESET), x + 1F, y + 260 + 1F, 0x88000000);
+        Font.NOTOSANS.drawCentered(matrixStack, text, x, y + 260, 0xFFFFFFFF);
+
+        if (UpdateChecker.INSTANCE.hasUpdate()) {
+            Font.ROBOTO.drawCentered(matrixStack, "Updates Available!", x + 1F, y + 280 + 1F, 0x88880000);
+            Font.ROBOTO.drawCentered(matrixStack, "Updates Available!", x, y + 280, 0xFFFF5555);
+        }
     }
 }

@@ -29,7 +29,7 @@ public class FullMap extends AnimatedWidget {
         super(null, 0F, 0F, 0F, 0F);
 
         HudRenderCallback.EVENT.register((matrixStack, delta) ->
-                render(matrixStack, MiniMap.CLIENT.getLastFrameDuration())
+            render(matrixStack, MiniMap.CLIENT.getLastFrameDuration())
         );
 
         // todo - move this to a new layer
@@ -94,6 +94,15 @@ public class FullMap extends AnimatedWidget {
         // render everything
         FullMap.INSTANCE.render(matrixStack, mouseX, mouseY, delta);
         Sidebar.INSTANCE.render(matrixStack, mouseX, mouseY, delta);
+
+        // tick toasts over fullmap
+        if (!Sidebar.INSTANCE.closed()) {
+            MiniMap.CLIENT.getProfiler().swap("toasts");
+            MiniMap.CLIENT.options.hudHidden = false;
+            MiniMap.CLIENT.getToastManager().draw(new MatrixStack());
+            MiniMap.CLIENT.options.hudHidden = true;
+            MiniMap.CLIENT.getProfiler().pop();
+        }
 
         // allow Mojang disable blending after drawing text
         Font.FIX_MOJANGS_TEXT_RENDERER_CRAP = false;
@@ -172,25 +181,25 @@ public class FullMap extends AnimatedWidget {
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
         return Sidebar.INSTANCE.mouseClicked(mouseX, mouseY, button)
-                || super.mouseClicked(mouseX, mouseY, button);
+            || super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseReleased(float mouseX, float mouseY, int button) {
         return Sidebar.INSTANCE.mouseReleased(mouseX, mouseY, button)
-                || super.mouseReleased(mouseX, mouseY, button);
+            || super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseDragged(float mouseX, float mouseY, int button, float deltaX, float deltaY) {
         return Sidebar.INSTANCE.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
-                || super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+            || super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         return Sidebar.INSTANCE.keyPressed(keyCode, scanCode, modifiers)
-                || super.keyPressed(keyCode, scanCode, modifiers);
+            || super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     public boolean closed() {

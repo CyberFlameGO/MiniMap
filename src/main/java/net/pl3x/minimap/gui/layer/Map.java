@@ -87,14 +87,14 @@ public class Map extends Layer {
         this.asyncUpdateTask.image = image;
 
         ThreadManager.INSTANCE.runAsync(
-                this.asyncUpdateTask,
-                () -> {
-                    this.asyncUpdateTask.running = false;
-                    if (!this.asyncUpdateTask.cancelled) {
-                        this.map.upload();
-                    }
-                },
-                ThreadManager.INSTANCE.getLayerUpdaterExecutor());
+            this.asyncUpdateTask,
+            () -> {
+                this.asyncUpdateTask.running = false;
+                if (!this.asyncUpdateTask.cancelled) {
+                    this.map.upload();
+                }
+            },
+            ThreadManager.INSTANCE.getLayerUpdaterExecutor());
     }
 
     @Override

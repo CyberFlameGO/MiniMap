@@ -21,23 +21,23 @@ public class Keyboard {
 
         this.globalKeys.clear();
         this.globalKeys.addAll(List.of(
-                new GlobalKey("minimap.key.map.open", GLFW.GLFW_KEY_M, () -> {
-                    if (MiniMap.CLIENT.currentScreen == null) {
-                        MiniMap.CLIENT.setScreen(new OverlayScreen(null));
-                    }
-                }),
-                new GlobalKey("minimap.key.minimap.zoom.out", GLFW.GLFW_KEY_PAGE_UP, () -> {
-                    if (Config.getConfig().zoom < 7) {
-                        Config.getConfig().zoom++;
-                        Config.save();
-                    }
-                }),
-                new GlobalKey("minimap.key.minimap.zoom.in", GLFW.GLFW_KEY_PAGE_DOWN, () -> {
-                    if (Config.getConfig().zoom > 0) {
-                        Config.getConfig().zoom--;
-                        Config.save();
-                    }
-                })
+            new GlobalKey("minimap.key.map.open", GLFW.GLFW_KEY_M, () -> {
+                if (MiniMap.CLIENT.currentScreen == null) {
+                    MiniMap.CLIENT.setScreen(new OverlayScreen(null));
+                }
+            }),
+            new GlobalKey("minimap.key.minimap.zoom.out", GLFW.GLFW_KEY_PAGE_UP, () -> {
+                if (Config.getConfig().zoom < 7) {
+                    Config.getConfig().zoom++;
+                    Config.save();
+                }
+            }),
+            new GlobalKey("minimap.key.minimap.zoom.in", GLFW.GLFW_KEY_PAGE_DOWN, () -> {
+                if (Config.getConfig().zoom > 0) {
+                    Config.getConfig().zoom--;
+                    Config.save();
+                }
+            })
         ));
     }
 

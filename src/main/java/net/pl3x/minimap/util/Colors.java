@@ -15,10 +15,10 @@ public class Colors {
 
     public static int shade(int color, float ratio) {
         return argb(
-                (int) (alpha(color) * ratio),
-                (int) (red(color) * ratio),
-                (int) (green(color) * ratio),
-                (int) (blue(color) * ratio)
+            (int) (alpha(color) * ratio),
+            (int) (red(color) * ratio),
+            (int) (green(color) * ratio),
+            (int) (blue(color) * ratio)
         );
     }
 
@@ -27,10 +27,10 @@ public class Colors {
         if (delta >= 1F) return color1;
         if (delta <= 0F) return color0;
         return argb(
-                (int) Mathf.lerp(alpha(color0), alpha(color1), delta),
-                (int) Mathf.lerp(red(color0), red(color1), delta),
-                (int) Mathf.lerp(green(color0), green(color1), delta),
-                (int) Mathf.lerp(blue(color0), blue(color1), delta)
+            (int) Mathf.lerp(alpha(color0), alpha(color1), delta),
+            (int) Mathf.lerp(red(color0), red(color1), delta),
+            (int) Mathf.lerp(green(color0), green(color1), delta),
+            (int) Mathf.lerp(blue(color0), blue(color1), delta)
         );
     }
 
@@ -39,10 +39,10 @@ public class Colors {
         if (delta >= 1F) return color1;
         if (delta <= 0F) return color0;
         return argb(
-                (int) Mathf.inverseLerp(alpha(color0), alpha(color1), delta),
-                (int) Mathf.inverseLerp(red(color0), red(color1), delta),
-                (int) Mathf.inverseLerp(green(color0), green(color1), delta),
-                (int) Mathf.inverseLerp(blue(color0), blue(color1), delta)
+            (int) Mathf.inverseLerp(alpha(color0), alpha(color1), delta),
+            (int) Mathf.inverseLerp(red(color0), red(color1), delta),
+            (int) Mathf.inverseLerp(green(color0), green(color1), delta),
+            (int) Mathf.inverseLerp(blue(color0), blue(color1), delta)
         );
     }
 
@@ -50,12 +50,12 @@ public class Colors {
         float[] hsb0 = Color.RGBtoHSB(red(color0), green(color0), blue(color0), null);
         float[] hsb1 = Color.RGBtoHSB(red(color1), green(color1), blue(color1), null);
         return setAlpha(
-                (int) Mathf.lerp(alpha(color0), alpha(color1), delta),
-                Color.HSBtoRGB(
-                        lerpShortestAngle(hsb0[0], hsb1[0], delta),
-                        Mathf.lerp(hsb0[1], hsb1[1], delta),
-                        Mathf.lerp(hsb0[2], hsb1[2], delta)
-                )
+            (int) Mathf.lerp(alpha(color0), alpha(color1), delta),
+            Color.HSBtoRGB(
+                lerpShortestAngle(hsb0[0], hsb1[0], delta),
+                Mathf.lerp(hsb0[1], hsb1[1], delta),
+                Mathf.lerp(hsb0[2], hsb1[2], delta)
+            )
         );
     }
 
@@ -63,12 +63,12 @@ public class Colors {
         float[] hsb0 = Color.RGBtoHSB(red(color0), green(color0), blue(color0), null);
         float[] hsb1 = Color.RGBtoHSB(red(color1), green(color1), blue(color1), null);
         return setAlpha(
-                (int) Mathf.inverseLerp(alpha(color0), alpha(color1), delta),
-                Color.HSBtoRGB(
-                        lerpShortestAngle(hsb0[0], hsb1[0], delta),
-                        Mathf.inverseLerp(hsb0[1], hsb1[1], delta),
-                        Mathf.inverseLerp(hsb0[2], hsb1[2], delta)
-                )
+            (int) Mathf.inverseLerp(alpha(color0), alpha(color1), delta),
+            Color.HSBtoRGB(
+                lerpShortestAngle(hsb0[0], hsb1[0], delta),
+                Mathf.inverseLerp(hsb0[1], hsb1[1], delta),
+                Mathf.inverseLerp(hsb0[2], hsb1[2], delta)
+            )
         );
     }
 

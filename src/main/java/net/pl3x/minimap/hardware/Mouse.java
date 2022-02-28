@@ -67,7 +67,10 @@ public class Mouse {
 
     public void render(MatrixStack matrixStack, float delta) {
         if (this.cursorEnabled && this.cursorRender && this.windowHovered) {
+            matrixStack.push();
+            matrixStack.translate(0, 0, 1900); // draw mouse on top
             cursor().draw(matrixStack, Mouse.INSTANCE.x(), Mouse.INSTANCE.y(), delta);
+            matrixStack.pop();
         }
     }
 
