@@ -3,7 +3,7 @@
 [![MIT License](https://img.shields.io/github/license/pl3xgaming/minimap?&logo=github)](LICENSE)
 [![Github Actions Build](https://img.shields.io/github/workflow/status/pl3xgaming/minimap/Build?event=push&logo=github)](https://modrinth.com/mod/minimap)
 [![CodeFactor](https://www.codefactor.io/repository/github/pl3xgaming/minimap/badge)](https://www.codefactor.io/repository/github/pl3xgaming/minimap)
-[![Join us on Discord](https://img.shields.io/discord/685683385313919172.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/nhGzEkwXQX )
+[![Join us on Discord](https://img.shields.io/discord/944144133054931025.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/nhGzEkwXQX )
 
 ### Description
 
