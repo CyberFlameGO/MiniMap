@@ -1,9 +1,15 @@
+Resources used in this project and their
+licenses can be found at the following links
+
 Cursors:
-  chrome glass - https://www.deviantart.com/yoyos/art/Chrome-Glass-32252748
+  polar - https://store.kde.org/p/999968
 
 Fonts:
   gooddog - https://www.dafont.com/good-dog.font
+  lato - https://fonts.google.com/specimen/Lato
+  nato sans - https://fonts.google.com/noto/specimen/Noto+Sans
   raleway - https://fonts.google.com/specimen/Raleway
+  roboto - https://fonts.google.com/specimen/Roboto
 
 Icons:
   about - https://www.flaticon.com/free-icon/information-button_1176
@@ -20,4 +26,3 @@ Icons:
 
 Sounds:
   whoosh.ogg - https://www.zapsplat.com/music/ui-computer-screen-window-expand-maximise-short-swipe-whoosh-1
-

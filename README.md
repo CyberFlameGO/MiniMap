@@ -46,3 +46,9 @@ Just clone this repository and run the following command
 ### Contributing
 
 We are not looking for contributors at this time.
+
+### Donate
+
+If you enjoy my work, you may donate on [GitHub Sponsors](https://github.com/sponsors/BillyGalbreath).
+
+[![GitHub Sponsors](https://i.imgur.com/eVDnwCb.png)](https://github.com/sponsors/BillyGalbreath)
