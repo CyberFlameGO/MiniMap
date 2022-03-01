@@ -49,7 +49,7 @@ import com.modrinth.minotaur.TaskModrinthUpload
 
 task modrinth(type: TaskModrinthUpload) {
     token = System.getenv("MODRINTH_TOKEN")
-    projectId = "PA9cUri3"
+    projectId = "mCuJmbvh"
     versionName = project.minecraft_version + " build " + project.build_num
     versionNumber = project.version
     uploadFile = remapJar

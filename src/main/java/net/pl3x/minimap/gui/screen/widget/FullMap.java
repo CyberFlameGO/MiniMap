@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.util.math.MatrixStack;
 import net.pl3x.minimap.MiniMap;
+import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.font.Font;
 import net.pl3x.minimap.gui.screen.OverlayScreen;
 import net.pl3x.minimap.gui.screen.widget.element.EntityMarker;
@@ -22,8 +23,12 @@ public class FullMap extends AnimatedWidget {
     private final EntityMarker playerMarker;
 
     private State state;
-    private int centerX;
-    private int centerZ;
+
+    private boolean dragging;
+    private float offsetX;
+    private float offsetY;
+    private float panX;
+    private float panY;
 
     private FullMap() {
         super(null, 0F, 0F, 0F, 0F);
@@ -70,7 +75,7 @@ public class FullMap extends AnimatedWidget {
             mouseY = Mouse.INSTANCE.y();
 
             // set default cursor
-            Mouse.INSTANCE.cursor(Cursor.HAND_OPEN);
+            Mouse.INSTANCE.cursor(this.dragging ? Cursor.HAND_GRAB : Cursor.HAND_OPEN);
         } else {
             mouseX = (float) MiniMap.CLIENT.mouse.getX();
             mouseY = (float) MiniMap.CLIENT.mouse.getY();
@@ -98,21 +103,20 @@ public class FullMap extends AnimatedWidget {
         // tick toasts over fullmap
         if (!Sidebar.INSTANCE.closed()) {
             MiniMap.CLIENT.getProfiler().swap("toasts");
+            boolean hudHidden = MiniMap.CLIENT.options.hudHidden;
             MiniMap.CLIENT.options.hudHidden = false;
             MiniMap.CLIENT.getToastManager().draw(new MatrixStack());
-            MiniMap.CLIENT.options.hudHidden = true;
+            MiniMap.CLIENT.options.hudHidden = hudHidden;
             MiniMap.CLIENT.getProfiler().pop();
+        }
+
+        // render our mouse after everything is rendered
+        if (useMouse) {
+            Mouse.INSTANCE.render(matrixStack, delta);
         }
 
         // allow Mojang disable blending after drawing text
         Font.FIX_MOJANGS_TEXT_RENDERER_CRAP = false;
-
-        // render our mouse after everything is rendered
-        if (useMouse) {
-            // render mouse above everything else
-            matrixStack.translate(0D, 0D, 10D);
-            Mouse.INSTANCE.render(matrixStack, delta);
-        }
 
         // clean up opengl stuff
         RenderSystem.disableBlend();
@@ -128,36 +132,54 @@ public class FullMap extends AnimatedWidget {
         super.render(matrixStack, mouseX, mouseY, delta);
 
         if (MiniMap.INSTANCE.getBackground() != null) {
-            RenderSystem.setShaderColor(1F, 1F, 1F, 0.95F);
             MiniMap.INSTANCE.getBackground().draw(matrixStack, 0F, 0F, Monitor.width(), Monitor.height(), 0F, 0F, Monitor.width() / MiniMap.TILE_SIZE, Monitor.height() / MiniMap.TILE_SIZE);
-            RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         }
 
-        int halfWidth = Math.round(Monitor.width() / 2F);
-        int halfHeight = Math.round(Monitor.height() / 2F);
+        float halfWidth = Monitor.width() / 2F;
+        float halfHeight = Monitor.height() / 2F;
 
-        int limitX = MiniMap.TILE_SIZE * (int) Math.ceil((float) halfWidth / MiniMap.TILE_SIZE);
-        int limitZ = MiniMap.TILE_SIZE * (int) Math.ceil((float) halfHeight / MiniMap.TILE_SIZE);
+        float limitX = MiniMap.TILE_SIZE * (int) Math.ceil(halfWidth / MiniMap.TILE_SIZE);
+        float limitZ = MiniMap.TILE_SIZE * (int) Math.ceil(halfHeight / MiniMap.TILE_SIZE);
 
-        for (int screenX = -limitX; screenX <= limitX; screenX += MiniMap.TILE_SIZE) {
-            for (int screenZ = -limitZ; screenZ <= limitZ; screenZ += MiniMap.TILE_SIZE) {
-                int blockX = screenX - (this.centerX & (MiniMap.TILE_SIZE - 1));
-                int blockZ = screenZ - (this.centerZ & (MiniMap.TILE_SIZE - 1));
+        float centerX = (float) MiniMap.INSTANCE.getPlayer().getX() + this.offsetX;
+        float centerZ = (float) MiniMap.INSTANCE.getPlayer().getZ() + this.offsetY;
 
-                Tile tile = TileManager.INSTANCE.getTile(MiniMap.INSTANCE.getWorld(), Numbers.blockToRegion(blockX + this.centerX), Numbers.blockToRegion(blockZ + this.centerZ), true);
+        float tiledX = centerX - Numbers.regionToBlock(Numbers.blockToRegion(Math.round(centerX)));
+        float tiledZ = centerZ - Numbers.regionToBlock(Numbers.blockToRegion(Math.round(centerZ)));
+
+        for (float screenX = -limitX; screenX <= limitX; screenX += MiniMap.TILE_SIZE) {
+            for (float screenZ = -limitZ; screenZ <= limitZ; screenZ += MiniMap.TILE_SIZE) {
+                float x = screenX - tiledX;
+                float z = screenZ - tiledZ;
+
+                Tile tile = TileManager.INSTANCE.getTile(
+                    MiniMap.INSTANCE.getWorld(),
+                    Numbers.blockToRegion(Math.round(x + centerX)),
+                    Numbers.blockToRegion(Math.round(z + centerZ)),
+                    true
+                );
+
+                x = (float) Math.floor(x + halfWidth);
+                z = (float) Math.floor(z + halfHeight);
+
                 if (tile != null && tile.isReady()) {
-                    tile.draw(matrixStack, blockX + halfWidth, blockZ + halfHeight);
+                    tile.draw(matrixStack, x, z);
                 }
+
+                GL.drawSolidRect(matrixStack, x, 0, x + 1, Monitor.height(), 0xFFFF0000);
+                GL.drawSolidRect(matrixStack, 0, z, Monitor.width(), z + 1, 0xFFFF0000);
+                Font.DEFAULT.drawWithShadow(matrixStack, (int) Math.ceil(x - halfWidth + centerX) + "," + (int) Math.ceil(z - halfHeight + centerZ), x + 3, z + 3);
             }
         }
 
         // todo - move this to a new layer
         matrixStack.push();
-        this.playerMarker.x(halfWidth);
-        this.playerMarker.y(halfHeight);
+        this.playerMarker.x(halfWidth - this.offsetX);
+        this.playerMarker.y(halfHeight - this.offsetY);
         this.playerMarker.width(16);
         this.playerMarker.height(16);
         this.playerMarker.render(matrixStack, true, delta);
+        Font.DEFAULT.drawWithShadow(matrixStack, Math.round(centerX - this.offsetX) + "," + Math.round(centerZ - this.offsetY), halfWidth - this.offsetX + 8, halfHeight - this.offsetY + 8);
         matrixStack.pop();
     }
 
@@ -167,10 +189,12 @@ public class FullMap extends AnimatedWidget {
     }
 
     public void open() {
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.panX = 0;
+        this.panY = 0;
         this.state = State.OPENED;
         Sidebar.INSTANCE.resetState();
-        this.centerX = MiniMap.INSTANCE.getPlayer().getBlockX();
-        this.centerZ = MiniMap.INSTANCE.getPlayer().getBlockZ();
     }
 
     public void close() {
@@ -180,18 +204,32 @@ public class FullMap extends AnimatedWidget {
 
     @Override
     public boolean mouseClicked(float mouseX, float mouseY, int button) {
+        if (!Sidebar.INSTANCE.hovered()) {
+            this.dragging = true;
+            this.panX = mouseX;
+            this.panY = mouseY;
+        }
         return Sidebar.INSTANCE.mouseClicked(mouseX, mouseY, button)
             || super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseReleased(float mouseX, float mouseY, int button) {
+        this.dragging = false;
+        this.panX = 0;
+        this.panY = 0;
         return Sidebar.INSTANCE.mouseReleased(mouseX, mouseY, button)
             || super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseDragged(float mouseX, float mouseY, int button, float deltaX, float deltaY) {
+        if (!Sidebar.INSTANCE.hovered() && this.dragging) {
+            this.offsetX -= mouseX - this.panX;
+            this.offsetY -= mouseY - this.panY;
+            this.panX = mouseX;
+            this.panY = mouseY;
+        }
         return Sidebar.INSTANCE.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
             || super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
