@@ -1,17 +1,12 @@
 package net.pl3x.minimap.sound;
 
-import com.mojang.serialization.Lifecycle;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.MutableRegistry;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.pl3x.minimap.MiniMap;
 
 import java.util.HashSet;
-import java.util.OptionalInt;
 import java.util.Set;
 
 public class Sound {
@@ -25,17 +20,9 @@ public class Sound {
     }
 
     public static void initialize() {
-        MutableRegistry<SoundEvent> registry = ((MutableRegistry<SoundEvent>) Registry.SOUND_EVENT);
         REGISTERED_SOUNDS.forEach(sound -> {
-            RegistryKey<SoundEvent> key = RegistryKey.of(registry.getKey(), sound.identifier);
-            int rawId = Registry.SOUND_EVENT.getRawId(sound.soundEvent);
-            OptionalInt id = rawId > 0 ? OptionalInt.of(rawId) : OptionalInt.empty();
-            sound.soundEvent = registry.replace(id, key, new SoundEvent(sound.identifier), Lifecycle.stable());
-            if (sound.soundEvent != null) {
-                MiniMap.LOG.info("Loaded sound " + sound.identifier);
-            } else {
-                MiniMap.LOG.error("Could not load sound " + sound.identifier);
-            }
+            sound.soundEvent = new SoundEvent(sound.identifier);
+            MiniMap.LOG.info("Loaded sound " + sound.identifier);
         });
     }
 

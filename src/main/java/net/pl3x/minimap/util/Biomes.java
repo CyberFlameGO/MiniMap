@@ -6,6 +6,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
@@ -24,7 +25,8 @@ public class Biomes {
     }
 
     public Biome getBiome(ClientWorld world, BlockPos pos) {
-        return world.getBiome(pos);
+        RegistryEntry<Biome> entry = world.getBiome(pos);
+        return entry == null ? null : entry.value();
     }
 
     public String getBiomeName(ClientPlayerEntity player) {
@@ -37,7 +39,7 @@ public class Biomes {
     }
 
     public Identifier getKey(ClientWorld world, BlockPos pos) {
-        return getKey(world, world.getBiome(pos));
+        return getKey(world, getBiome(world, pos));
     }
 
     public Identifier getKey(ClientWorld world, Biome biome) {

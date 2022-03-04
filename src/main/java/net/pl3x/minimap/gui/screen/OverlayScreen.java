@@ -74,7 +74,7 @@ public class OverlayScreen extends Screen {
     }
 
     @Override
-    public void onClose() {
+    public void close() {
         MiniMap.CLIENT.setScreen(this.parent);
 
         FullMap.INSTANCE.close();

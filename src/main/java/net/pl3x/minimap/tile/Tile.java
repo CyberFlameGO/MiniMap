@@ -11,6 +11,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.LightType;
 import net.minecraft.world.biome.Biome;
@@ -269,7 +270,7 @@ public class Tile {
                     // get the biome of the current block
                     // see ClientWorldMixin for a hack that
                     // allows this method to return null
-                    Biome biome = getWorld().getBiome(pos);
+                    Biome biome = Biomes.INSTANCE.getBiome(getWorld(), pos);
                     // only plot the pixel if a biome was found
                     // edge of view distance has a lot of blocks
                     // with missing biomes, so this is a needed check

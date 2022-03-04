@@ -168,7 +168,6 @@ public class FullMap extends AnimatedWidget {
         if (MiniMap.INSTANCE.getBackground() != null) {
             MiniMap.INSTANCE.getBackground().draw(matrixStack, -halfWidth, -halfHeight, halfWidth, halfHeight, 0F, 0F, width / Tile.SIZE, height / Tile.SIZE);
         }
-
         // translate tiles to player position
         matrixStack.push();
         matrixStack.translate(-playerPosX * scale, -playerPosZ * scale, 0F);
