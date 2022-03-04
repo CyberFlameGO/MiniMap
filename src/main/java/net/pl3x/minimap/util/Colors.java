@@ -1,8 +1,23 @@
 package net.pl3x.minimap.util;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.math.BlockPos;
+
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Colors {
+    private static final List<Block> invisibleBlocks = new ArrayList<>();
+
+    static {
+        invisibleBlocks.add(Blocks.TALL_GRASS);
+        invisibleBlocks.add(Blocks.GRASS);
+    }
+
     public static int shade(int color, int shade) {
         float ratio = switch (shade) {
             case 0 -> 180F / 0xFF;
@@ -123,5 +138,17 @@ public class Colors {
 
     public static int fromHex(String color) {
         return (int) Long.parseLong(color.replace("#", ""), 16);
+    }
+
+    public static boolean isInvisible(ClientWorld world, BlockState state, BlockPos pos) {
+        return isInvisible(state.getBlock()) || state.getMapColor(world, pos).color == 0;
+    }
+
+    public static boolean isInvisible(BlockState state) {
+        return isInvisible(state.getBlock());
+    }
+
+    public static boolean isInvisible(Block block) {
+        return invisibleBlocks.contains(block);
     }
 }

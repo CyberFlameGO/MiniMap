@@ -19,11 +19,11 @@ public class ReadQueue implements QueueAction {
 
     @Override
     public void run() {
-        read(this.tile.getBase());
-        read(this.tile.getBiomes());
-        read(this.tile.getHeight());
-        read(this.tile.getFluids());
-        read(this.tile.getLight());
+        read(this.tile.getBaseImage());
+        read(this.tile.getBiomesImage());
+        read(this.tile.getHeightmapImage());
+        read(this.tile.getFluidsImage());
+        read(this.tile.getLightmapImage());
         this.tile.upload();
         this.tile.setReady(true);
     }

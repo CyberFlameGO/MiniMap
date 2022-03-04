@@ -41,6 +41,12 @@ tasks.withType(JavaCompile).configureEach {
     it.options.release.set(17)
 }
 
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}" }
+    }
+}
+
 loom {
     mixin.defaultRefmapName = "minimap.refmap.json"
 }

@@ -2,6 +2,7 @@ package net.pl3x.minimap.gui.screen.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.gui.GL;
@@ -131,55 +132,76 @@ public class FullMap extends AnimatedWidget {
 
         super.render(matrixStack, mouseX, mouseY, delta);
 
+        float scale = 1F;
+
+        float width = Monitor.width();//MiniMap.INSTANCE.getSize();
+        float height = Monitor.height();//MiniMap.INSTANCE.getSize();
+        float halfWidth = width / 2F;
+        float halfHeight = height / 2F;
+
+        float centerX = Math.round(Monitor.width() / 2F);//MiniMap.INSTANCE.getCenterX();
+        float centerZ = Math.round(Monitor.height() / 2F);//MiniMap.INSTANCE.getCenterZ();
+
+        ClientPlayerEntity player = MiniMap.INSTANCE.getPlayer();
+        float playerPosX = (float) player.getX();
+        float playerPosZ = (float) player.getZ();
+        int playerBlockX = player.getBlockX();
+        int playerBlockZ = player.getBlockZ();
+
+        // blend mode to only draw alpha levels
+        RenderSystem.blendFuncSeparate(GL11.GL_ZERO, GL11.GL_ONE, GL11.GL_SRC_COLOR, GL11.GL_ZERO);
+        // draw low alpha on all pixels (will hide anything we draw)
+        GL.drawSolidRect(matrixStack, 0, 0, Monitor.width(), Monitor.height(), 0x01 << 24);
+
+        // translate everything to position
+        matrixStack.push();
+        matrixStack.translate(centerX, centerZ, 0F);
+
+        // draw high alpha square/circle where we want to draw the map (the part that will show)
+        GL.drawSolidRect(matrixStack, -halfWidth, -halfHeight, halfWidth, halfHeight, 0xFF << 24);
+        //GL.drawSolidCirc(matrixStack, 0, 0, halfWidth, 0xFF << 24);
+
+        // blend mode to only writes where high alpha values exist
+        RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
+
+        // draw background/sky
         if (MiniMap.INSTANCE.getBackground() != null) {
-            MiniMap.INSTANCE.getBackground().draw(matrixStack, 0F, 0F, Monitor.width(), Monitor.height(), 0F, 0F, Monitor.width() / MiniMap.TILE_SIZE, Monitor.height() / MiniMap.TILE_SIZE);
+            MiniMap.INSTANCE.getBackground().draw(matrixStack, -halfWidth, -halfHeight, halfWidth, halfHeight, 0F, 0F, width / Tile.SIZE, height / Tile.SIZE);
         }
 
-        float halfWidth = Monitor.width() / 2F;
-        float halfHeight = Monitor.height() / 2F;
+        // translate tiles to player position
+        matrixStack.push();
+        matrixStack.translate(-playerPosX * scale, -playerPosZ * scale, 0F);
+        //GL.rotateScene(matrixStack, playerPosX * scale, playerPosZ * scale, -MiniMap.INSTANCE.getAngle());
+        matrixStack.scale(scale, scale, 1F);
 
-        float limitX = MiniMap.TILE_SIZE * (int) Math.ceil(halfWidth / MiniMap.TILE_SIZE);
-        float limitZ = MiniMap.TILE_SIZE * (int) Math.ceil(halfHeight / MiniMap.TILE_SIZE);
-
-        float centerX = (float) MiniMap.INSTANCE.getPlayer().getX() + this.offsetX;
-        float centerZ = (float) MiniMap.INSTANCE.getPlayer().getZ() + this.offsetY;
-
-        float tiledX = centerX - Numbers.regionToBlock(Numbers.blockToRegion(Math.round(centerX)));
-        float tiledZ = centerZ - Numbers.regionToBlock(Numbers.blockToRegion(Math.round(centerZ)));
-
-        for (float screenX = -limitX; screenX <= limitX; screenX += MiniMap.TILE_SIZE) {
-            for (float screenZ = -limitZ; screenZ <= limitZ; screenZ += MiniMap.TILE_SIZE) {
-                float x = screenX - tiledX;
-                float z = screenZ - tiledZ;
-
-                Tile tile = TileManager.INSTANCE.getTile(
-                    MiniMap.INSTANCE.getWorld(),
-                    Numbers.blockToRegion(Math.round(x + centerX)),
-                    Numbers.blockToRegion(Math.round(z + centerZ)),
-                    true
-                );
-
-                x = (float) Math.floor(x + halfWidth);
-                z = (float) Math.floor(z + halfHeight);
-
+        // draw tiles
+        int regionX, regionZ;
+        for (float screenX = -halfWidth; Numbers.regionToBlock((regionX = Numbers.blockToRegion((int) (screenX + playerBlockX)))) < halfWidth + playerPosX; screenX += Tile.SIZE) {
+            for (float screenZ = -halfHeight; Numbers.regionToBlock((regionZ = Numbers.blockToRegion((int) (screenZ + playerBlockZ)))) < halfHeight + playerPosZ; screenZ += Tile.SIZE) {
+                Tile tile = TileManager.INSTANCE.getTile(MiniMap.INSTANCE.getWorld(), regionX, regionZ, true);
                 if (tile != null && tile.isReady()) {
-                    tile.draw(matrixStack, x, z);
+                    tile.draw(matrixStack, Numbers.regionToBlock(regionX), Numbers.regionToBlock(regionZ));
                 }
-
-                GL.drawSolidRect(matrixStack, x, 0, x + 1, Monitor.height(), 0xFFFF0000);
-                GL.drawSolidRect(matrixStack, 0, z, Monitor.width(), z + 1, 0xFFFF0000);
-                Font.DEFAULT.drawWithShadow(matrixStack, (int) Math.ceil(x - halfWidth + centerX) + "," + (int) Math.ceil(z - halfHeight + centerZ), x + 3, z + 3);
             }
         }
 
+        // finished translating tiles to offset
+        matrixStack.pop();
+
+        // blend mode for full translucent pixel support
+        RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
         // todo - move this to a new layer
         matrixStack.push();
-        this.playerMarker.x(halfWidth - this.offsetX);
-        this.playerMarker.y(halfHeight - this.offsetY);
+        this.playerMarker.x(-this.offsetX);
+        this.playerMarker.y(-this.offsetY);
         this.playerMarker.width(16);
         this.playerMarker.height(16);
         this.playerMarker.render(matrixStack, true, delta);
-        Font.DEFAULT.drawWithShadow(matrixStack, Math.round(centerX - this.offsetX) + "," + Math.round(centerZ - this.offsetY), halfWidth - this.offsetX + 8, halfHeight - this.offsetY + 8);
+        matrixStack.pop();
+
+        // finished translating everything to center of monitor
         matrixStack.pop();
     }
 

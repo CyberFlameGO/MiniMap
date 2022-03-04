@@ -25,11 +25,11 @@ public class WriteQueue implements QueueAction {
 
     @Override
     public void run() {
-        write(this.tile.getBase());
-        write(this.tile.getBiomes());
-        write(this.tile.getHeight());
-        write(this.tile.getFluids());
-        write(this.tile.getLight());
+        write(this.tile.getBaseImage());
+        write(this.tile.getBiomesImage());
+        write(this.tile.getHeightmapImage());
+        write(this.tile.getFluidsImage());
+        write(this.tile.getLightmapImage());
     }
 
     private void write(Image image) {
@@ -49,7 +49,7 @@ public class WriteQueue implements QueueAction {
         Exception error = null;
         Path tmpPath = image.path().resolveSibling(image.path().getFileName() + ".tmp");
         try (ImageOutputStream out = ImageIO.createImageOutputStream(Files.newOutputStream(tmpPath))) {
-            BufferedImage buffer = new BufferedImage(MiniMap.TILE_SIZE, MiniMap.TILE_SIZE, BufferedImage.TYPE_INT_ARGB);
+            BufferedImage buffer = new BufferedImage(Tile.SIZE, Tile.SIZE, BufferedImage.TYPE_INT_ARGB);
             ImageTypeSpecifier type = ImageTypeSpecifier.createFromRenderedImage(buffer);
             writer = ImageIO.getImageWriters(type, "png").next();
             ImageWriteParam param = writer.getDefaultWriteParam();

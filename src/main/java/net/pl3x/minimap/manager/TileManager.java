@@ -60,18 +60,13 @@ public class TileManager {
         String key = String.format("%s_%d_%d", world.getRegistryKey().getValue(), regionX, regionZ);
         Tile tile = this.tiles.get(key);
         if (tile == null && load) {
-            tile = loadTile(world, regionX, regionZ);
+            tile = new Tile(world, regionX, regionZ);
+            tile.load();
             this.tiles.put(key, tile);
         }
         if (tile != null) {
-            tile.use();
+            tile.setLastUsed(Scheduler.INSTANCE.getCurrentTick());
         }
-        return tile;
-    }
-
-    private Tile loadTile(ClientWorld world, int regionX, int regionZ) {
-        Tile tile = new Tile(world, regionX, regionZ);
-        tile.load();
         return tile;
     }
 }

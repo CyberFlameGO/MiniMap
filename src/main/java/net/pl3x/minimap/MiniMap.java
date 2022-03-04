@@ -34,7 +34,6 @@ import java.util.List;
 
 public class MiniMap {
     public static final String MODID = "minimap";
-    public static final int TILE_SIZE = 512;
     public static final MiniMap INSTANCE = new MiniMap();
     public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
     public static final Logger LOG = LogManager.getLogger("MiniMap");

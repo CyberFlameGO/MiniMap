@@ -42,7 +42,7 @@ public class Map extends Layer {
         float y0 = mm.getCenterY() - halfSize + scale;
         float y1 = y0 + mm.getSize() - scale2;
 
-        float u = (MiniMap.TILE_SIZE - mm.getDeltaZoom()) / MiniMap.TILE_SIZE / 2F;
+        float u = (Tile.SIZE - mm.getDeltaZoom()) / Tile.SIZE / 2F;
         float v = 1F - u;
 
         // uses blend which only writes where high alpha values exist
@@ -72,7 +72,7 @@ public class Map extends Layer {
         // check if we have a map texture
         if (this.map == null) {
             // load the map texture
-            this.map = new NativeImageBackedTexture(MiniMap.TILE_SIZE, MiniMap.TILE_SIZE, true);
+            this.map = new NativeImageBackedTexture(Tile.SIZE, Tile.SIZE, true);
             MiniMap.CLIENT.getTextureManager().registerTexture(this.mapId, this.map);
             return;
         }
@@ -123,11 +123,11 @@ public class Map extends Layer {
             if (this.cancelled) {
                 return;
             }
-            this.playerX = mm.getPlayer().getX() - MiniMap.TILE_SIZE / 2D;
-            this.playerZ = mm.getPlayer().getZ() - MiniMap.TILE_SIZE / 2D;
+            this.playerX = mm.getPlayer().getX() - Tile.SIZE / 2D;
+            this.playerZ = mm.getPlayer().getZ() - Tile.SIZE / 2D;
 
-            for (int x = 0; x < MiniMap.TILE_SIZE; x++) {
-                for (int z = 0; z < MiniMap.TILE_SIZE; z++) {
+            for (int x = 0; x < Tile.SIZE; x++) {
+                for (int z = 0; z < Tile.SIZE; z++) {
                     if (this.cancelled) {
                         return;
                     }
@@ -149,7 +149,7 @@ public class Map extends Layer {
                         continue;
                     }
 
-                    this.image.setColor(x, z, this.source.getColor(this.blockX & (MiniMap.TILE_SIZE - 1), this.blockZ & (MiniMap.TILE_SIZE - 1)));
+                    this.image.setColor(x, z, this.source.getColor(this.blockX & (Tile.SIZE - 1), this.blockZ & (Tile.SIZE - 1)));
                 }
             }
         }

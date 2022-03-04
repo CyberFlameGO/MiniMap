@@ -1,30 +1,14 @@
 package net.pl3x.minimap.manager;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.MapColor;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.LightType;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.EmptyChunk;
 import net.pl3x.minimap.MiniMap;
-import net.pl3x.minimap.gui.animation.Easing;
 import net.pl3x.minimap.scheduler.Scheduler;
 import net.pl3x.minimap.scheduler.Task;
 import net.pl3x.minimap.tile.Tile;
-import net.pl3x.minimap.util.Biomes;
-import net.pl3x.minimap.util.Colors;
-import net.pl3x.minimap.util.Mathf;
 import net.pl3x.minimap.util.Numbers;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -50,14 +34,13 @@ public class ChunkScanner {
     }
 
     public void start() {
-        this.loadedChunks.clear();
+        stop();
         this.scanTask = new ScanTask();
         Scheduler.INSTANCE.addTask(this.scanTask);
     }
 
     public void stop() {
         if (this.scanTask != null) {
-            this.scanTask.asyncScanTask.cancel();
             this.scanTask.cancel();
             this.scanTask = null;
         }
@@ -65,48 +48,61 @@ public class ChunkScanner {
     }
 
     private static class ScanTask extends Task {
-        private final AsyncScan asyncScanTask = new AsyncScan();
+        private final State state;
+        private final AsyncScan asyncScanTask;
 
-        private boolean running;
+        private int tick;
 
         private ScanTask() {
-            super(20, true);
+            super(0, true);
+            this.state = new State();
+            this.asyncScanTask = new AsyncScan(this.state);
+        }
+
+        @Override
+        public void cancel() {
+            super.cancel();
+            this.state.cancelled = true;
         }
 
         @Override
         public void run() {
-            if (this.running) {
+            // todo - make this interval configurable
+            if (this.tick++ < 20) {
+                return;
+            }
+
+            if (this.state.running) {
                 // haven't finished previous run
                 return;
             }
 
             if (MiniMap.INSTANCE.getPlayer() == null) {
+                // no player, game not ready
                 return;
             }
 
-            this.running = true;
+            this.tick = 0;
+            this.state.running = true;
 
-            ThreadManager.INSTANCE.runAsync(this.asyncScanTask, () -> this.running = false, ThreadManager.INSTANCE.getChunkScannerExecutor());
+            ThreadManager.INSTANCE.runAsync(
+                this.asyncScanTask,
+                () -> this.state.running = false,
+                ThreadManager.INSTANCE.getChunkScannerExecutor()
+            );
         }
     }
 
     private static class AsyncScan implements Runnable {
-        private final List<Block> invisibleBlocks = new ArrayList<>();
+        private final State state;
 
-        private boolean cancelled;
-
-        private AsyncScan() {
-            invisibleBlocks.add(Blocks.TALL_GRASS);
-            invisibleBlocks.add(Blocks.GRASS);
-        }
-
-        public void cancel() {
-            this.cancelled = true;
+        private AsyncScan(State state) {
+            this.state = state;
         }
 
         @Override
         public void run() {
-            if (this.cancelled) {
+            if (this.state.cancelled) {
                 return;
             }
 
@@ -115,182 +111,27 @@ public class ChunkScanner {
                 return;
             }
 
-            BlockPos.Mutable pos = new BlockPos.Mutable();
-            BlockPos.Mutable pos2 = new BlockPos.Mutable();
-
-            int minY = world.getBottomY();
-            int maxY = world.getBottomY() + world.getDimension().getLogicalHeight();
-
-            // iterate each chunk to map it
+            // iterate each chunk
             for (Chunk chunk : ChunkScanner.INSTANCE.loadedChunks) {
-                int blockX = Numbers.chunkToBlock(chunk.getPos().x);
-                int blockZ = Numbers.chunkToBlock(chunk.getPos().z);
-
                 // get the tile this chunk belongs to
                 Tile tile = TileManager.INSTANCE.getTile(world, Numbers.chunkToRegion(chunk.getPos().x), Numbers.chunkToRegion(chunk.getPos().z), true);
-                if (!tile.isReady()) {
-                    // tile is not currently ready
-                    continue;
-                }
+                if (tile.isReady()) {
+                    // scan the chunk
+                    tile.scanChunk(chunk, this.state);
 
-                // iterate each block in this chunk
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        if (this.cancelled) {
-                            return;
-                        }
-
-                        // current block position in the world at the highest Y coordinate
-                        pos.set(blockX + x, 0, blockZ + z);
-                        pos.setY(chunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, pos.getX(), pos.getZ()) + 1);
-                        getStartY(world, chunk, pos, minY, maxY);
-
-                        // current pixel in the tile image
-                        int pixelX = pos.getX() & MiniMap.TILE_SIZE - 1;
-                        int pixelZ = pos.getZ() & MiniMap.TILE_SIZE - 1;
-
-                        // reset fluid tracker
-                        BlockPos fluidPos = null;
-
-                        // base layer
-                        {
-                            BlockState state;
-                            int color;
-                            do {
-                                pos.move(Direction.DOWN);
-                                state = chunk.getBlockState(pos);
-                                color = state.getMapColor(world, pos).color;
-                                if (fluidPos == null) {
-                                    // only track the first time we see a liquid
-                                    fluidPos = !state.getFluidState().isEmpty() ? pos.mutableCopy() : null;
-                                }
-                            } while (pos.getY() > world.getBottomY() && (color == 0 || !state.getFluidState().isEmpty() || this.invisibleBlocks.contains(state.getBlock())));
-                            tile.getBase().setPixel(pixelX, pixelZ, (0xFF << 24) | color);
-                        }
-
-                        if (this.cancelled) {
-                            return;
-                        }
-
-                        // biomes layer
-                        {
-                            // get the biome of the current block
-                            // see ClientWorldMixin for a hack that
-                            // allows this method to return null
-                            Biome biome = world.getBiome(pos);
-                            // only plot the pixel if a biome was found
-                            // edge of view distance has a lot of blocks
-                            // with missing biomes, so this is a needed check
-                            if (biome != null) {
-                                tile.getBiomes().setPixel(pixelX, pixelZ, Biomes.Color.get(world, biome));
-                            }
-                        }
-
-                        if (this.cancelled) {
-                            return;
-                        }
-
-                        // height layer
-                        {
-                            int height = 0x22;
-                            height = getHeightColor(world, chunk, pos, pos2.set(pos.getX() - 1, 0, pos.getZ()), minY, maxY, height, 0x00);
-                            height = getHeightColor(world, chunk, pos, pos2.set(pos.getX() + 1, 0, pos.getZ()), minY, maxY, height, 0x44);
-                            height = getHeightColor(world, chunk, pos, pos2.set(pos.getX(), 0, pos.getZ() - 1), minY, maxY, height, 0x00);
-                            height = getHeightColor(world, chunk, pos, pos2.set(pos.getX(), 0, pos.getZ() + 1), minY, maxY, height, 0x44);
-                            if (height >= 0) {
-                                tile.getHeight().setPixel(pixelX, pixelZ, height << 24);
-                            }
-                        }
-
-                        if (this.cancelled) {
-                            return;
-                        }
-
-                        // fluids layer
-                        {
-                            int color = 0;
-                            if (fluidPos != null) {
-                                // setup initial fluid stuff
-                                float depth = 0F;
-                                boolean lava;
-                                if (chunk.getBlockState(pos2.set(fluidPos)).isOf(Blocks.LAVA)) {
-                                    lava = true;
-                                    color = 0xFFEA5C0F;
-                                } else {
-                                    lava = false;
-                                    color = MapColor.WATER_BLUE.color;
-                                }
-                                // iterate down until we don't find any more fluids
-                                BlockState state;
-                                do {
-                                    pos2.move(Direction.DOWN);
-                                    state = chunk.getBlockState(pos2);
-                                    depth += 0.025F;
-                                } while (pos2.getY() > world.getBottomY() && (!state.getFluidState().isEmpty() || this.invisibleBlocks.contains(state.getBlock())));
-                                // let's do some maths to get pretty fluid colors based on depth
-                                color = Colors.lerpARGB(color, 0xFF000000, Mathf.clamp(0, lava ? 0.3F : 0.45F, Easing.Cubic.out(depth / 1.5F)));
-                                color = Colors.setAlpha(lava ? 0xFF : (int) (Easing.Quintic.out(Mathf.clamp(0, 1, depth * 5F)) * 0xFF), color);
-                            }
-                            tile.getFluids().setPixel(pixelX, pixelZ, color);
-                        }
-
-                        if (this.cancelled) {
-                            return;
-                        }
-
-                        // light layer
-                        {
-                            // store light levels as black pixels - we will invert this during rendering
-                            int light = world.getLightLevel(LightType.BLOCK, (fluidPos == null ? pos : fluidPos).up());
-                            int alpha = (int) (Mathf.inverseLerp(0, 15, light) * 0xFF);
-                            tile.getLight().setPixel(pixelX, pixelZ, Colors.setAlpha(alpha, 0x00000000));
-                        }
-                    }
-                }
-
-                // mark tile dirty
-                tile.markDirty();
-            }
-        }
-
-        private int getHeightColor(ClientWorld world, Chunk chunk, BlockPos.Mutable pos, BlockPos.Mutable pos2, int minY, int maxY, int oldColor, int newColor) {
-            if (oldColor < 0 || world.getChunk(pos2) instanceof EmptyChunk) {
-                return -1;
-            }
-            pos2.setY(world.getChunk(pos2).sampleHeightmap(Heightmap.Type.WORLD_SURFACE, pos2.getX(), pos2.getZ()) + 1);
-            return iterateDown(world, getStartY(world, chunk, pos2, minY, maxY), minY).getY() < pos.getY() ? newColor : oldColor;
-        }
-
-        private BlockPos.Mutable getStartY(ClientWorld world, Chunk chunk, BlockPos.Mutable pos, int minY, int maxY) {
-            // todo - add option for seeing through ceiling
-            if (world.getDimension().hasCeiling()) {
-                // todo - possibly add option for bottomup/topdown scanning
-                if (false) {
-                    // start from bottom up until we find air
-                    pos.setY(minY);
-                    do {
-                        pos.move(Direction.UP);
-                    } while (!chunk.getBlockState(pos).isAir() && pos.getY() < maxY);
-                } else {
-                    // start from top down until we find air
-                    pos.setY(maxY);
-                    do {
-                        pos.move(Direction.DOWN);
-                    } while (!chunk.getBlockState(pos).isAir() && pos.getY() > minY);
+                    // mark tile dirty
+                    tile.markToSave();
                 }
             }
-            return pos;
         }
+    }
 
-        private BlockPos iterateDown(ClientWorld world, BlockPos.Mutable pos2, int minY) {
-            BlockState state;
-            int color;
-            do {
-                pos2.move(Direction.DOWN);
-                state = world.getBlockState(pos2);
-                color = state.getMapColor(world, pos2).color;
-            } while (pos2.getY() > minY && (color == 0 || !state.getFluidState().isEmpty() || invisibleBlocks.contains(state.getBlock())));
-            return pos2;
+    public static class State {
+        private boolean running;
+        private boolean cancelled;
+
+        public boolean isCancelled() {
+            return this.cancelled;
         }
     }
 }

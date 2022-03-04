@@ -8,7 +8,7 @@ import java.nio.file.Path;
 
 public class Image {
     private final Path path;
-    private final int[] pixels = new int[MiniMap.TILE_SIZE * MiniMap.TILE_SIZE];
+    private final int[] pixels = new int[Tile.SIZE * Tile.SIZE];
 
     public Image(Path path) {
         this.path = path;
@@ -27,18 +27,18 @@ public class Image {
     }
 
     public int getPixel(int x, int z) {
-        return this.pixels[z * MiniMap.TILE_SIZE + x];
+        return this.pixels[z * Tile.SIZE + x];
     }
 
     public void setPixels(BufferedImage buffer) {
-        for (int x = 0; x < MiniMap.TILE_SIZE; x++) {
-            for (int z = 0; z < MiniMap.TILE_SIZE; z++) {
+        for (int x = 0; x < Tile.SIZE; x++) {
+            for (int z = 0; z < Tile.SIZE; z++) {
                 setPixel(x, z, buffer.getRGB(x, z));
             }
         }
     }
 
     public void setPixel(int x, int z, int color) {
-        this.pixels[z * MiniMap.TILE_SIZE + x] = Colors.rgb2bgr(color);
+        this.pixels[z * Tile.SIZE + x] = Colors.rgb2bgr(color);
     }
 }
