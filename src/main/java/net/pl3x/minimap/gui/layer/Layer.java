@@ -10,7 +10,7 @@ public abstract class Layer {
         this.mm = MiniMap.INSTANCE;
     }
 
-    public abstract void render(MatrixStack matrixStack);
+    public abstract void render(MatrixStack matrixStack, float delta);
 
     public void update() {
     }

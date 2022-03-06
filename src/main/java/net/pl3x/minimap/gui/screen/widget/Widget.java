@@ -133,6 +133,10 @@ public abstract class Widget {
         return false;
     }
 
+    public boolean mouseScrolled(float mouseX, float mouseY, float amount) {
+        return this.hoveredElement(mouseX, mouseY).filter((widget) -> widget.mouseScrolled(mouseX, mouseY, amount)).isPresent();
+    }
+
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         for (Widget widget : children()) {
             if (widget.keyPressed(keyCode, scanCode, modifiers)) {

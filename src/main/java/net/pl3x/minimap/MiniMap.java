@@ -6,15 +6,15 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.math.MathHelper;
 import net.pl3x.minimap.config.Config;
+import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.font.Font;
-import net.pl3x.minimap.gui.layer.Background;
 import net.pl3x.minimap.gui.layer.BottomText;
 import net.pl3x.minimap.gui.layer.Directions;
 import net.pl3x.minimap.gui.layer.Frame;
 import net.pl3x.minimap.gui.layer.Layer;
 import net.pl3x.minimap.gui.layer.Map;
-import net.pl3x.minimap.gui.layer.Mask;
 import net.pl3x.minimap.gui.layer.Players;
 import net.pl3x.minimap.gui.screen.widget.Sidebar;
 import net.pl3x.minimap.gui.texture.Texture;
@@ -24,10 +24,12 @@ import net.pl3x.minimap.manager.FileManager;
 import net.pl3x.minimap.manager.TileManager;
 import net.pl3x.minimap.scheduler.Scheduler;
 import net.pl3x.minimap.scheduler.Task;
+import net.pl3x.minimap.tile.Tile;
 import net.pl3x.minimap.util.Mathf;
 import net.pl3x.minimap.util.Numbers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +49,7 @@ public class MiniMap {
 
     private boolean visible = true;
     private float size;
-    private float deltaZoom;
+
     private float angle;
     private float centerX;
     private float centerY;
@@ -101,10 +103,6 @@ public class MiniMap {
         this.size = size;
     }
 
-    public float getDeltaZoom() {
-        return this.deltaZoom;
-    }
-
     public float getAngle() {
         return this.angle;
     }
@@ -126,7 +124,9 @@ public class MiniMap {
     }
 
     public void initialize() {
-        HudRenderCallback.EVENT.register(MiniMap.INSTANCE::render);
+        HudRenderCallback.EVENT.register((matrixStack, delta) ->
+            render(matrixStack, CLIENT.getLastFrameDuration())
+        );
     }
 
     public void start() {
@@ -135,7 +135,6 @@ public class MiniMap {
         }
 
         this.size = 0F;
-        this.deltaZoom = 0F;
         this.angle = 0F;
         this.centerX = 0F;
         this.centerY = 0F;
@@ -149,8 +148,6 @@ public class MiniMap {
         TileManager.INSTANCE.start();
         ChunkScanner.INSTANCE.start();
 
-        this.layers.add(new Mask());
-        this.layers.add(new Background());
         this.layers.add(new Map());
         this.layers.add(new Frame());
         this.layers.add(new Players());
@@ -183,7 +180,7 @@ public class MiniMap {
 
         this.player = CLIENT.player;
         if (this.player == null) {
-            return true; //  no player
+            return true; // no player
         }
 
         // don't render when debug hud is showing
@@ -193,14 +190,6 @@ public class MiniMap {
     public void render(MatrixStack matrixStack, float delta) {
         if (dontRender()) {
             return;
-        }
-
-        // smooth delta zoom
-        int zoom = (int) (Mathf.clamp(0, 7, Config.getConfig().zoom) * 64 + 64);
-        if (Math.abs(zoom - this.deltaZoom) > 0.01F) {
-            this.deltaZoom += delta / 5F * (zoom - this.deltaZoom);
-        } else {
-            this.deltaZoom = zoom;
         }
 
         // angle of player rotation
@@ -222,7 +211,7 @@ public class MiniMap {
         Font.FIX_MOJANGS_TEXT_RENDERER_CRAP = true;
 
         // render layers
-        this.layers.forEach(layer -> layer.render(matrixStack));
+        this.layers.forEach(layer -> layer.render(matrixStack, delta));
 
         // allow Mojang disable blending after drawing text
         Font.FIX_MOJANGS_TEXT_RENDERER_CRAP = false;
@@ -281,5 +270,75 @@ public class MiniMap {
             case MID -> Monitor.height() / 2F;
             case HIGH -> Monitor.height();
         } + Config.getConfig().anchorOffsetY * scale;
+    }
+
+    public void drawMap(MatrixStack matrixStack, float mouseX, float mouseY, float width, float height, float centerX, float centerZ, float offsetX, float offsetZ, boolean circular, float zoom, float angle, float delta) {
+        float halfWidth = width / 2F;
+        float halfHeight = height / 2F;
+        float playerX = (float) getPlayer().getX();
+        float playerZ = (float) getPlayer().getZ();
+
+        // blend mode to only draw alpha levels
+        RenderSystem.blendFuncSeparate(GL11.GL_ZERO, GL11.GL_ONE, GL11.GL_SRC_COLOR, GL11.GL_ZERO);
+
+        // draw low alpha on all pixels (will hide anything we draw)
+        GL.drawSolidRect(matrixStack, 0, 0, Monitor.width(), Monitor.height(), 0x01 << 24);
+
+        // translate everything to position
+        matrixStack.push();
+        matrixStack.translate(centerX, centerZ, 0F);
+
+        // draw high alpha square/circle where we want to draw the map (the part that will show)
+        if (circular) {
+            GL.drawSolidCirc(matrixStack, 0, 0, halfWidth, 0xFF << 24);
+        } else {
+            GL.drawSolidRect(matrixStack, -halfWidth, -halfHeight, +halfWidth, +halfHeight, 0xFF << 24);
+        }
+
+        // blend mode to only writes where high alpha values exist
+        RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
+
+        // draw background/sky
+        if (getBackground() != null) {
+            getBackground().draw(matrixStack, -halfWidth, -halfHeight, +halfWidth, +halfHeight, 0F, 0F, width / Tile.SIZE, height / Tile.SIZE);
+        }
+
+        // scale map to emulate zoom
+        matrixStack.scale(zoom, zoom, 1F);
+
+        // translate tiles to player position and drag offset
+        matrixStack.translate(-playerX - offsetX, -playerZ - offsetZ, 0F);
+
+        // rotate map to player angle
+        if (angle != 0F) {
+            GL.rotateScene(matrixStack, playerX, playerZ, -angle);
+        }
+
+        // draw tiles
+        int regionX, regionZ;
+        for (float screenX = -halfWidth + offsetX; Numbers.regionToBlock((regionX = Numbers.blockToRegion((int) (screenX + getPlayer().getBlockX())))) < halfWidth + playerX + offsetX; screenX += Tile.SIZE) {
+            for (float screenZ = -halfHeight + offsetZ; Numbers.regionToBlock((regionZ = Numbers.blockToRegion((int) (screenZ + getPlayer().getBlockZ())))) < halfHeight + playerZ + offsetZ; screenZ += Tile.SIZE) {
+                Tile tile = TileManager.INSTANCE.getTile(getWorld(), regionX, regionZ, true);
+                if (tile != null && tile.isReady()) {
+                    tile.draw(matrixStack, Numbers.regionToBlock(regionX), Numbers.regionToBlock(regionZ));
+                }
+            }
+        }
+
+        // put blend mode back to full translucent pixel support
+        RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+        matrixStack.pop();
+    }
+
+    public float calcZoom(int zoom, float deltaZoom, float delta) {
+        // todo use Ease functions instead of this mess
+        float realZoom = (float) (Math.pow(2, MathHelper.clamp(zoom, 0, 10) / 4F));
+        if (Math.abs(realZoom - deltaZoom) > 0.01F) {
+            deltaZoom += delta / 2.5F * (realZoom - deltaZoom);
+        } else {
+            deltaZoom = realZoom;
+        }
+        return deltaZoom;
     }
 }

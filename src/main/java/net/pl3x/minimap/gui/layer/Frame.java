@@ -8,7 +8,7 @@ import org.lwjgl.opengl.GL11;
 
 public class Frame extends Layer {
     @Override
-    public void render(MatrixStack matrixStack) {
+    public void render(MatrixStack matrixStack, float delta) {
         if (!Config.getConfig().showFrame) {
             return;
         }

@@ -12,7 +12,7 @@ public class Directions extends Layer {
     private float y;
 
     @Override
-    public void render(MatrixStack matrixStack) {
+    public void render(MatrixStack matrixStack, float delta) {
         if (!Config.getConfig().showDirections) {
             return;
         }

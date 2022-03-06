@@ -13,10 +13,11 @@ public class Players extends Layer {
     }
 
     @Override
-    public void render(MatrixStack matrixStack) {
+    public void render(MatrixStack matrixStack, float delta) {
         // use a blend that supports translucent pixels
         RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
+        // show self
         matrixStack.push();
         this.entityMarker.x(mm.getCenterX());
         this.entityMarker.y(mm.getCenterY());

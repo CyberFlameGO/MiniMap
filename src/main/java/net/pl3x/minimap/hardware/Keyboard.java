@@ -27,7 +27,7 @@ public class Keyboard {
                 }
             }),
             new GlobalKey("minimap.key.minimap.zoom.out", GLFW.GLFW_KEY_PAGE_UP, () -> {
-                if (Config.getConfig().zoom < 7) {
+                if (Config.getConfig().zoom < 10) {
                     Config.getConfig().zoom++;
                     Config.save();
                 }

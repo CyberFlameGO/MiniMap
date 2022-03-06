@@ -137,7 +137,7 @@ public class StyleCategory extends Category {
         MiniMap.INSTANCE.setSize(196);
 
         RenderSystem.setShaderColor(1F, 1F, 1F, Config.getConfig().opacity / 255F);
-        MiniMap.INSTANCE.getLayers().forEach(layer -> layer.render(matrixStack));
+        MiniMap.INSTANCE.getLayers().forEach(layer -> layer.render(matrixStack, delta));
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
         MiniMap.INSTANCE.setCenterX(mmX);

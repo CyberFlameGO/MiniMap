@@ -11,7 +11,6 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.LightType;
 import net.minecraft.world.biome.Biome;
@@ -213,6 +212,10 @@ public class Tile {
             },
             ThreadManager.INSTANCE.getTileUpdaterExecutor()
         );
+    }
+
+    public void draw(MatrixStack matrixStack) {
+        draw(matrixStack, Numbers.regionToBlock(getRegionX()), Numbers.regionToBlock(getRegionZ()));
     }
 
     public void draw(MatrixStack matrixStack, float x, float z) {

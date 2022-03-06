@@ -10,14 +10,12 @@ import java.util.concurrent.Executors;
 public class ThreadManager {
     public static final ThreadManager INSTANCE = new ThreadManager();
     public static final String CHUNK_SCANNER_THREAD_NAME = "Minimap-Chunk-Scanner";
-    public static final String LAYER_UPDATER_THREAD_NAME = "Minimap-Layer-Updater";
     public static final String TILE_UPDATER_THREAD_NAME = "Minimap-Tile-Updater";
     public static final String READ_IO_THREAD_NAME = "Minimap-IO-Read";
     public static final String WRITE_IO_THREAD_NAME = "Minimap-IO-Write";
     public static final String HTTP_IO_THREAD_NAME = "Minimap-IO-Http";
 
     private ExecutorService chunkScannerExecutor;
-    private ExecutorService layerUpdaterExecutor;
     private ExecutorService tileUpdaterExecutor;
     private ExecutorService readIOExecutor;
     private ExecutorService writeIOExecutor;
@@ -31,13 +29,6 @@ public class ThreadManager {
             this.chunkScannerExecutor = Executors.newFixedThreadPool(Math.max(1, getThreads()), new ThreadFactoryBuilder().setNameFormat(CHUNK_SCANNER_THREAD_NAME + "-%d").build());
         }
         return this.chunkScannerExecutor;
-    }
-
-    public ExecutorService getLayerUpdaterExecutor() {
-        if (this.layerUpdaterExecutor == null) {
-            this.layerUpdaterExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat(LAYER_UPDATER_THREAD_NAME).build());
-        }
-        return this.layerUpdaterExecutor;
     }
 
     public ExecutorService getTileUpdaterExecutor() {

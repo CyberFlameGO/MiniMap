@@ -40,6 +40,8 @@ public class UpdateChecker {
     private int latestVersion;
     private boolean hasUpdate;
 
+    private long lastChecked = 0;
+
     private UpdateChecker() {
         ModContainer modContainer = FabricLoader.getInstance().getModContainer(MiniMap.MODID).orElse(null);
         if (modContainer == null) {
@@ -56,15 +58,12 @@ public class UpdateChecker {
         this.currentVersion = current;
 
         Scheduler.INSTANCE.addTask(new Task(20, true) {
-            private long lastChecked = 0;
-
             @Override
             public void run() {
                 long now = System.currentTimeMillis();
-                if (this.lastChecked + 900000 > now) { // 15 minutes
+                if (lastChecked + 900000 > now) { // 15 minutes
                     return;
                 }
-                this.lastChecked = now;
                 ThreadManager.INSTANCE.runAsync(() -> {
                     try {
                         checkForUpdates();
@@ -96,7 +95,7 @@ public class UpdateChecker {
     public void checkForUpdates() {
         // reset latest version while we check
         this.latestVersion = Status.CHECKING;
-        MiniMap.LOG.info("Checking for updates...");
+        this.lastChecked = System.currentTimeMillis();
 
         String response = "{}";
         try {
@@ -123,10 +122,7 @@ public class UpdateChecker {
         this.hasUpdate = getCurrentVersion() > 0 && getLatestVersion() > 0 && getLatestVersion() - getCurrentVersion() > 0;
 
         if (hasUpdate()) {
-            MiniMap.LOG.info("Updates found!");
             MiniMap.CLIENT.getToastManager().add(new UpdateToast());
-        } else {
-            MiniMap.LOG.info("No updates found.");
         }
     }
 

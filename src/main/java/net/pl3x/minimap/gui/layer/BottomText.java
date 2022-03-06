@@ -18,7 +18,7 @@ public class BottomText extends Layer {
     private final List<Text> text = new ArrayList<>();
 
     @Override
-    public void render(MatrixStack matrixStack) {
+    public void render(MatrixStack matrixStack, float delta) {
         if (this.text.isEmpty()) {
             return;
         }

@@ -99,6 +99,11 @@ public class OverlayScreen extends Screen {
     }
 
     @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        return FullMap.INSTANCE.mouseScrolled((float) mouseX * Monitor.scale(), (float) mouseY * Monitor.scale(), (float) amount);
+    }
+
+    @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         return FullMap.INSTANCE.keyPressed(keyCode, scanCode, modifiers) || super.keyPressed(keyCode, scanCode, modifiers);
     }
