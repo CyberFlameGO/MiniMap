@@ -1,6 +1,5 @@
 package net.pl3x.minimap.tile;
 
-import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.util.Colors;
 
 import java.awt.image.BufferedImage;

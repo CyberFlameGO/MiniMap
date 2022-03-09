@@ -59,7 +59,7 @@ public class Cursor extends Drawable {
     }
 
     protected Resource resource() throws IOException {
-        return MiniMap.CLIENT.getResourceManager().getResource(this.identifier);
+        return MiniMap.getClient().getResourceManager().getResource(this.identifier);
     }
 
     public void draw(MatrixStack matrixStack, float x, float y, float delta) {

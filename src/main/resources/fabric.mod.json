@@ -17,7 +17,7 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "net.pl3x.minimap.MiniMapClientInitializer"
+      "net.pl3x.minimap.MiniMap"
     ],
     "modmenu": [
       "net.pl3x.minimap.gui.ModMenu"

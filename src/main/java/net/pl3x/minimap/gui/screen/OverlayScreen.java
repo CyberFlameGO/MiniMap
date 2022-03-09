@@ -38,15 +38,15 @@ public class OverlayScreen extends Screen {
             this.alreadyInitialized = true;
 
             // disable debug info overlay temporarily
-            this.debugEnabled = MiniMap.CLIENT.options.debugEnabled;
-            MiniMap.CLIENT.options.debugEnabled = false;
+            this.debugEnabled = MiniMap.getClient().options.debugEnabled;
+            MiniMap.getClient().options.debugEnabled = false;
 
             // open fullmap and reset all states
             FullMap.INSTANCE.open();
         }
 
         MiniMap.INSTANCE.setVisible(false);
-        MiniMap.CLIENT.options.hudHidden = true;
+        MiniMap.getClient().options.hudHidden = true;
 
         this.width = (int) (width() * Monitor.scale());
         this.height = (int) (height() * Monitor.scale());
@@ -69,18 +69,18 @@ public class OverlayScreen extends Screen {
     @Override
     public void removed() {
         MiniMap.INSTANCE.setVisible(true);
-        MiniMap.CLIENT.options.hudHidden = false;
+        MiniMap.getClient().options.hudHidden = false;
         Mouse.INSTANCE.cursorEnabled(false);
     }
 
     @Override
     public void close() {
-        MiniMap.CLIENT.setScreen(this.parent);
+        MiniMap.getClient().setScreen(this.parent);
 
         FullMap.INSTANCE.close();
 
         // put back debug info overlay
-        MiniMap.CLIENT.options.debugEnabled = this.debugEnabled;
+        MiniMap.getClient().options.debugEnabled = this.debugEnabled;
     }
 
     @Override

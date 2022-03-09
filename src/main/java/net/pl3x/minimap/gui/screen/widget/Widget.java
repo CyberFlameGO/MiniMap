@@ -82,7 +82,7 @@ public abstract class Widget {
     public void render(MatrixStack matrixStack, float mouseX, float mouseY, float delta) {
         // check if mouse is hovering this widget
         this.hovered = isMouseOver(mouseX, mouseY);
-        if (this.wasHovered != this.hovered && MiniMap.CLIENT.isWindowFocused()) {
+        if (this.wasHovered != this.hovered && MiniMap.getClient().isWindowFocused()) {
             onHoverChange();
             this.wasHovered = this.hovered;
         }

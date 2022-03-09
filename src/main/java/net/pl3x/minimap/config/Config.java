@@ -41,6 +41,7 @@ public class Config {
 
     public Layers layers = new Layers();
     public Animations animations = new Animations();
+    public Radar radar = new Radar();
 
     private static final Gson gson = new GsonBuilder()
         .disableHtmlEscaping()

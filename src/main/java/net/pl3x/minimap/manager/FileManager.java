@@ -33,14 +33,14 @@ public class FileManager {
         this.worldDirs.clear();
         this.tilesDir = null;
 
-        if (MiniMap.CLIENT.isInSingleplayer()) {
-            MinecraftServerAccess server = (MinecraftServerAccess) MiniMap.CLIENT.getServer();
+        if (MiniMap.getClient().isInSingleplayer()) {
+            MinecraftServerAccess server = (MinecraftServerAccess) MiniMap.getClient().getServer();
             if (server == null) {
                 throw new RuntimeException("Cannot obtain single player world name");
             }
             this.tilesDir = resolve(this.dataDir, "singleplayer/" + server.getSession().getDirectoryName());
         } else {
-            ServerInfo server = MiniMap.CLIENT.getCurrentServerEntry();
+            ServerInfo server = MiniMap.getClient().getCurrentServerEntry();
             if (server == null) {
                 throw new RuntimeException("Cannot obtain multiplayer server ip address");
             }

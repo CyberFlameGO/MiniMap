@@ -86,7 +86,7 @@ public class Sidebar extends AnimatedWidget {
             children().addAll(this.categories);
         }
 
-        if (MiniMap.CLIENT.currentScreen instanceof OverlayScreen overlayScreen) {
+        if (MiniMap.getClient().currentScreen instanceof OverlayScreen overlayScreen) {
             if (state() == State.OPENED) {
                 // fix width when fully open and screen size changes
                 this.sidebarAnimation.setWidth(overlayScreen.width(), false);

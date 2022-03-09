@@ -1,32 +1,38 @@
 package net.pl3x.minimap;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.font.Font;
-import net.pl3x.minimap.gui.layer.BottomText;
-import net.pl3x.minimap.gui.layer.Directions;
-import net.pl3x.minimap.gui.layer.Frame;
-import net.pl3x.minimap.gui.layer.Layer;
-import net.pl3x.minimap.gui.layer.Map;
-import net.pl3x.minimap.gui.layer.Players;
+import net.pl3x.minimap.gui.screen.widget.Radar;
 import net.pl3x.minimap.gui.screen.widget.Sidebar;
 import net.pl3x.minimap.gui.texture.Texture;
+import net.pl3x.minimap.hardware.Keyboard;
 import net.pl3x.minimap.hardware.Monitor;
 import net.pl3x.minimap.manager.ChunkScanner;
 import net.pl3x.minimap.manager.FileManager;
+import net.pl3x.minimap.manager.ResourceManager;
 import net.pl3x.minimap.manager.TileManager;
 import net.pl3x.minimap.scheduler.Scheduler;
 import net.pl3x.minimap.scheduler.Task;
 import net.pl3x.minimap.tile.Tile;
+import net.pl3x.minimap.util.Biomes;
+import net.pl3x.minimap.util.Clock;
 import net.pl3x.minimap.util.Mathf;
 import net.pl3x.minimap.util.Numbers;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
@@ -34,18 +40,26 @@ import org.lwjgl.opengl.GL11;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MiniMap {
+public class MiniMap implements ClientModInitializer {
     public static final String MODID = "minimap";
-    public static final MiniMap INSTANCE = new MiniMap();
-    public static final MinecraftClient CLIENT = MinecraftClient.getInstance();
     public static final Logger LOG = LogManager.getLogger("MiniMap");
 
-    private final List<Layer> layers = new ArrayList<>();
+    public static MiniMap INSTANCE;
 
-    private ClientPlayerEntity player;
+    public static MinecraftClient getClient() {
+        return MinecraftClient.getInstance();
+    }
+
+    public MiniMap() {
+        INSTANCE = this;
+    }
+
     private ClientWorld world;
 
-    private Texture background = Texture.SKY_OVERWORLD;
+    private Texture background;
+    private final List<Text> bottomText = new ArrayList<>();
+
+    private Radar radar;
 
     private boolean visible = true;
     private float size;
@@ -53,6 +67,7 @@ public class MiniMap {
     private float angle;
     private float centerX;
     private float centerY;
+    private float deltaZoom;
 
     private float lastWidth;
     private float lastHeight;
@@ -60,15 +75,65 @@ public class MiniMap {
     private Task tickTask;
     private long tick;
 
-    public MiniMap() {
+    @Override
+    public void onInitializeClient() {
+        if (Config.getConfig() == null) {
+            new IllegalStateException("Could not load minimap configuration").printStackTrace();
+            return;
+        }
+
+        Scheduler.INSTANCE.initialize();
+        ResourceManager.INSTANCE.initialize();
+        Keyboard.INSTANCE.initialize();
+
+        HudRenderCallback.EVENT.register((matrixStack, delta) -> render(matrixStack, getClient().getLastFrameDuration()));
+
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> start());
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> stop());
     }
 
-    public List<Layer> getLayers() {
-        return this.layers;
+    public void start() {
+        if (!Config.getConfig().enabled) {
+            return; // disabled
+        }
+
+        this.size = 0F;
+        this.angle = 0F;
+        this.centerX = 0F;
+        this.centerY = 0F;
+        this.lastWidth = 0;
+        this.lastHeight = 0;
+        this.tick = 0L;
+
+        updateWindow();
+
+        FileManager.INSTANCE.start();
+        TileManager.INSTANCE.start();
+        ChunkScanner.INSTANCE.start();
+
+        this.radar = new Radar();
+
+        this.tickTask = Scheduler.INSTANCE.addTask(0, true, this::tick);
+    }
+
+    public void stop() {
+        if (this.radar != null) {
+            this.radar = null;
+        }
+
+        if (this.tickTask != null) {
+            this.tickTask.cancel();
+            this.tickTask = null;
+        }
+
+        ChunkScanner.INSTANCE.stop();
+        TileManager.INSTANCE.stop();
+
+        Sidebar.INSTANCE.close(true);
     }
 
     public ClientPlayerEntity getPlayer() {
-        return this.player;
+        return getClient().player;
     }
 
     public ClientWorld getWorld() {
@@ -123,68 +188,17 @@ public class MiniMap {
         this.centerY = y;
     }
 
-    public void initialize() {
-        HudRenderCallback.EVENT.register((matrixStack, delta) ->
-            render(matrixStack, CLIENT.getLastFrameDuration())
-        );
-    }
-
-    public void start() {
-        if (!Config.getConfig().enabled) {
-            return; // disabled
-        }
-
-        this.size = 0F;
-        this.angle = 0F;
-        this.centerX = 0F;
-        this.centerY = 0F;
-        this.lastWidth = 0;
-        this.lastHeight = 0;
-        this.tick = 0L;
-
-        updateWindow();
-
-        FileManager.INSTANCE.start();
-        TileManager.INSTANCE.start();
-        ChunkScanner.INSTANCE.start();
-
-        this.layers.add(new Map());
-        this.layers.add(new Frame());
-        this.layers.add(new Players());
-        this.layers.add(new Directions());
-        this.layers.add(new BottomText());
-
-        this.tickTask = Scheduler.INSTANCE.addTask(0, true, this::tick);
-    }
-
-    public void stop() {
-        if (this.tickTask != null) {
-            this.tickTask.cancel();
-            this.tickTask = null;
-        }
-
-        this.layers.forEach(Layer::stop);
-
-        ChunkScanner.INSTANCE.stop();
-        TileManager.INSTANCE.stop();
-
-        Sidebar.INSTANCE.close(true);
-
-        this.layers.clear();
-    }
-
     public boolean dontRender() {
         if (!isVisible()) {
             return true; // hidden
         }
 
-        this.player = CLIENT.player;
-        if (this.player == null) {
+        if (getPlayer() == null) {
             return true; // no player
         }
 
         // don't render when debug hud is showing
-        return CLIENT.options.debugEnabled;
+        return getClient().options.debugEnabled;
     }
 
     public void render(MatrixStack matrixStack, float delta) {
@@ -193,7 +207,10 @@ public class MiniMap {
         }
 
         // angle of player rotation
-        this.angle = Numbers.normalizeDegrees(this.player.getYaw(delta));
+        this.angle = Numbers.normalizeDegrees(getPlayer().getYaw(delta));
+
+        // calculate delta zoom
+        this.deltaZoom = calcZoom(Config.getConfig().zoom, this.deltaZoom, delta);
 
         // setup opengl stuff
         matrixStack.push();
@@ -210,8 +227,7 @@ public class MiniMap {
         // don't allow Mojang disable blending after drawing text
         Font.FIX_MOJANGS_TEXT_RENDERER_CRAP = true;
 
-        // render layers
-        this.layers.forEach(layer -> layer.render(matrixStack, delta));
+        drawLayers(matrixStack, delta);
 
         // allow Mojang disable blending after drawing text
         Font.FIX_MOJANGS_TEXT_RENDERER_CRAP = false;
@@ -222,15 +238,91 @@ public class MiniMap {
         matrixStack.pop();
     }
 
+    public void drawLayers(MatrixStack matrixStack, float delta) {
+        // draw map
+        drawMap(
+            matrixStack,
+            0F, 0F,
+            getSize(),
+            getSize(),
+            getCenterX(),
+            getCenterY(),
+            0F,
+            0F,
+            Config.getConfig().circular,
+            this.deltaZoom,
+            Config.getConfig().northLocked ? 0 : getAngle(),
+            delta
+        );
+
+        // use a blend that supports translucent pixels
+        RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+        // draw radar markers
+        if (this.radar != null) {
+            this.radar.render(matrixStack, delta);
+        }
+
+        // draw frame
+        if (Config.getConfig().showFrame) {
+            (Config.getConfig().circular ? Texture.FRAME_CIRCLE : Texture.FRAME_SQUARE)
+                .draw(matrixStack, getCenterX() - getSize() / 2F, getCenterY() - getSize() / 2F, getSize(), getSize());
+        }
+
+        // draw directions
+        if (Config.getConfig().showDirections) {
+            float angle = Config.getConfig().northLocked ? 0 : getAngle();
+            float distance = getSize() / 2F + Font.DEFAULT.height() / 2F;
+            if (!Config.getConfig().circular && !Config.getConfig().northLocked && angle != 0F) {
+                distance /= Mathf.cosRads(45F - Math.abs(45F + (-Math.abs(angle) % 90F)));
+            }
+
+            matrixStack.push();
+            matrixStack.translate(distance * Mathf.sinRads(angle + 180F), distance * Mathf.cosRads(angle + 180F), 0D);
+            Font.DEFAULT.drawCenteredWithShadow(matrixStack, "N", getCenterX(), getCenterY(), 0xFFFFFF | (Config.getConfig().opacity << 24));
+            matrixStack.pop();
+            matrixStack.push();
+            matrixStack.translate(distance * Mathf.sinRads(angle + 90F), distance * Mathf.cosRads(angle + 90F), 0D);
+            Font.DEFAULT.drawCenteredWithShadow(matrixStack, "E", getCenterX(), getCenterY(), 0xFFFFFF | (Config.getConfig().opacity << 24));
+            matrixStack.pop();
+            matrixStack.push();
+            matrixStack.translate(distance * Mathf.sinRads(angle), distance * Mathf.cosRads(angle), 0D);
+            Font.DEFAULT.drawCenteredWithShadow(matrixStack, "S", getCenterX(), getCenterY(), 0xFFFFFF | (Config.getConfig().opacity << 24));
+            matrixStack.pop();
+            matrixStack.push();
+            matrixStack.translate(distance * Mathf.sinRads(angle - 90F), distance * Mathf.cosRads(angle - 90F), 0D);
+            Font.DEFAULT.drawCenteredWithShadow(matrixStack, "W", getCenterX(), getCenterY(), 0xFFFFFF | (Config.getConfig().opacity << 24));
+            matrixStack.pop();
+        }
+
+        // draw bottom text
+        if (!this.bottomText.isEmpty()) {
+            float y = getCenterY() + getSize() / 2F + Font.DEFAULT.height() * 2F;
+            int color = 0xFFFFFF | (Config.getConfig().opacity << 24);
+            int i = 0;
+
+            matrixStack.push();
+            for (Text text : this.bottomText) {
+                Font.DEFAULT.drawCenteredWithShadow(matrixStack, text, getCenterX(), y + Font.DEFAULT.height() * i++, color);
+            }
+            matrixStack.pop();
+        }
+    }
+
     public void tick() {
         if (dontRender()) {
             return;
         }
         if (this.tick++ >= Config.getConfig().updateInterval) {
-            this.layers.forEach(Layer::update);
+            updateBackground();
+            updateBottomText();
             this.tick = 0L;
         }
         updateWindow();
+
+        if (this.radar != null) {
+            this.radar.update();
+        }
     }
 
     public void updateWindow() {
@@ -248,7 +340,7 @@ public class MiniMap {
         this.size = Config.getConfig().size;
         float scale = Monitor.scale();
 
-        net.minecraft.client.util.Monitor monitor = CLIENT.getWindow().getMonitor();
+        net.minecraft.client.util.Monitor monitor = getClient().getWindow().getMonitor();
         if (monitor != null) {
             float monitorHeight = monitor.getCurrentVideoMode().getHeight();
             scale *= Mathf.clamp(0.5F, 1F, Monitor.height() / monitorHeight / 0.9F);
@@ -340,5 +432,34 @@ public class MiniMap {
             deltaZoom = realZoom;
         }
         return deltaZoom;
+    }
+
+    public void updateBackground() {
+        RegistryKey<World> key = getPlayer().world.getRegistryKey();
+        if (key == World.OVERWORLD) {
+            setBackground(Texture.SKY_OVERWORLD);
+        } else if (key == World.NETHER) {
+            setBackground(Texture.SKY_THE_NETHER);
+        } else if (key == World.END) {
+            setBackground(Texture.SKY_THE_END);
+        } else {
+            setBackground(Texture.SKY_OVERWORLD);
+        }
+    }
+
+    public void updateBottomText() {
+        this.bottomText.clear();
+        String[] lines = Config.getConfig().bottomText.split("\n");
+        for (String line : lines) {
+            if (StringUtils.isBlank(line)) {
+                continue;
+            }
+            this.bottomText.add(new TranslatableText(line
+                .replace("{x}", Integer.toString(getPlayer().getBlockX()))
+                .replace("{y}", Integer.toString(getPlayer().getBlockY()))
+                .replace("{z}", Integer.toString(getPlayer().getBlockZ()))
+                .replace("{biome}", Biomes.INSTANCE.getBiomeName(getPlayer()))
+                .replace("{clock}", Clock.INSTANCE.getTime(getWorld()))));
+        }
     }
 }

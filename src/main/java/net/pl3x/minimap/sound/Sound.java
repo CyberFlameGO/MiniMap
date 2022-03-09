@@ -46,7 +46,7 @@ public class Sound {
         this.instance = PositionedSoundInstance.master(this.soundEvent, 1F, 1F);
 
         // player instance
-        MiniMap.CLIENT.getSoundManager().play(this.instance);
+        MiniMap.getClient().getSoundManager().play(this.instance);
     }
 
     public void stop() {
@@ -55,6 +55,6 @@ public class Sound {
         }
 
         // stop current instance
-        MiniMap.CLIENT.getSoundManager().stop(this.instance);
+        MiniMap.getClient().getSoundManager().stop(this.instance);
     }
 }

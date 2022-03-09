@@ -55,8 +55,8 @@ public class Mouse {
         this.mouseX = (float) rawX[0];
         this.mouseY = (float) rawY[0];
 
-        if (this.windowFocused != MiniMap.CLIENT.isWindowFocused()) {
-            this.windowFocused = MiniMap.CLIENT.isWindowFocused();
+        if (this.windowFocused != MiniMap.getClient().isWindowFocused()) {
+            this.windowFocused = MiniMap.getClient().isWindowFocused();
             if (this.cursorEnabled) {
                 visibility(this.windowFocused);
             }

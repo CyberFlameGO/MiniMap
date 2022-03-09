@@ -31,7 +31,7 @@ public class FullMap extends AnimatedWidget {
         super(null, 0F, 0F, 0F, 0F);
 
         HudRenderCallback.EVENT.register((matrixStack, delta) ->
-            render(matrixStack, MiniMap.CLIENT.getLastFrameDuration())
+            render(matrixStack, MiniMap.getClient().getLastFrameDuration())
         );
     }
 
@@ -58,7 +58,7 @@ public class FullMap extends AnimatedWidget {
         }
 
         // get mouse ready
-        boolean useMouse = Mouse.INSTANCE.cursorEnabled() && MiniMap.CLIENT.currentScreen instanceof OverlayScreen;
+        boolean useMouse = Mouse.INSTANCE.cursorEnabled() && MiniMap.getClient().currentScreen instanceof OverlayScreen;
         float mouseX, mouseY;
 
         // update mouse position before rendering anything
@@ -71,8 +71,8 @@ public class FullMap extends AnimatedWidget {
             // set default cursor
             Mouse.INSTANCE.cursor(this.dragging ? Cursor.HAND_GRAB : Cursor.HAND_OPEN);
         } else {
-            mouseX = (float) MiniMap.CLIENT.mouse.getX();
-            mouseY = (float) MiniMap.CLIENT.mouse.getY();
+            mouseX = (float) MiniMap.getClient().mouse.getX();
+            mouseY = (float) MiniMap.getClient().mouse.getY();
         }
 
         // setup opengl stuff
@@ -96,12 +96,12 @@ public class FullMap extends AnimatedWidget {
 
         // tick toasts over fullmap
         if (!Sidebar.INSTANCE.closed()) {
-            MiniMap.CLIENT.getProfiler().swap("toasts");
-            boolean hudHidden = MiniMap.CLIENT.options.hudHidden;
-            MiniMap.CLIENT.options.hudHidden = false;
-            MiniMap.CLIENT.getToastManager().draw(new MatrixStack());
-            MiniMap.CLIENT.options.hudHidden = hudHidden;
-            MiniMap.CLIENT.getProfiler().pop();
+            MiniMap.getClient().getProfiler().swap("toasts");
+            boolean hudHidden = MiniMap.getClient().options.hudHidden;
+            MiniMap.getClient().options.hudHidden = false;
+            MiniMap.getClient().getToastManager().draw(new MatrixStack());
+            MiniMap.getClient().options.hudHidden = hudHidden;
+            MiniMap.getClient().getProfiler().pop();
         }
 
         // render our mouse after everything is rendered

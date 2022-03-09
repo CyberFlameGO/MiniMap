@@ -3,7 +3,7 @@ package net.pl3x.minimap.tile;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.MapColor;
+import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.util.math.MatrixStack;
@@ -171,7 +171,7 @@ public class Tile {
             }
             // register it
             this.texture = new NativeImageBackedTexture(Tile.SIZE, Tile.SIZE, true);
-            MiniMap.CLIENT.getTextureManager().registerTexture(this.identifier, this.texture);
+            MiniMap.getClient().getTextureManager().registerTexture(this.identifier, this.texture);
         }
 
         NativeImage image = this.texture.getImage();
@@ -255,13 +255,13 @@ public class Tile {
                     do {
                         pos.move(Direction.DOWN);
                         state = chunk.getBlockState(pos);
-                        color = state.getMapColor(getWorld(), pos).color;
+                        color = Colors.getBlockColor(getWorld(), state, pos);
                         if (fluidPos == null) {
                             // only track the first time we see a liquid
                             fluidPos = !state.getFluidState().isEmpty() ? pos.mutableCopy() : null;
                         }
                     } while (pos.getY() > getWorld().getBottomY() && (color == 0 || !state.getFluidState().isEmpty() || Colors.isInvisible(state)));
-                    getBaseImage().setPixel(pixelX, pixelZ, (0xFF << 24) | color);
+                    getBaseImage().setPixel(pixelX, pixelZ, color == 0 ? color : (0xFF << 24) | color);
                 }
 
                 if (scannerState.isCancelled()) {
@@ -314,7 +314,7 @@ public class Tile {
                             color = 0xFFEA5C0F;
                         } else {
                             lava = false;
-                            color = MapColor.WATER_BLUE.color;
+                            color = BiomeColors.getWaterColor(getWorld(), pos2);
                         }
                         // iterate down until we don't find any more fluids
                         BlockState state;

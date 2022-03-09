@@ -122,7 +122,7 @@ public class UpdateChecker {
         this.hasUpdate = getCurrentVersion() > 0 && getLatestVersion() > 0 && getLatestVersion() - getCurrentVersion() > 0;
 
         if (hasUpdate()) {
-            MiniMap.CLIENT.getToastManager().add(new UpdateToast());
+            MiniMap.getClient().getToastManager().add(new UpdateToast());
         }
     }
 
@@ -154,7 +154,7 @@ public class UpdateChecker {
             if (!this.soundPlayed && startTime > 0L) {
                 this.soundPlayed = true;
                 // todo get custom update alert sound
-                MiniMap.CLIENT.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, 1F, 1F));
+                MiniMap.getClient().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, 1F, 1F));
             }
 
             return startTime >= 5000L ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;

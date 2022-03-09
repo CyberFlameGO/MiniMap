@@ -26,7 +26,7 @@ public class Font {
     private static final Set<Font> REGISTERED_FONTS = new HashSet<>();
     private static final String PROVIDER_JSON = "{\"providers\":[{\"type\":\"ttf\",\"file\":\"minimap:%s.ttf\",\"shift\":[0, 0],\"size\":%f,\"oversample\":%f}]}";
 
-    public static final Font DEFAULT = register("default_font", MiniMap.CLIENT.textRenderer.fontHeight, 1F);
+    public static final Font DEFAULT = register("default_font", MiniMap.getClient().textRenderer.fontHeight, 1F);
     public static final Font GOODDOG = register("gooddog", 32F, 4F);
     public static final Font LATO = register("lato", 20F, 4F);
     public static final Font NOTOSANS = register("notosans", 20F, 4F);
@@ -44,7 +44,7 @@ public class Font {
     public static void initialize() {
         REGISTERED_FONTS.forEach(font -> {
             if (font == Font.DEFAULT) {
-                font.textRenderer = MiniMap.CLIENT.textRenderer;
+                font.textRenderer = MiniMap.getClient().textRenderer;
             } else {
                 font.textRenderer = generateTextRenderer(font);
             }
@@ -55,14 +55,14 @@ public class Font {
         JsonObject data = JsonHelper.deserialize(new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create(), String.format(PROVIDER_JSON, font.name, font.height(), font.oversample), JsonObject.class);
         if (data == null) {
             MiniMap.LOG.error("Could not deserialize internal font!");
-            return MiniMap.CLIENT.textRenderer;
+            return MiniMap.getClient().textRenderer;
         }
         List<net.minecraft.client.font.Font> list = Lists.newArrayList();
         JsonArray jsonArray = JsonHelper.getArray(data, "providers");
         for (int i = jsonArray.size() - 1; i >= 0; --i) {
             try {
                 JsonObject jsonObject = JsonHelper.asObject(jsonArray.get(i), "providers[" + i + "]");
-                net.minecraft.client.font.Font mcFont = FontType.byId(JsonHelper.getString(jsonObject, "type")).createLoader(jsonObject).load(MiniMap.CLIENT.getResourceManager());
+                net.minecraft.client.font.Font mcFont = FontType.byId(JsonHelper.getString(jsonObject, "type")).createLoader(jsonObject).load(MiniMap.getClient().getResourceManager());
                 if (mcFont != null) {
                     list.add(mcFont);
                 }
@@ -71,7 +71,7 @@ public class Font {
                 e.printStackTrace();
             }
         }
-        FontStorage storage = new FontStorage(MiniMap.CLIENT.getTextureManager(), new Identifier(MiniMap.MODID, "font/" + font.name + "_" + font.height()));
+        FontStorage storage = new FontStorage(MiniMap.getClient().getTextureManager(), new Identifier(MiniMap.MODID, "font/" + font.name + "_" + font.height()));
         storage.setFonts(list);
         return new TextRenderer(id -> storage);
     }

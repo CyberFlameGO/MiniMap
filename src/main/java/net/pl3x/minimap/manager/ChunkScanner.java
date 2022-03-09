@@ -2,6 +2,7 @@ package net.pl3x.minimap.manager;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import net.pl3x.minimap.MiniMap;
 import net.pl3x.minimap.scheduler.Scheduler;
@@ -113,8 +114,22 @@ public class ChunkScanner {
 
             // iterate each chunk
             for (Chunk chunk : ChunkScanner.INSTANCE.loadedChunks) {
+                // check if edge chunk
+                if (isEdgeChunk(world, chunk)) {
+                    // don't render edge chunks because they contain blocks that
+                    // are missing biome information and also because color blending
+                    // causes huge sections of incorrect colors
+                    continue;
+                }
+
                 // get the tile this chunk belongs to
-                Tile tile = TileManager.INSTANCE.getTile(world, Numbers.chunkToRegion(chunk.getPos().x), Numbers.chunkToRegion(chunk.getPos().z), true);
+                Tile tile = TileManager.INSTANCE.getTile(
+                    world,
+                    Numbers.chunkToRegion(chunk.getPos().x),
+                    Numbers.chunkToRegion(chunk.getPos().z),
+                    true
+                );
+
                 if (tile.isReady()) {
                     // scan the chunk
                     tile.scanChunk(chunk, this.state);
@@ -123,6 +138,18 @@ public class ChunkScanner {
                     tile.markToSave();
                 }
             }
+        }
+
+        private boolean isEdgeChunk(ClientWorld world, Chunk chunk) {
+            ChunkPos pos = chunk.getPos();
+            return world.getChunk(pos.x - 1, pos.z).isEmpty() // west
+                || world.getChunk(pos.x + 1, pos.z).isEmpty() // east
+                || world.getChunk(pos.x, pos.z - 1).isEmpty()  // north
+                || world.getChunk(pos.x, pos.z + 1).isEmpty()  // south
+                || world.getChunk(pos.x - 1, pos.z - 1).isEmpty()  // northwest
+                || world.getChunk(pos.x - 1, pos.z + 1).isEmpty()  // southwest
+                || world.getChunk(pos.x + 1, pos.z - 1).isEmpty()  // northeast
+                || world.getChunk(pos.x + 1, pos.z + 1).isEmpty(); // southeast
         }
     }
 

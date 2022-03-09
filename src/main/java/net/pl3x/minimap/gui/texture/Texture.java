@@ -64,7 +64,7 @@ public class Texture extends Drawable {
     }
 
     protected Resource resource() throws IOException {
-        return MiniMap.CLIENT.getResourceManager().getResource(this.identifier);
+        return MiniMap.getClient().getResourceManager().getResource(this.identifier);
     }
 
     public void animate(MatrixStack matrixStack, float x, float y, float delta) {
