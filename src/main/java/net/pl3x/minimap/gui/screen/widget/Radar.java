@@ -32,6 +32,7 @@ public class Radar {
         }
 
         if (Config.getConfig().radar.showPlayers) {
+            // todo
             // show other players
         }
 
