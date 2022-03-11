@@ -13,6 +13,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
+import net.pl3x.minimap.config.Advanced;
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.GL;
 import net.pl3x.minimap.gui.font.Font;
@@ -142,6 +143,7 @@ public class MiniMap implements ClientModInitializer {
 
     public void setWorld(ClientWorld world) {
         this.world = world;
+        Advanced.reload();
     }
 
     public Texture getBackground() {

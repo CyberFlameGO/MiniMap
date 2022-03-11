@@ -93,7 +93,7 @@ public class UpdateChecker {
     }
 
     public void checkForUpdates() {
-        // reset latest version while we check
+        // reset the latest version while we check
         this.latestVersion = Status.CHECKING;
         this.lastChecked = System.currentTimeMillis();
 

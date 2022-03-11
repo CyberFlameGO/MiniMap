@@ -4,36 +4,19 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CropBlock;
+import net.minecraft.block.MapColor;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.block.StemBlock;
 import net.minecraft.client.color.world.BiomeColors;
-import net.minecraft.client.color.world.FoliageColors;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
+import net.pl3x.minimap.config.Advanced;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 public class Colors {
-    public static int shade(int color, int shade) {
-        float ratio = switch (shade) {
-            case 0 -> 180F / 0xFF;
-            case 1 -> 220F / 0xFF;
-            case 2 -> 255F / 0xFF;
-            default -> throw new IllegalStateException("Unexpected shade: " + shade);
-        };
-        return shade(color, ratio);
-    }
-
     public static int shade(int color, float ratio) {
-        return argb(
-            (int) (alpha(color) * ratio),
-            (int) (red(color) * ratio),
-            (int) (green(color) * ratio),
-            (int) (blue(color) * ratio)
-        );
+        return argb(alpha(color), (int) (red(color) * ratio), (int) (green(color) * ratio), (int) (blue(color) * ratio));
     }
 
     public static int lerpARGB(int color0, int color1, float delta) {
@@ -132,76 +115,38 @@ public class Colors {
     }
 
     public static int setAlpha(int alpha, int color) {
-        return alpha << 24 | color & 0x00FFFFFF;
+        return (alpha << 24) | (color & 0x00FFFFFF);
     }
 
     public static int fromHex(String color) {
         return (int) Long.parseLong(color.replace("#", ""), 16);
     }
 
-    private static final Set<Block> GRASS_COLOR_BLOCKS = Set.of(
-        Blocks.GRASS_BLOCK,
-        Blocks.GRASS,
-        Blocks.TALL_GRASS,
-        Blocks.FERN,
-        Blocks.LARGE_FERN,
-        Blocks.POTTED_FERN,
-        Blocks.SUGAR_CANE
-    );
-
-    private static final Set<Block> FOLIAGE_COLOR_BLOCKS = Set.of(
-        Blocks.VINE,
-        Blocks.OAK_LEAVES,
-        Blocks.JUNGLE_LEAVES,
-        Blocks.ACACIA_LEAVES,
-        Blocks.DARK_OAK_LEAVES
-    );
-
-    private static final Set<Block> invisibleBlocks = Set.of(
-        Blocks.TALL_GRASS,
-        Blocks.GRASS
-    );
-
-    public static boolean isInvisible(ClientWorld world, BlockState state, BlockPos pos) {
-        return isInvisible(state.getBlock()) || state.getMapColor(world, pos).color == 0;
-    }
-
-    public static boolean isInvisible(BlockState state) {
-        return isInvisible(state.getBlock());
-    }
-
-    public static boolean isInvisible(Block block) {
-        return invisibleBlocks.contains(block);
-    }
-
     public static int getBlockColor(ClientWorld world, BlockState state, BlockPos pos) {
         Block block = state.getBlock();
-        int color = -1;
-        if (block == Blocks.MELON_STEM || block == Blocks.PUMPKIN_STEM) {
-            int age = state.get(StemBlock.AGE);
-            color = argb(0, age * 32, 0xFF - age * 8, age * 4);
-        } else if (block == Blocks.ATTACHED_MELON_STEM || block == Blocks.ATTACHED_PUMPKIN_STEM) {
-            color = 0xE0C71C;
-        } else if (block == Blocks.WHEAT) {
-            color = Colors.lerpARGB(0x007C00, 0xDCBB65, (state.get(CropBlock.AGE) + 1) / 8F);
-        } else if (block == Blocks.LILY_PAD) {
-            color = 0x208030;
-        } else if (block == Blocks.REDSTONE_WIRE) {
-            color = RedstoneWireBlock.getWireColor(state.get(RedstoneWireBlock.POWER));
-        } else if (block == Blocks.CAULDRON) {
-            color = BiomeColors.getWaterColor(world, pos);
-        } else if (block == Blocks.BIRCH_LEAVES) {
-            color = FoliageColors.getBirchColor();
-        } else if (block == Blocks.SPRUCE_LEAVES) {
-            color = FoliageColors.getSpruceColor();
-        } else if (GRASS_COLOR_BLOCKS.contains(block)) {
-            color = BiomeColors.getGrassColor(world, pos);
-        } else if (FOLIAGE_COLOR_BLOCKS.contains(block)) {
-            color = BiomeColors.getFoliageColor(world, pos);
+        int color = Advanced.getConfig().blockColors.getOrDefault(block, -1);
+
+        if (color != 0) {
+            if (block == Blocks.MELON_STEM || block == Blocks.PUMPKIN_STEM) {
+                int age = state.get(StemBlock.AGE);
+                color = argb(0, age * 32, 0xFF - age * 8, age * 4);
+            } else if (block == Blocks.WHEAT) {
+                color = Colors.lerpARGB(MapColor.DARK_GREEN.color, color, (state.get(CropBlock.AGE) + 1) / 8F);
+            } else if (block == Blocks.REDSTONE_WIRE) {
+                color = RedstoneWireBlock.getWireColor(state.get(RedstoneWireBlock.POWER));
+            } else if (block == Blocks.GRASS_BLOCK || block == Blocks.GRASS || block == Blocks.TALL_GRASS || block == Blocks.FERN || block == Blocks.LARGE_FERN || block == Blocks.POTTED_FERN || block == Blocks.SUGAR_CANE) {
+                // hate how slow this is, but it's accurate and blends
+                color = BiomeColors.getGrassColor(world, pos);
+            } else if (block == Blocks.VINE || block == Blocks.OAK_LEAVES || block == Blocks.JUNGLE_LEAVES || block == Blocks.ACACIA_LEAVES || block == Blocks.DARK_OAK_LEAVES) {
+                // hate how slow this is, but it's accurate and blends
+                color = shade(BiomeColors.getFoliageColor(world, pos), 200 / 255F);
+            }
         }
+
         if (color < 0) {
             return state.getMapColor(world, pos).color;
         }
+
         return color;
     }
 }

@@ -15,8 +15,8 @@ import net.minecraft.world.Heightmap;
 import net.minecraft.world.LightType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.EmptyChunk;
 import net.pl3x.minimap.MiniMap;
+import net.pl3x.minimap.config.Advanced;
 import net.pl3x.minimap.config.Config;
 import net.pl3x.minimap.gui.animation.Easing;
 import net.pl3x.minimap.gui.texture.Drawable;
@@ -174,17 +174,17 @@ public class Tile {
             MiniMap.getClient().getTextureManager().registerTexture(this.identifier, this.texture);
         }
 
-        NativeImage image = this.texture.getImage();
-        if (image == null) {
-            // not ready, skip
-            return;
-        }
-
-
         ThreadManager.INSTANCE.runAsync(
             () -> {
+                NativeImage image = this.texture.getImage();
+                if (image == null) {
+                    // not ready, skip
+                    return;
+                }
+
                 int color = 0xFF << 24;
-                float skylight = this.world.getStarBrightness(1F) * 15;
+                float skylight = getWorld().getStarBrightness(1F) * 15;
+
                 for (int x = 0; x < Tile.SIZE; x++) {
                     for (int z = 0; z < Tile.SIZE; z++) {
                         if (Config.getConfig().layers.base) {
@@ -200,7 +200,7 @@ public class Tile {
                             color = Colors.mix(color, getFluidsImage().getPixel(x, z));
                         }
                         if (Config.getConfig().layers.lightmap) {
-                            color = Colors.mix(color, (int) Mathf.clamp(0, 0xFF, (0xFF * Mathf.inverseLerp(0, 15, 15 - (this.world.getDimension().hasCeiling() ? 5 : skylight)) - Colors.alpha(getLightmapImage().getPixel(x, z))) / 1.2F) << 24);
+                            color = Colors.mix(color, (int) Mathf.clamp(0, 0xFF, (0xFF * Mathf.inverseLerp(0, 15, 15 - (getWorld().getDimension().hasCeiling() ? 5 : skylight)) - Colors.alpha(getLightmapImage().getPixel(x, z))) / 1.2F) << 24);
                         }
                         image.setColor(x, z, color);
                     }
@@ -241,6 +241,15 @@ public class Tile {
                 pos.setY(chunk.sampleHeightmap(Heightmap.Type.WORLD_SURFACE, pos.getX(), pos.getZ()) + 1);
                 getStartY(chunk, pos);
 
+                // get the biome of the current block
+                // see ClientWorldMixin for a hack that
+                // allows this method to return null
+                Biome biome = Biomes.INSTANCE.getBiome(getWorld(), pos);
+                if (biome == null) {
+                    // chunk was unloaded mid-scan, or it is an edge chunk
+                    return;
+                }
+
                 // current pixel in the tile image
                 int pixelX = pos.getX() & Tile.SIZE - 1;
                 int pixelZ = pos.getZ() & Tile.SIZE - 1;
@@ -260,7 +269,7 @@ public class Tile {
                             // only track the first time we see a liquid
                             fluidPos = !state.getFluidState().isEmpty() ? pos.mutableCopy() : null;
                         }
-                    } while (pos.getY() > getWorld().getBottomY() && (color == 0 || !state.getFluidState().isEmpty() || Colors.isInvisible(state)));
+                    } while (pos.getY() > getWorld().getBottomY() && (color <= 0 || !state.getFluidState().isEmpty()));
                     getBaseImage().setPixel(pixelX, pixelZ, color == 0 ? color : (0xFF << 24) | color);
                 }
 
@@ -270,16 +279,7 @@ public class Tile {
 
                 // biomes layer
                 {
-                    // get the biome of the current block
-                    // see ClientWorldMixin for a hack that
-                    // allows this method to return null
-                    Biome biome = Biomes.INSTANCE.getBiome(getWorld(), pos);
-                    // only plot the pixel if a biome was found
-                    // edge of view distance has a lot of blocks
-                    // with missing biomes, so this is a needed check
-                    if (biome != null) {
-                        getBiomesImage().setPixel(pixelX, pixelZ, Biomes.Color.get(getWorld(), biome));
-                    }
+                    getBiomesImage().setPixel(pixelX, pixelZ, Biomes.INSTANCE.getColor(getWorld(), biome));
                 }
 
                 if (scannerState.isCancelled()) {
@@ -288,13 +288,13 @@ public class Tile {
 
                 // height layer
                 {
-                    int height = 0x22;
-                    height = getHeightColor(chunk, pos, pos2.set(pos.getX() - 1, 0, pos.getZ()), height, 0x00);
-                    height = getHeightColor(chunk, pos, pos2.set(pos.getX() + 1, 0, pos.getZ()), height, 0x44);
-                    height = getHeightColor(chunk, pos, pos2.set(pos.getX(), 0, pos.getZ() - 1), height, 0x00);
-                    height = getHeightColor(chunk, pos, pos2.set(pos.getX(), 0, pos.getZ() + 1), height, 0x44);
-                    if (height >= 0) {
-                        getHeightmapImage().setPixel(pixelX, pixelZ, height << 24);
+                    int color = 0x22;
+                    color = getHeightColor(chunk, biome, pos, pos2.set(pos.getX() - 1, 0, pos.getZ()), color, 0x00);
+                    color = getHeightColor(chunk, biome, pos, pos2.set(pos.getX() + 1, 0, pos.getZ()), color, 0x44);
+                    color = getHeightColor(chunk, biome, pos, pos2.set(pos.getX(), 0, pos.getZ() - 1), color, 0x00);
+                    color = getHeightColor(chunk, biome, pos, pos2.set(pos.getX(), 0, pos.getZ() + 1), color, 0x44);
+                    if (color >= 0) {
+                        getHeightmapImage().setPixel(pixelX, pixelZ, color << 24);
                     }
                 }
 
@@ -311,9 +311,10 @@ public class Tile {
                         boolean lava;
                         if (chunk.getBlockState(pos2.set(fluidPos)).isOf(Blocks.LAVA)) {
                             lava = true;
-                            color = 0xFFEA5C0F;
+                            color = Advanced.getConfig().blockColors.get(Blocks.LAVA);
                         } else {
                             lava = false;
+                            // hate how slow this is, but it's accurate and blends
                             color = BiomeColors.getWaterColor(getWorld(), pos2);
                         }
                         // iterate down until we don't find any more fluids
@@ -322,7 +323,7 @@ public class Tile {
                             pos2.move(Direction.DOWN);
                             state = chunk.getBlockState(pos2);
                             depth += 0.025F;
-                        } while (pos2.getY() > getWorld().getBottomY() && (!state.getFluidState().isEmpty() || Colors.isInvisible(state)));
+                        } while (pos2.getY() > getWorld().getBottomY() && !state.getFluidState().isEmpty());
                         // let's do some maths to get pretty fluid colors based on depth
                         color = Colors.lerpARGB(color, 0xFF000000, Mathf.clamp(0, lava ? 0.3F : 0.45F, Easing.Cubic.out(depth / 1.5F)));
                         color = Colors.setAlpha(lava ? 0xFF : (int) (Easing.Quintic.out(Mathf.clamp(0, 1, depth * 5F)) * 0xFF), color);
@@ -345,12 +346,9 @@ public class Tile {
         }
     }
 
-    private int getHeightColor(Chunk chunk, BlockPos.Mutable pos, BlockPos.Mutable pos2, int oldColor, int newColor) {
-        if (oldColor < 0 || getWorld().getChunk(pos2) instanceof EmptyChunk) {
-            return -1;
-        }
+    private int getHeightColor(Chunk chunk, Biome biome, BlockPos.Mutable pos, BlockPos.Mutable pos2, int oldColor, int newColor) {
         pos2.setY(getWorld().getChunk(pos2).sampleHeightmap(Heightmap.Type.WORLD_SURFACE, pos2.getX(), pos2.getZ()) + 1);
-        return iterateDown(getStartY(chunk, pos2)).getY() < pos.getY() ? newColor : oldColor;
+        return iterateDown(biome, getStartY(chunk, pos2)).getY() < pos.getY() ? newColor : oldColor;
     }
 
     private BlockPos.Mutable getStartY(Chunk chunk, BlockPos.Mutable pos) {
@@ -375,12 +373,12 @@ public class Tile {
         return pos;
     }
 
-    private BlockPos iterateDown(BlockPos.Mutable pos) {
+    private BlockPos iterateDown(Biome biome, BlockPos.Mutable pos) {
         BlockState state;
         do {
             pos.move(Direction.DOWN);
             state = getWorld().getBlockState(pos);
-        } while (pos.getY() > getWorld().getBottomY() && (!state.getFluidState().isEmpty() || Colors.isInvisible(getWorld(), state, pos)));
+        } while (pos.getY() > getWorld().getBottomY() && (Colors.getBlockColor(getWorld(), state, pos) <= 0 || !state.getFluidState().isEmpty()));
         return pos;
     }
 }

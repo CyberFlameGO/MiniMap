@@ -131,7 +131,7 @@ public class FullMap extends AnimatedWidget {
             matrixStack,
             this.zoomCenterX, this.zoomCenterZ,
             Monitor.width(), Monitor.height(),
-            Math.round(Monitor.width() / 2F), Math.round(Monitor.height() / 2F),
+            (int) (Monitor.width() / 2F) + 0.01F, (int) (Monitor.height() / 2F) + 0.01F, // rounding causes off by 1 issues
             this.offsetX, this.offsetZ,
             false,
             this.deltaZoom,

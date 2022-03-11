@@ -67,7 +67,7 @@ public abstract class Category extends AnimatedWidget {
         // always draw tabs
         this.tab.render(matrixStack, mouseX, mouseY, delta);
 
-        // only draw children and content if this category is selected or is animating on/off screen
+        // only draw children and content if this category is selected or is animating
         if (selected() || !animations().isEmpty()) {
             super.render(matrixStack, mouseX, mouseY, delta);
             renderContent(matrixStack, mouseX, mouseY, delta);

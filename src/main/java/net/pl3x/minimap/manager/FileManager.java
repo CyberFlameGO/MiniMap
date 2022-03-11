@@ -19,14 +19,14 @@ public class FileManager {
 
     public final Path configDir;
     public final Path configFile;
-    public final Path dataDir;
+    public final Path advancedFile;
 
     public Path tilesDir;
 
     private FileManager() {
-        this.configDir = FabricLoader.getInstance().getConfigDir();
-        this.configFile = resolve(configDir, MiniMap.MODID + ".json");
-        this.dataDir = resolve(configDir, MiniMap.MODID);
+        this.configDir = FabricLoader.getInstance().getConfigDir().resolve(MiniMap.MODID);
+        this.configFile = resolve(this.configDir, "config.json");
+        this.advancedFile = resolve(this.configDir, "advanced.json");
     }
 
     public void start() {
@@ -38,13 +38,13 @@ public class FileManager {
             if (server == null) {
                 throw new RuntimeException("Cannot obtain single player world name");
             }
-            this.tilesDir = resolve(this.dataDir, "singleplayer/" + server.getSession().getDirectoryName());
+            this.tilesDir = resolve(this.configDir, "singleplayer/" + server.getSession().getDirectoryName());
         } else {
             ServerInfo server = MiniMap.getClient().getCurrentServerEntry();
             if (server == null) {
                 throw new RuntimeException("Cannot obtain multiplayer server ip address");
             }
-            this.tilesDir = resolve(this.dataDir, "multiplayer/" + server.address);
+            this.tilesDir = resolve(this.configDir, "multiplayer/" + server.address);
         }
     }
 
